@@ -1,4 +1,4 @@
-# RCNS Social Showcase ⚡️ (Hickey Certified)
+# Rotary Nairobi South Social Showcase ⚡️ (Hickey Certified)
 
 > "Simplicity is the absence of interleaving." — Rich Hickey
 

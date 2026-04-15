@@ -1,4 +1,4 @@
-name = "rcns-showcase"
+name = "rotarynairobis"
 assets = { directory = "dist" }
 main = "server/entry.cloudflare-workers.js"
 compatibility_date = "2026-04-15"
