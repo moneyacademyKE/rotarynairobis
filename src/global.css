@@ -1,0 +1,226 @@
+/* 
+ * RCNS Social Showcase Design System
+ * 
+ * Themes are scoped by [data-theme] on the <body> tag.
+ * Root variables define the baseline, while themes override them.
+ */
+
+:root {
+  /* Fluid Typography Scale (1.25 ratio) */
+  --font-size-xs: clamp(0.64rem, 0.05vw + 0.63rem, 0.67rem);
+  --font-size-sm: clamp(0.8rem, 0.17vw + 0.76rem, 0.89rem);
+  --font-size-base: clamp(1rem, 0.34vw + 0.91rem, 1.19rem);
+  --font-size-lg: clamp(1.25rem, 0.61vw, 1.58rem);
+  --font-size-xl: clamp(1.56rem, 1vw + 1.31rem, 2.11rem);
+
+  /* Fluid Spacing Scale */
+  --space-xs: clamp(0.5rem, 0.12vw + 0.47rem, 0.56rem);
+  --space-sm: clamp(0.75rem, 0.25vw + 0.69rem, 0.88rem);
+  --space-md: clamp(1.25rem, 0.5vw + 1.13rem, 1.5rem);
+  --space-lg: clamp(2rem, 1vw + 1.75rem, 2.5rem);
+
+  --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  
+  /* Brand Constants (OKLCH for Perceptual Uniformity) */
+  --rcns-blue: oklch(45% 0.18 245);
+  --rcns-gold: oklch(85% 0.15 85);
+  --rich-black: oklch(12% 0.01 245); /* Tinted Navy Black */
+  --rich-cream: oklch(98% 0.01 245); /* Tinted Off-white */
+
+  /* Baseline Theme: Twitter-inspired but Rotary-Refined */
+  --bg-color: var(--rich-black);
+  --text-color: oklch(85% 0.01 245);
+  --text-dim: oklch(55% 0.01 245);
+  --accent-color: var(--rcns-blue);
+  --border-color: oklch(25% 0.02 245);
+  --card-bg: oklch(15% 0.02 245);
+  --tab-height: 72px;
+  --max-width: 580px;
+}
+
+[data-theme="instagram"] {
+  --bg-color: var(--rich-cream);
+  --text-color: oklch(20% 0.01 245);
+  --text-dim: oklch(50% 0.01 245);
+  --accent-color: oklch(60% 0.2 330); /* Instagram Magenta Tinted */
+  --border-color: oklch(90% 0.01 245);
+  --card-bg: var(--rich-cream);
+}
+
+[data-theme="tiktok"] {
+  --bg-color: oklch(8% 0.02 245);
+  --text-color: #ffffff;
+  --text-dim: oklch(70% 0.01 245 / 0.7);
+  --accent-color: oklch(65% 0.25 15); /* TikTok Red */
+  --border-color: oklch(100% 0 0 / 0.1);
+}
+
+[data-theme="birthdays"] {
+  --bg-color: oklch(15% 0.1 280); /* Deep Purple */
+  --text-color: var(--rcns-gold);
+  --text-dim: oklch(70% 0.05 280);
+  --accent-color: var(--rcns-gold);
+  --border-color: oklch(100% 0.15 85 / 0.2);
+}
+
+[data-theme="recaps"] {
+  --bg-color: oklch(15% 0.05 200); /* Deep Teal */
+  --text-color: oklch(85% 0.1 180);
+  --text-dim: oklch(60% 0.05 200);
+  --accent-color: oklch(80% 0.15 180);
+  --border-color: oklch(100% 0.1 180 / 0.1);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  letter-spacing: -0.011em;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+/* Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  padding-bottom: var(--tab-height);
+  width: 100%;
+}
+
+/* Typography Overrides */
+[data-theme="twitter"] .heading { font-weight: 800; }
+[data-theme="instagram"] .heading { font-family: var(--font-serif); font-weight: 400; font-size: var(--font-size-xl); }
+[data-theme="tiktok"] .heading { font-weight: 700; text-shadow: 0 0 20px oklch(65% 0.25 15 / 0.4); }
+
+/* Scroll Snap Containers */
+.snap-container {
+  height: calc(100vh - var(--tab-height));
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  background-color: var(--bg-color);
+  scroll-behavior: smooth;
+}
+
+.snap-container::-webkit-scrollbar {
+  display: none;
+}
+
+.snap-item {
+  height: calc(100vh - var(--tab-height));
+  width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grid for Instagram - Asymmetric Polish */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5px;
+  background-color: var(--border-color);
+}
+
+.grid-item {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background-color: var(--card-bg);
+  transition: transform 0.2s ease-out;
+}
+
+.grid-item:hover {
+  transform: scale(0.98);
+}
+
+.grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Feed Styles - Modern Editorial Rhythm */
+.feed-item {
+  border-bottom: 1px solid var(--border-color);
+  padding: var(--space-md) var(--space-sm);
+  display: flex;
+  gap: var(--space-sm);
+  transition: background-color 0.2s ease;
+  animation: feed-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.feed-item:nth-child(1) { animation-delay: 0.05s; }
+.feed-item:nth-child(2) { animation-delay: 0.1s; }
+.feed-item:nth-child(3) { animation-delay: 0.15s; }
+.feed-item:nth-child(4) { animation-delay: 0.2s; }
+.feed-item:nth-child(5) { animation-delay: 0.25s; }
+
+.feed-item:hover {
+  background-color: oklch(from var(--bg-color) calc(l + 0.02) c h);
+}
+
+@keyframes feed-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.avatar {
+  width: clamp(32px, 2vw + 32px, 48px);
+  height: clamp(32px, 2vw + 32px, 48px);
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px var(--border-color);
+}
+
+/* Animations */
+@keyframes heart {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.animate-heart {
+  animation: heart 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Utils */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

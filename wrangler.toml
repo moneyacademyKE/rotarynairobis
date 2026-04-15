@@ -1,0 +1,29 @@
+name = "rcns-showcase"
+assets = { directory = "dist" }
+main = "server/entry.cloudflare-workers.js"
+compatibility_date = "2026-04-15"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rcns_db"
+database_id = "2353e3b0-47a4-4fad-bbdf-11d02e3037d6"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "f92d9b7c7de04b4eaa0fba93f36c95bb"
+
+[placement]
+mode = "smart"
+
+[[queues.producers]]
+binding = "CLASSIFY_QUEUE"
+queue = "rcns-classify-queue"
+
+[[queues.consumers]]
+queue = "rcns-classify-queue"
+max_batch_size = 5
+max_batch_timeout = 5
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "nai-media"
