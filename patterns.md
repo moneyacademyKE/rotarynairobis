@@ -173,4 +173,28 @@
 - **Consistency**: High-impact brand presence on all tabs.
 - **Experience**: The brand "feels" premium as it floats independently of the content scroll.
 - **Rich Hickey Quality**: De-complects the *Identity of the Site* from the *Content of the Platform*.
+ 
++## Pattern: The Epochal Ingestion Ledger (Telegram Facts)
++**Problem**: Third-party event streams (Telegram) are ephemeral and mutating. If we only store the "current state" of a post, we lose the historical context or the ability to re-process the raw data if our classification logic improves.
++
++**Solution**:
++1.  **Raw Fact Accession**: Every incoming webhook payload is immediately persisted to `telegram_raw_facts` as a JSON blob + `update_id`.
++2.  **Point-in-Time Projection**: A secondary process (or trigger) transforms these raw facts into the unified `posts_facts` ledger.
++3.  **Immutability**: We never "update" a Telegram post; we append a new fact if the message is edited, and the D1 `VIEW` resolves the most recent one.
++
++**Benefits**:
++- **Rich Hickey Quality**: De-complects "Event Reception" from "Data Interpretation."
++- **Auditability**: We can replay the entire Telegram history from raw JSON at any time.
++
++## Pattern: The Media Pull-Through Bridge
++**Problem**: Telegram media links are temporary (ephemeral). We need a permanent "Fact" of the media in our own infrastructure (R2).
++
++**Solution**:
++1.  **Metadata Fetch**: Use `getFile` to retrieve the internal Telegram path.
++2.  **R2 Proxy**: The worker fetches the bytes from Telegram and `put`s them into R2 using a `telegram_` prefix based on the `file_unique_id`.
++3.  **Unified URI**: The `posts_facts` table stores the R2 filename, allowing the standard `/photos/*` proxy to serve it.
++
++**Benefits**:
++- **Persistence**: Media survives even if the original Telegram message is deleted.
++- **Simplicity**: No complex client-side upload logic; the server handles the data migration.
 

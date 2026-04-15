@@ -24,6 +24,13 @@ CREATE TABLE IF NOT EXISTS posts_facts (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS telegram_raw_facts (
+    tx_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    update_id INTEGER UNIQUE NOT NULL,
+    raw_json TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 2. Create Current State Views (Resolves Epochal Time)
 DROP VIEW IF EXISTS media;
 CREATE VIEW media AS
@@ -67,5 +74,6 @@ CREATE INDEX IF NOT EXISTS idx_posts_facts_entity ON posts_facts(id, tx_id DESC)
 -- View indexes are virtual, so we index the underlying facts that build the view bounds.
 CREATE INDEX IF NOT EXISTS idx_media_facts_type ON media_facts(type);
 CREATE INDEX IF NOT EXISTS idx_posts_facts_account ON posts_facts(account);
+CREATE INDEX IF NOT EXISTS idx_telegram_raw_update_id ON telegram_raw_facts(update_id);
 
 

@@ -56,6 +56,11 @@
 - **Z-Index Layering**: Keeping the floating logo at a higher `z-index` (200) than the content but lower than the navigation (100) ensures visual hierarchy is preserved during the scroll.
 - **Pointer Events**: Setting `pointer-events: none` on the floating header container while keeping `pointer-events: auto` on the logo link allows users to scroll content "through" the negative space of the branding layer.
 
+## Stateless Telegram Ingestion (Webhook API v7+)
+- **Fact Accretion**: Storing the raw Telegram `Update` JSON in `telegram_raw_facts` before processing ensures we never lose the original context of a message, fulfilling the "Epochal Time" requirement.
+- **Media Pull Pattern**: Instead of expecting the client to upload media, the server "pulls" from Telegram's `getFile` API, then proxies it to R2. This de-complects "Receiving" from "Storing."
+- **Secret Verification**: Using `X-Telegram-Bot-Api-Secret-Token` provides a lightweight security boundary for stateless webhooks in a serverless environment without needing heavy session middleware.
+
 ## Rich Hickey Quality
-- The system is now a pure projector of three distinct fact streams: D1 (Meta), KV (Cache), and R2 (Media).
+- The system is now a pure projector of four distinct fact streams: D1 (Meta), KV (Cache), R2 (Media), and Telegram (Ingestion).
 - The deployment artifact remains lean (<1MB), fulfilling the "Simple Made Easy" ideal.
