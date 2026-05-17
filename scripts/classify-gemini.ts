@@ -12,27 +12,23 @@ const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" 
 const PHOTOS_DIR = path.join(process.cwd(), 'public/photos');
 const MANIFEST_PATH = path.join(process.cwd(), 'src/data/media-classification.json');
 
-const PROMPT = `
-You are a high-fidelity visual auditor for the Rotary Club of Nairobi South. 
-Your task is to classify images into one of four distinct categories based on their visual content.
+const PROMPT = `You are an elite AI visual classifier and metadata extractor for the Rotary Club of Nairobi South.
+Analyze the provided image and classify it into one of four exclusive categories:
 
-Categories:
-1. EVENT_POSTER: This is an upcoming event announcement flyer. It MUST have explicit markers for "Date" and "Venue"/"Location".
-2. BIRTHDAY: This is a birthday celebration graphic. It MUST explicitly contain the word "Birthday".
-3. EVENT_RECAP: This is a retrospective summary of a past event. It is usually a collage of photos or a "Moments" / "Highlights" graphic. It should NOT be an upcoming announcement.
-4. PHOTO: This is regular, raw photography of people, meetings, or club fellowship. It is not a designed graphic.
+1. EVENT_POSTER: An upcoming event announcement flyer, calendar, or registration invite. Typically has a title, date, time, venue, or speaker.
+2. BIRTHDAY: A graphic specifically celebrating a member's birthday or anniversary, explicitly mentioning "Birthday" or "Happy Birthday".
+3. EVENT_RECAP: A retrospective graphic summarizing a past meeting, project, or event (e.g., photo collage, "Thank You", "Moments", "Highlights" banners). Not an upcoming invitation.
+4. PHOTO: Raw, unedited, or non-designed photographic captures of people, fellowship meetings, projects, or actual activities. No heavy designed graphics overlay.
 
-Instructions:
-- Analyze the image carefully.
-- Extract any key text visible in the image as a "snippet" (max 100 characters).
-- Assign the category based on the rules above.
+Extraction Rule for "snippet":
+- If the image contains text, extract the main heading, date, speaker, or celebration message (max 120 chars).
+- If it is a PHOTO with no readable overlay text, describe the visual scene concisely (e.g., "Members planting trees", "Club assembly group photo") (max 120 chars).
 
-Output format (strict JSON):
+You MUST return a strict, minified JSON object with no markdown block formatting:
 {
-  "type": "CATEGORY_NAME",
-  "snippet": "visible text..."
-}
-`;
+  "type": "EVENT_POSTER" | "BIRTHDAY" | "EVENT_RECAP" | "PHOTO",
+  "snippet": "concise text or description"
+}`;
 
 function fileToBase64(filePath: string): string {
   return fs.readFileSync(filePath).toString('base64');
