@@ -1,0 +1,63 @@
+import { describe, it, expect, vi } from "vitest";
+
+describe("AI Reprocessing Endpoint", () => {
+  it("should fail with 401 if secret token does not match environment", async () => {
+    const jsonMock = vi.fn();
+    const mockPlatform = {
+      env: {
+        TELEGRAM_SECRET_TOKEN: "secure_token"
+      }
+    };
+    const request = new Request("http://localhost/api/reprocess?secret=wrong");
+
+    const { onGet } = await import("./index");
+    await onGet({ request, platform: mockPlatform, json: jsonMock } as any);
+    expect(jsonMock).toHaveBeenCalledWith(401, expect.objectContaining({ error: "Unauthorized" }));
+  });
+
+  it("should successfully fetch and enqueue the last 50 images", async () => {
+    const jsonMock = vi.fn();
+    const mockSend = vi.fn();
+    
+    const mockResults = [
+      { id: 1, file_name: "photo_1.jpg" },
+      { id: 2, file_name: "photo_2.jpg" }
+    ];
+
+    const mockDB = {
+      prepare: vi.fn().mockReturnValue({
+        all: vi.fn().mockResolvedValue({ results: mockResults })
+      })
+    };
+
+    const mockPlatform = {
+      env: {
+        TELEGRAM_SECRET_TOKEN: "secure_token",
+        DB: mockDB,
+        CLASSIFY_QUEUE: {
+          send: mockSend
+        }
+      }
+    };
+
+    const request = new Request("http://localhost/api/reprocess?secret=secure_token");
+
+    const { onGet } = await import("./index");
+    await onGet({ request, platform: mockPlatform, json: jsonMock } as any);
+
+    expect(mockDB.prepare).toHaveBeenCalled();
+    expect(mockSend).toHaveBeenCalledTimes(2);
+    expect(mockSend).toHaveBeenNthCalledWith(1, {
+      fileName: "photo_1.jpg",
+      imageUrl: "http://localhost/photos/photo_1.jpg"
+    });
+
+    expect(jsonMock).toHaveBeenCalledWith(
+      200,
+      expect.objectContaining({
+        status: "Success",
+        message: expect.stringContaining("Enqueued 2 images")
+      })
+    );
+  });
+});
