@@ -2,6 +2,58 @@ import type { RequestHandler } from "@builder.io/qwik-city";
 import { getFile, getDownloadUrl } from "../../../lib/telegram";
 
 /**
+ * Self-Healing Webhook & Diagnostics Endpoint
+ * Resolves ingestion staleness by inspecting Telegram's Bot API and 
+ * automatically aligning the webhook to the worker's current active origin.
+ */
+export const onGet: RequestHandler = async ({ request, platform, json }) => {
+  const env = platform.env as any;
+  const botToken = env.TELEGRAM_BOT_TOKEN;
+
+  if (!botToken) {
+    json(500, { error: "TELEGRAM_BOT_TOKEN is not configured in environment bindings" });
+    return;
+  }
+
+  const requestUrl = new URL(request.url);
+  const targetWebhookUrl = `${requestUrl.origin}/api/telegram`;
+
+  // Fetch current webhook info from Telegram
+  const infoRes = await fetch(`https://api.telegram.org/bot${botToken}/getWebhookInfo`);
+  const info = await infoRes.json() as any;
+
+  let healStatus = "Webhook is perfectly aligned. No action needed.";
+
+  if (info.ok && info.result.url !== targetWebhookUrl) {
+    const secretToken = env.TELEGRAM_SECRET_TOKEN || "test_secret_token";
+    const setRes = await fetch(
+      `https://api.telegram.org/bot${botToken}/setWebhook`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: targetWebhookUrl,
+          secret_token: secretToken,
+          allowed_updates: ["channel_post", "edited_channel_post"]
+        })
+      }
+    );
+    const setInfo = await setRes.json() as any;
+    healStatus = setInfo.ok 
+      ? `Successfully healed! Updated webhook URL to: ${targetWebhookUrl}` 
+      : `Failed to update webhook: ${setInfo.description}`;
+  }
+
+  json(200, {
+    status: "Healthy",
+    target_webhook_url: targetWebhookUrl,
+    telegram_webhook_info: info.result,
+    heal_status: healStatus,
+    database_facts_count: await env.DB.prepare("SELECT COUNT(*) as count FROM telegram_raw_facts").first("count")
+  });
+};
+
+/**
  * Telegram Webhook Ingestion Endpoint (Rich Hickey "Epochal Time" Style)
  */
 export const onPost: RequestHandler = async ({ request, platform, json }) => {

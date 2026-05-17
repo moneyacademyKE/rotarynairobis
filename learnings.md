@@ -62,5 +62,11 @@
 - **Secret Verification**: Using `X-Telegram-Bot-Api-Secret-Token` provides a lightweight security boundary for stateless webhooks in a serverless environment without needing heavy session middleware.
 
 ## Rich Hickey Quality
-- The system is now a pure projector of four distinct fact streams: D1 (Meta), KV (Cache), R2 (Media), and Telegram (Ingestion).
+- The system is now a pure projector of five distinct fact streams: D1 (Meta), KV (Cache), R2 (Media), Telegram (Ingestion), and Orama (Transient Search).
 - The deployment artifact remains lean (<1MB), fulfilling the "Simple Made Easy" ideal.
+
+## Transient Edge Search
+- **Zero-Accidental Complexity**: By creating a transient in-memory search context on-demand at edge runtime, we completely de-complect "persistence storage" from "search lookup." There is no need for persistent index files, webhook synchronization triggers, or distributed consensus.
+- **Pure Value Ingestion**: Validating D1 SQLite database records through Zod specification boundaries (`parseD1PostRows`) before entering Orama guarantees type-safety and visual reliability at the rendering layer.
+- **Resource Footprint**: Garbage collection of the Orama index at query termination prevents memory leaks and scales perfectly inside Cloudflare Workers isolates.
+

@@ -23,6 +23,7 @@ export const usePlatformTheme = routeLoader$(({ url }) => {
   if (path.includes('/tiktok')) return 'tiktok';
   if (path.includes('/birthdays')) return 'birthdays';
   if (path.includes('/recaps')) return 'recaps';
+  if (path.includes('/search')) return 'twitter';
   return 'twitter';
 });
 
@@ -82,6 +83,14 @@ export default component$(() => {
         >
           <span class="icon">🎞️</span>
           <span class="label">Recaps</span>
+        </a>
+        <a 
+          href="/search/" 
+          class={["nav-item", loc.url.pathname.includes('/search') ? "active" : ""]}
+          aria-label="Search"
+        >
+          <span class="icon">🔍</span>
+          <span class="label">Search</span>
         </a>
       </nav>
 

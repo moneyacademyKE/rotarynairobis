@@ -5,12 +5,15 @@ import { parseD1PostRows } from "../../domain/specs";
 export const usePosts = routeLoader$(async ({ platform }) => {
   const db = platform.env.DB;
   
-  // Clean 'Home' feed: Text-only OR raw Photos (excluding Posters/Birthdays/Recaps)
+  // Clean 'Home' feed: Text-only upcoming rotary club events (EVENT_POSTER)
   const { results } = await db.prepare(`
     SELECT p.* 
     FROM posts p
-    LEFT JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
-    WHERE m.id IS NULL OR m.type = 'PHOTO'
+    JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
+    WHERE m.type = 'EVENT_POSTER' 
+      AND p.text IS NOT NULL 
+      AND p.text != '' 
+      AND p.text NOT LIKE 'Legacy media archive%'
     GROUP BY p.id
     ORDER BY p.id DESC
   `).all();
@@ -23,7 +26,7 @@ export default component$(() => {
   return (
     <div class="twitter-feed">
       <header class="feed-header">
-        <h1 class="heading">Home</h1>
+        <h1 class="heading">Upcoming Events</h1>
       </header>
       
       {posts.value.map((post: any) => (
@@ -34,17 +37,17 @@ export default component$(() => {
               <span class="account-name">{post.account || 'rcns'}</span>
               <span class="handle">@{post.account?.toLowerCase().replace(/\s+/g, '') || 'rcns'}</span>
               <span class="dot">·</span>
-              <span class="date">{post.date}</span>
+              <span class="date">{post.date || 'Today'}</span>
             </div>
             
             <div class="post-body">
               {post.isAnalytics ? (
                 <div class="analytics-report">
                   <div class="report-header">📊 Statistics Report</div>
-                  <pre class="report-content">{post.text.replace(/#\w+/g, '')}</pre>
+                  <pre class="report-content">{post.text ? post.text.replace(/#\w+/g, '') : ''}</pre>
                 </div>
               ) : (
-                <p class="post-text">{post.text.replace(/#\w+/g, '')}</p>
+                <p class="post-text">{post.text ? post.text.replace(/#\w+/g, '') : ''}</p>
               )}
             </div>
             

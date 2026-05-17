@@ -5,12 +5,12 @@ import { parseInstagramRows } from "../../domain/specs";
 export const useInstagramData = routeLoader$(async ({ platform }) => {
   const db = platform.env.DB;
   
-  // Pure Fellowship Photos (excluding all designed Graphics/Posters)
+  // All active visual media (excluding FAILED classifications), images only, no text
   const { results } = await db.prepare(`
     SELECT p.*, m.file_name as photo_src
     FROM posts p
     JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
-    WHERE m.type = 'PHOTO'
+    WHERE m.type != 'FAILED'
     ORDER BY p.id DESC
   `).all();
   
@@ -24,6 +24,34 @@ export default component$(() => {
   
   return (
     <div class="instagram-profile">
+      <header class="profile-header">
+        <div class="profile-top">
+          <div class="profile-avatar"></div>
+          <div class="profile-stats">
+            <div class="stat">
+              <strong>{data.value.allPhotos.length}</strong>
+              <div>posts</div>
+            </div>
+            <div class="stat">
+              <strong>85</strong>
+              <div>members</div>
+            </div>
+            <div class="stat">
+              <strong>1.2K</strong>
+              <div>followers</div>
+            </div>
+          </div>
+        </div>
+        <div class="profile-info">
+          <h2 class="full-name">Rotary Club of Nairobi South</h2>
+          <p class="bio">Service Above Self 🌟 • Edge-native showcase capturing fellowship, service projects, and club celebrations in District 9212.</p>
+        </div>
+      </header>
+
+      <div class="view-toggle">
+        <button class="active">📷 Photos</button>
+      </div>
+
       <div class="grid-container">
         {data.value.allPhotos.map((photo, i) => (
           <div key={i} class="grid-item">

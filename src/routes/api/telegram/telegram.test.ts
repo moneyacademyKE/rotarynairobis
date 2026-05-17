@@ -76,4 +76,14 @@ describe("Telegram Webhook Ingestion (TDD Green)", () => {
     // Verify Account is null (No Attribution)
     expect((mockPlatform.env.DB.prepare as any)).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO posts"));
   });
+
+  it("should fail gracefully if TELEGRAM_BOT_TOKEN is missing in environment", async () => {
+    const jsonMock = vi.fn();
+    const badPlatform = { env: { DB: mockPlatform.env.DB } };
+    const request = new Request("http://localhost/api/telegram");
+
+    const { onGet } = await import("./index");
+    await onGet({ request, platform: badPlatform, json: jsonMock } as any);
+    expect(jsonMock).toHaveBeenCalledWith(500, expect.objectContaining({ error: expect.stringContaining("TELEGRAM_BOT_TOKEN") }));
+  });
 });
