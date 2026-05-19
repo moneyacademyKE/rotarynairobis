@@ -22,7 +22,7 @@ export const usePosts = routeLoader$(async ({ platform }) => {
 });
 
 // Robust date extraction from social event flyer copy
-function parseEventDate(text: string): Date | null {
+export function parseEventDate(text: string): Date | null {
   const months = [
     "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december",
     "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
@@ -41,7 +41,7 @@ function parseEventDate(text: string): Date | null {
     if (!isNaN(date.getTime())) return date;
   }
   
-  const regex1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s*,\s*(\d{4}))?/i;
+  const regex1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})(?!\d)(?:st|nd|rd|th)?(?:\s*(?:,\s*)?(\d{4}))?/i;
   const match1 = lowercase.match(regex1);
   if (match1) {
     const monthStr = match1[1].slice(0, 3).toLowerCase();
@@ -52,13 +52,13 @@ function parseEventDate(text: string): Date | null {
     if (!isNaN(date.getTime())) return date;
   }
 
-  const regex2 = /(\d{1,2})(?:st|nd|rd|th)?(?:\s+of)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*/i;
+  const regex2 = /(\d{1,2})(?!\d)(?:st|nd|rd|th)?(?:\s+of)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*(?:\s*(?:,\s*)?(\d{4}))?/i;
   const match2 = lowercase.match(regex2);
   if (match2) {
     const day = parseInt(match2[1], 10);
     const monthStr = match2[2].slice(0, 3).toLowerCase();
     const monthIndex = months.indexOf(monthStr) % 12;
-    const year = 2026;
+    const year = match2[3] ? parseInt(match2[3], 10) : 2026;
     const date = new Date(year, monthIndex, day);
     if (!isNaN(date.getTime())) return date;
   }
@@ -66,7 +66,7 @@ function parseEventDate(text: string): Date | null {
   return null;
 }
 
-function formatExtractedDate(date: Date | null): string {
+export function formatExtractedDate(date: Date | null): string {
   if (!date) return "";
   return date.toLocaleDateString("en-US", {
     month: "long",
@@ -75,7 +75,13 @@ function formatExtractedDate(date: Date | null): string {
   });
 }
 
-function reformatEventText(text: string, account: string): string {
+export function reformatEventText(text: string, account: string): string {
+  // If the text is already formatted as "The Rotary Club of ... will be hosting ..." or similar, return it directly!
+  if (/^the\s+rotary\s+club\s+of\s+.*(?:will\s+be\s+hosting|invites\s+you\s+to)/i.test(text.trim())) {
+    const trimmed = text.trim();
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  }
+
   const lowercase = text.toLowerCase();
   
   // 1. Extract Club Name
@@ -98,21 +104,19 @@ function reformatEventText(text: string, account: string): string {
   // 2. Extract Speaker
   let speaker = "";
   const speakerRegexes = [
-    /guest\s+speaker:?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
-    /speaker:?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
-    /host(?:ing)?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
-    /keynote\s+by\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
-    /facilitator:?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/
+    /(?:featuring|facilitated\s+by|speaker|keynote\s+by):?\s*([A-Z][a-zA-Z\s.,&]+?)(?=\s+at|\s+from|\s+on|\.|\n|$)/i
   ];
   
   for (const regex of speakerRegexes) {
     const match = text.match(regex);
     if (match && match[1]) {
-      const val = match[1].trim();
+      let val = match[1].trim();
+      val = val.replace(/^(?:presidents?|rtn\.?|dr\.?|mr\.?|mrs\.?|ms\.?|prof\.?)\s+/i, "").trim();
       const forbidden = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", 
                          "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December",
-                         "Rotary", "Club", "Nairobi", "District", "President", "Director", "Fellowship", "Join", "Zoom", "Meeting"];
-      if (!forbidden.some(word => val.includes(word))) {
+                         "Rotary", "Club", "Nairobi", "District", "Fellowship", "Join", "Zoom", "Meeting"];
+      const hasForbidden = forbidden.some(word => new RegExp(`\\b${word}\\b`, "i").test(val));
+      if (!hasForbidden && val.length > 2) {
         speaker = val;
         break;
       }
@@ -132,20 +136,28 @@ function reformatEventText(text: string, account: string): string {
     if (onMatch && onMatch[1]) {
       topic = onMatch[1].trim();
     } else {
-      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      if (lines.length > 0 && lines[0].length < 80 && !lines[0].toLowerCase().includes("instagram") && !lines[0].toLowerCase().includes("facebook")) {
-        topic = lines[0].replace(/#\w+/g, '').trim();
+      const segments = text.split(/[.,\n]/).map(s => s.trim()).filter(s => s.length > 0);
+      if (segments.length > 0) {
+        let candidate = segments[0];
+        const clubEscaped = clubName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const clubPrefixRegex = new RegExp(`^(?:the\\s+)?rotary\\s+club\\s+of\\s+(?:${clubEscaped}|[A-Za-z0-9]+)\\s*(?:to\\s+host|hosts)?`, "i");
+        candidate = candidate.replace(clubPrefixRegex, "");
+        candidate = candidate.trim();
+        if (candidate.length >= 4 && candidate.length <= 60) {
+          topic = candidate.charAt(0).toUpperCase() + candidate.slice(1);
+        }
       }
     }
   }
 
   // 4. Extract Venue
   let venue = "our fellowship venue";
-  const venueRegex = /at\s+([A-Z][A-Za-z0-9\s,]{3,50?})(?=\s+from|\s+on|\s+at|\.|\n)/;
+  const venueRegex = /at\s+([A-Z0-9][A-Za-z0-9\s-]{2,50})(?=\s+(?:from|on|at|fellowship)|\.|\n|,|$)/i;
   const venueMatch = text.match(venueRegex);
   if (venueMatch && venueMatch[1]) {
     const val = venueMatch[1].trim();
-    if (!["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].includes(val)) {
+    const forbidden = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Zoom"];
+    if (!forbidden.includes(val)) {
       venue = val;
     }
   } else {
@@ -158,10 +170,11 @@ function reformatEventText(text: string, account: string): string {
 
   // 5. Extract Time
   let time = "6:00 PM";
-  const timeRegex = /(?:from|at)\s+(\d{1,2}(?::\d{2})?\s*(?:AM|PM|am|pm))/i;
+  const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:AM|PM|am|pm))\b/i;
   const timeMatch = text.match(timeRegex);
   if (timeMatch && timeMatch[1]) {
-    time = timeMatch[1].trim().toUpperCase();
+    const rawTime = timeMatch[1].trim().toUpperCase();
+    time = rawTime.replace(/(\d)(AM|PM)/, "$1 $2");
   }
 
   // 6. Extract Day and Date
@@ -197,7 +210,7 @@ function reformatEventText(text: string, account: string): string {
   }
 
   if (!speaker && topic) {
-    const isSpecialEvent = ["assembly", "visit", "night", "project", "celebration", "fellowship", "calendar", "board"].some(w => topic.toLowerCase().includes(w));
+    const isSpecialEvent = ["assembly", "visit", "night", "project", "celebration", "fellowship", "calendar", "board", "installation"].some(w => topic.toLowerCase().includes(w));
     if (isSpecialEvent) {
       return `The Rotary Club of ${clubName} will be hosting the '${topic}' event at ${venue} from ${time} on ${dayDate}.`;
     }

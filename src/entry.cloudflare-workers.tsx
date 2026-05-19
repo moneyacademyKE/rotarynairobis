@@ -51,8 +51,13 @@ Analyze the provided image and classify it into one of four exclusive categories
 4. PHOTO: Raw, unedited, or non-designed photographic captures of people, fellowship meetings, projects, or actual activities. No heavy designed graphics overlay.
 
 Extraction Rule for "snippet":
-- If the image contains text, extract the main heading, date, speaker, or celebration message (max 120 chars).
-- If it is a PHOTO with no readable overlay text, describe the visual scene concisely (e.g., "Members planting trees", "Club assembly group photo") (max 120 chars).
+- If it is EVENT_POSTER: Generate a complete, natural event description sentence using the following fluid templates (do not truncate):
+  - If there is a speaker and a topic: "The Rotary Club of <Club Name> will be hosting <Speaker Name> to present on '<Topic>' at <Venue> from <Time> on <DayOfWeek, Month Day, Year>."
+  - If there is a speaker but no topic: "The Rotary Club of <Club Name> will be hosting <Speaker Name> at <Venue> from <Time> on <DayOfWeek, Month Day, Year>."
+  - If there is no speaker but a topic (e.g., club assemblies, movie nights, fellowship meetings): "The Rotary Club of <Club Name> will be hosting the '<Topic>' event at <Venue> from <Time> on <DayOfWeek, Month Day, Year>."
+  - If there is no speaker and no topic: "The Rotary Club of <Club Name> invites you to a fellowship gathering at <Venue> from <Time> on <DayOfWeek, Month Day, Year>."
+  - Resolve the weekday prefix of the date (e.g. "Friday" for "February 20, 2026"). If a detail like venue is missing, use "our fellowship venue" or fallback to what is readable on the image. If time is missing, use "6:00 PM".
+- If it is BIRTHDAY, EVENT_RECAP, or PHOTO: Write a concise text description or celebration message (max 120 chars).
 
 You MUST return a strict, minified JSON object with no markdown block formatting:
 {

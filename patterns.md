@@ -265,3 +265,17 @@
 - **Performance**: Zero extra DOM element footprint for each card on the page; modal markup is rendered exactly once.
 - **Experience**: The user gets a smooth, desktop-grade slide-out panel that preserves scroll position and keeps the feed immediately accessible.
 
+
+## Pattern: The Fluid Event Text Extractor (Double-Layer Fact Formatting)
+**Problem**: Raw image text extraction (OCR/AI) is highly unstructured, yielding inconsistent dates, missing venues, and variable speaker formats. Directly rendering these raw snippets results in a chaotic, unpolished layout full of default fallback placeholders (like "our fellowship venue" or "February 20, 2026").
+
+**Solution**:
+1. **Fluid Output Prompts**: Modify the Gemini extraction prompt to output a fully structured, natural English event sentence directly inside the queue consumer using a set of strictly defined templates (e.g., speaker + topic, speaker only, special events, or generic fellowship).
+2. **On-the-Fly Formatting Mirror**: Implement a matching parsing helper (`reformatEventText`) in the frontend route loader that runs the exact same regex-based restructuring on raw database text values.
+3. **Double-Layer Fact Protection**: The combination of both layers ensures that newly ingested items are stored pre-formatted directly by the AI, while legacy database rows are formatted dynamically on-the-fly, producing a clean UI.
+
+**Benefits**:
+- **Simplicity**: No complex relational tables required for individual event attributes (venue, speaker, date, time); everything is parsed into a single human-readable and structured event statement.
+- **Factuality**: Avoids generic placeholders, formatting every event announcement to sound premium and natural.
+- **TDD Verification**: The entire parser is validated using Vitest and E2E Playwright suites to guarantee formatting correctness before pushing to production.
+

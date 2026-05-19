@@ -85,3 +85,8 @@
 - **Top Navigation Category Pills**: Transitioning mobile layout from bottom navigation tabs to top-aligned horizontal category pills enhances visual spacing and aligns with premium desktop editorial styling.
 - **Global Context-Driven Drawer**: Centralizing slide-out detail views in a root layout panel using Qwik's `createContextId` and `useContextProvider` decouples individual cards from drawer logic. Pages simply populate the shared store to render previews, details, and captions dynamically.
 
+## Structured Event Text Extraction (Flyer Parsing & Re-formatting)
+- **Fluid Format Formatting**: When converting event announcement text/images to structural text, using a fluid template hierarchy that scales based on available details (speaker + topic, speaker only, topic only, or general fellowship) ensures the frontend remains factual and clean without default "unknown" or "undefined" markers.
+- **TDD Parser Hardening**: Ingesting raw visual text snippets often yields fragmented time strings (e.g. `7:00pm` vs `6:00 PM`) and mixed date formats (e.g. `16 April 2026` vs `25th July`). Writing unit tests for date-parsing and text formatting, and using robust Regexes to normalize them (like inserting space before AM/PM), provides bulletproof UI outputs.
+- **Gemini Direct Output vs On-The-Fly Loading**: By feeding the exact fluid sentence templates directly into the Gemini queue consumer prompt, the AI-generated snippets are persisted in the final formatted state. A mirroring utility (using the same parsing rules) runs in the frontend loader to gracefully handle any legacy database rows, creating a seamless dual-layer fact preservation system.
+
