@@ -5,12 +5,12 @@ import { parseInstagramRows } from "../../domain/specs";
 export const useInstagramData = routeLoader$(async ({ platform }) => {
   const db = platform.env.DB;
   
-  // All active visual media (excluding FAILED classifications), images only, no text
+  // Visual media classified strictly as PHOTO (excluding posters, recaps, birthdays to prevent cross-tab duplication)
   const { results } = await db.prepare(`
     SELECT p.*, m.file_name as photo_src
     FROM posts p
     JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
-    WHERE m.type != 'FAILED'
+    WHERE m.type = 'PHOTO'
     ORDER BY p.id DESC
   `).all();
   
