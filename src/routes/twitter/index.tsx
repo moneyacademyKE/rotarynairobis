@@ -64,6 +64,113 @@ function formatExtractedDate(date: Date | null): string {
   });
 }
 
+function reformatEventText(text: string, account: string): string {
+  const lowercase = text.toLowerCase();
+  
+  // 1. Extract Club Name
+  const accountClean = (account || 'rcns').toLowerCase().replace(/[^a-z0-9]/g, '');
+  let clubName = "Nairobi South";
+  if (accountClean.includes("muthaiga")) clubName = "Nairobi Muthaiga";
+  else if (accountClean.includes("upperhill")) clubName = "Nairobi Upper Hill";
+  else if (accountClean.includes("ngong")) clubName = "Ngong Road";
+  else if (accountClean.includes("syokimau")) clubName = "Syokimau";
+  else if (accountClean.includes("thika")) clubName = "Nairobi Thika Road";
+  else if (accountClean.includes("metropolitan")) clubName = "Nairobi Metropolitan";
+  else if (accountClean.includes("nairobi")) clubName = "Nairobi";
+  
+  const clubRegex = /rotary\s+club\s+of\s+([A-Za-z\s]+?)(?:\s+hosts|\s+invites|\s+will|\s+is|\.|\n)/i;
+  const clubMatch = text.match(clubRegex);
+  if (clubMatch && clubMatch[1].trim().length > 3 && clubMatch[1].trim().length < 30) {
+    clubName = clubMatch[1].trim();
+  }
+
+  // 2. Extract Speaker
+  let speaker = "a guest speaker";
+  const speakerRegexes = [
+    /guest\s+speaker:?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
+    /speaker:?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
+    /host(?:ing)?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
+    /keynote\s+by\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
+    /facilitator:?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/
+  ];
+  
+  for (const regex of speakerRegexes) {
+    const match = text.match(regex);
+    if (match && match[1]) {
+      const val = match[1].trim();
+      const forbidden = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", 
+                         "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December",
+                         "Rotary", "Club", "Nairobi", "District", "President", "Director", "Fellowship", "Join", "Zoom", "Meeting"];
+      if (!forbidden.some(word => val.includes(word))) {
+        speaker = val;
+        break;
+      }
+    }
+  }
+
+  // 3. Extract Topic
+  let topic = "a special topic";
+  const topicQuotesRegex = /['"“‘]([^'"”’\n]{5,100})['"”’]/;
+  const topicOnRegex = /(?:present\s+on|speaking\s+on|topic:?)\s+['"“‘]?([^'"”’\n.]{5,100})['"”’]?/i;
+  
+  const quotesMatch = text.match(topicQuotesRegex);
+  if (quotesMatch && quotesMatch[1]) {
+    topic = `'${quotesMatch[1].trim()}'`;
+  } else {
+    const onMatch = text.match(topicOnRegex);
+    if (onMatch && onMatch[1]) {
+      topic = `'${onMatch[1].trim()}'`;
+    } else {
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length > 0 && lines[0].length < 80 && !lines[0].toLowerCase().includes("instagram") && !lines[0].toLowerCase().includes("facebook")) {
+        topic = `'${lines[0].replace(/#\w+/g, '').trim()}'`;
+      }
+    }
+  }
+
+  // 4. Extract Venue
+  let venue = "our fellowship venue";
+  const venueRegex = /at\s+([A-Z][A-Za-z0-9\s,]{3,50?})(?=\s+from|\s+on|\s+at|\.|\n)/;
+  const venueMatch = text.match(venueRegex);
+  if (venueMatch && venueMatch[1]) {
+    const val = venueMatch[1].trim();
+    if (!["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].includes(val)) {
+      venue = val;
+    }
+  } else {
+    if (lowercase.includes("zoom")) venue = "Zoom (Virtual)";
+    else if (lowercase.includes("braeburn")) venue = "Braeburn Theatre, Gitanga Road";
+    else if (lowercase.includes("radisson")) venue = "Radisson Blu, Upper Hill";
+    else if (lowercase.includes("laico")) venue = "Laico Regency";
+    else if (lowercase.includes("serena")) venue = "Nairobi Serena Hotel";
+  }
+
+  // 5. Extract Time
+  let time = "6:00 PM";
+  const timeRegex = /(?:from|at)\s+(\d{1,2}(?::\d{2})?\s*(?:AM|PM|am|pm))/i;
+  const timeMatch = text.match(timeRegex);
+  if (timeMatch && timeMatch[1]) {
+    time = timeMatch[1].trim().toUpperCase();
+  }
+
+  // 6. Extract Day and Date
+  let dayDate = "February 20, 2026";
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const parsed = parseEventDate(text);
+  if (parsed) {
+    const monthName = months[parsed.getMonth()];
+    dayDate = `${monthName} ${parsed.getDate()}, ${parsed.getFullYear()}`;
+  } else {
+    const dateRegex = /on\s+([A-Z][a-z]+\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,\s*\d{4})?)/i;
+    const dateMatch = text.match(dateRegex);
+    if (dateMatch && dateMatch[1]) {
+      dayDate = dateMatch[1].trim();
+    }
+  }
+
+  return `The Rotary Club of ${clubName} will be hosting ${speaker} to present on ${topic} at ${venue} from ${time} on ${dayDate}.`;
+}
+
 export default component$(() => {
   const posts = usePosts();
   const drawerState = useContext(DrawerContext);
@@ -122,6 +229,7 @@ export default component$(() => {
               upcoming.map((post) => {
                 const eventDate = parseEventDate(post.text || "");
                 const displayDate = formatExtractedDate(eventDate);
+                const formattedContent = reformatEventText(post.text || "", post.account || "");
                 const title = post.text ? post.text.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Announcement";
                 
                 return (
@@ -143,7 +251,7 @@ export default component$(() => {
                     </div>
                     {displayDate && <div class="event-date-extracted">{displayDate}</div>}
                     <div class="event-item-body">
-                      {post.text ? post.text.replace(/#\w+/g, '').trim() : ""}
+                      {formattedContent}
                     </div>
                   </div>
                 );
@@ -165,6 +273,7 @@ export default component$(() => {
               previous.map((post) => {
                 const eventDate = parseEventDate(post.text || "");
                 const displayDate = formatExtractedDate(eventDate);
+                const formattedContent = reformatEventText(post.text || "", post.account || "");
                 const title = post.text ? post.text.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Recap";
                 
                 return (
@@ -186,7 +295,7 @@ export default component$(() => {
                     </div>
                     {displayDate && <div class="event-date-extracted">{displayDate}</div>}
                     <div class="event-item-body">
-                      {post.text ? post.text.replace(/#\w+/g, '').trim() : ""}
+                      {formattedContent}
                     </div>
                   </div>
                 );
