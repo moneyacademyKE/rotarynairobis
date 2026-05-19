@@ -8,7 +8,7 @@ export const usePosts = routeLoader$(async ({ platform }) => {
   
   // Clean 'Home' feed: Text-only upcoming rotary club events (EVENT_POSTER)
   const { results } = await db.prepare(`
-    SELECT p.* 
+    SELECT p.*, m.snippet, m.type 
     FROM posts p
     JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
     WHERE m.type = 'EVENT_POSTER' 
@@ -29,6 +29,17 @@ function parseEventDate(text: string): Date | null {
   ];
   
   const lowercase = text.toLowerCase();
+  
+  // Try numeric date formats first (e.g. 09.02.2026 or 09/02/2026)
+  const regexNumeric = /(\d{1,2})[./-](\d{1,2})[./-](\d{4})/;
+  const matchNumeric = lowercase.match(regexNumeric);
+  if (matchNumeric) {
+    const day = parseInt(matchNumeric[1], 10);
+    const monthIndex = parseInt(matchNumeric[2], 10) - 1;
+    const year = parseInt(matchNumeric[3], 10);
+    const date = new Date(year, monthIndex, day);
+    if (!isNaN(date.getTime())) return date;
+  }
   
   const regex1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s*,\s*(\d{4}))?/i;
   const match1 = lowercase.match(regex1);
@@ -85,7 +96,7 @@ function reformatEventText(text: string, account: string): string {
   }
 
   // 2. Extract Speaker
-  let speaker = "a guest speaker";
+  let speaker = "";
   const speakerRegexes = [
     /guest\s+speaker:?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
     /speaker:?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/,
@@ -109,21 +120,21 @@ function reformatEventText(text: string, account: string): string {
   }
 
   // 3. Extract Topic
-  let topic = "a special topic";
+  let topic = "";
   const topicQuotesRegex = /['"“‘]([^'"”’\n]{5,100})['"”’]/;
   const topicOnRegex = /(?:present\s+on|speaking\s+on|topic:?)\s+['"“‘]?([^'"”’\n.]{5,100})['"”’]?/i;
   
   const quotesMatch = text.match(topicQuotesRegex);
   if (quotesMatch && quotesMatch[1]) {
-    topic = `'${quotesMatch[1].trim()}'`;
+    topic = quotesMatch[1].trim();
   } else {
     const onMatch = text.match(topicOnRegex);
     if (onMatch && onMatch[1]) {
-      topic = `'${onMatch[1].trim()}'`;
+      topic = onMatch[1].trim();
     } else {
       const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length > 0 && lines[0].length < 80 && !lines[0].toLowerCase().includes("instagram") && !lines[0].toLowerCase().includes("facebook")) {
-        topic = `'${lines[0].replace(/#\w+/g, '').trim()}'`;
+        topic = lines[0].replace(/#\w+/g, '').trim();
       }
     }
   }
@@ -168,7 +179,24 @@ function reformatEventText(text: string, account: string): string {
     }
   }
 
-  return `The Rotary Club of ${clubName} will be hosting ${speaker} to present on ${topic} at ${venue} from ${time} on ${dayDate}.`;
+  // FLUID FORMATTING
+  if (speaker && topic) {
+    return `The Rotary Club of ${clubName} will be hosting ${speaker} to present on '${topic}' at ${venue} from ${time} on ${dayDate}.`;
+  }
+  
+  if (speaker && !topic) {
+    return `The Rotary Club of ${clubName} will be hosting ${speaker} at ${venue} from ${time} on ${dayDate}.`;
+  }
+
+  if (!speaker && topic) {
+    const isSpecialEvent = ["assembly", "visit", "night", "project", "celebration", "fellowship", "calendar", "board"].some(w => topic.toLowerCase().includes(w));
+    if (isSpecialEvent) {
+      return `The Rotary Club of ${clubName} will be hosting the '${topic}' event at ${venue} from ${time} on ${dayDate}.`;
+    }
+    return `The Rotary Club of ${clubName} will be hosting an event on '${topic}' at ${venue} from ${time} on ${dayDate}.`;
+  }
+
+  return `The Rotary Club of ${clubName} invites you to a fellowship gathering at ${venue} from ${time} on ${dayDate}.`;
 }
 
 export default component$(() => {
@@ -181,7 +209,7 @@ export default component$(() => {
   const previous: Post[] = [];
 
   posts.value.forEach((post, index) => {
-    const text = post.text || "";
+    const text = post.snippet || post.text || "";
     const parsedDate = parseEventDate(text);
     
     if (parsedDate) {
@@ -227,10 +255,11 @@ export default component$(() => {
               </div>
             ) : (
               upcoming.map((post) => {
-                const eventDate = parseEventDate(post.text || "");
+                const targetText = post.snippet || post.text || "";
+                const eventDate = parseEventDate(targetText);
                 const displayDate = formatExtractedDate(eventDate);
-                const formattedContent = reformatEventText(post.text || "", post.account || "");
-                const title = post.text ? post.text.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Announcement";
+                const formattedContent = reformatEventText(targetText, post.account || "");
+                const title = targetText ? targetText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Announcement";
                 
                 return (
                   <div 
@@ -271,10 +300,11 @@ export default component$(() => {
               </div>
             ) : (
               previous.map((post) => {
-                const eventDate = parseEventDate(post.text || "");
+                const targetText = post.snippet || post.text || "";
+                const eventDate = parseEventDate(targetText);
                 const displayDate = formatExtractedDate(eventDate);
-                const formattedContent = reformatEventText(post.text || "", post.account || "");
-                const title = post.text ? post.text.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Recap";
+                const formattedContent = reformatEventText(targetText, post.account || "");
+                const title = targetText ? targetText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Recap";
                 
                 return (
                   <div 
