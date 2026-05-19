@@ -28,21 +28,6 @@ export const ReelFeed = component$<ReelFeedProps>((props) => {
                 height={1280}
               />
             </div>
-            
-            <div class="reel-overlay">
-              <div class="reel-left">
-                <span class="reel-user">@{post.account?.toLowerCase().replace(/\s+/g, '') || 'rcns'}</span>
-                <p class="reel-caption">{(post.text || '').replace(/#\w+/g, '')}</p>
-                <div class="reel-music">
-                  <span class="music-icon">♫</span>
-                  <span class="music-text">Original Sound - {(post.account || 'rcns').toUpperCase()}</span>
-                </div>
-              </div>
-              
-              <div class="reel-right">
-                <div class="spinning-record"></div>
-              </div>
-            </div>
           </div>
         ))
       )}
