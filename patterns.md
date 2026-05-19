@@ -174,22 +174,6 @@
 - **Experience**: The brand "feels" premium as it floats independently of the content scroll.
 - **Rich Hickey Quality**: De-complects the *Identity of the Site* from the *Content of the Platform*.
  
-+## Pattern: The Epochal Ingestion Ledger (Telegram Facts)
-+**Problem**: Third-party event streams (Telegram) are ephemeral and mutating. If we only store the "current state" of a post, we lose the historical context or the ability to re-process the raw data if our classification logic improves.
-+
-+**Solution**:
-+1.  **Raw Fact Accession**: Every incoming webhook payload is immediately persisted to `telegram_raw_facts` as a JSON blob + `update_id`.
-+2.  **Point-in-Time Projection**: A secondary process (or trigger) transforms these raw facts into the unified `posts_facts` ledger.
-+3.  **Immutability**: We never "update" a Telegram post; we append a new fact if the message is edited, and the D1 `VIEW` resolves the most recent one.
-+
-+**Benefits**:
-+- **Rich Hickey Quality**: De-complects "Event Reception" from "Data Interpretation."
-+- **Auditability**: We can replay the entire Telegram history from raw JSON at any time.
-+
-+## Pattern: The Media Pull-Through Bridge
-+**Problem**: Telegram media links are temporary (ephemeral). We need a permanent "Fact" of the media in our own infrastructure (R2).
-+
-+**Solution**:
 ## Pattern: The Epochal Ingestion Ledger (Telegram Facts)
 **Problem**: Third-party event streams (Telegram) are ephemeral and mutating. If we only store the "current state" of a post, we lose the historical context or the ability to re-process the raw data if our classification logic improves.
 
@@ -279,3 +263,15 @@
 - **Factuality**: Avoids generic placeholders, formatting every event announcement to sound premium and natural.
 - **TDD Verification**: The entire parser is validated using Vitest and E2E Playwright suites to guarantee formatting correctness before pushing to production.
 
+## Pattern: The Source-of-Truth Priority Pattern (Database Contamination Bypass)
+**Problem**: In joined database tables (such as posts linked to media), inaccurate database associations or seeder groupings can cause posts to display incorrect visual/text details (e.g., matching a post with an incorrect OCR flyer snippet).
+
+**Solution**:
+1. **Source of Truth Hierarchy**: Prioritize human-authored post caption text (`post.text`) over machine-extracted OCR text (`post.snippet`) when rendering titles, dates, speakers, and venues. Fall back to OCR data only if direct text is absent.
+2. **Metadata Sanitization**: Pre-process captions through a regex-based header-stripping routine to discard platform attribution prefixes (e.g., `'rotarymuthaiga' on Instagram`) before parsing or formatting.
+3. **Keyword Dictionary Mapping**: Supplement regex-based property extraction with a dictionary of known domain keywords (such as "assembly", "induction", "movie night") to gracefully map events that don't match typical grammar-based regex patterns.
+
+**Benefits**:
+- **Factuality**: Guaranteed correct event description cards, fully aligned with the actual user post.
+- **Visual Purity**: Prevents drawer headers and card contents from showing social media account headers.
+- **Simplicity**: No complex database migrations or relational restructuring needed to fix loose seeder joins.

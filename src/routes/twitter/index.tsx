@@ -21,14 +21,22 @@ export const usePosts = routeLoader$(async ({ platform }) => {
   return parseD1PostRows(results);
 });
 
+// Helper to clean social media platform header info (e.g. 'username' on Instagram)
+export function cleanPostText(text: string): string {
+  if (!text) return "";
+  let cleaned = text.replace(/^'[^']+'\s+on\s+(Instagram|Twitter|Telegram|Social)\s*/i, "");
+  return cleaned.trim();
+}
+
 // Robust date extraction from social event flyer copy
 export function parseEventDate(text: string): Date | null {
+  const cleaned = cleanPostText(text);
   const months = [
     "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december",
     "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
   ];
   
-  const lowercase = text.toLowerCase();
+  const lowercase = cleaned.toLowerCase();
   
   // Try numeric date formats first (e.g. 09.02.2026 or 09/02/2026)
   const regexNumeric = /(\d{1,2})[./-](\d{1,2})[./-](\d{4})/;
@@ -76,13 +84,15 @@ export function formatExtractedDate(date: Date | null): string {
 }
 
 export function reformatEventText(text: string, account: string): string {
+  const cleaned = cleanPostText(text);
+  
   // If the text is already formatted as "The Rotary Club of ... will be hosting ..." or similar, return it directly!
-  if (/^the\s+rotary\s+club\s+of\s+.*(?:will\s+be\s+hosting|invites\s+you\s+to)/i.test(text.trim())) {
-    const trimmed = text.trim();
+  if (/^the\s+rotary\s+club\s+of\s+.*(?:will\s+be\s+hosting|invites\s+you\s+to)/i.test(cleaned.trim())) {
+    const trimmed = cleaned.trim();
     return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
   }
 
-  const lowercase = text.toLowerCase();
+  const lowercase = cleaned.toLowerCase();
   
   // 1. Extract Club Name
   const accountClean = (account || 'rcns').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -94,11 +104,26 @@ export function reformatEventText(text: string, account: string): string {
   else if (accountClean.includes("thika")) clubName = "Nairobi Thika Road";
   else if (accountClean.includes("metropolitan")) clubName = "Nairobi Metropolitan";
   else if (accountClean.includes("nairobi")) clubName = "Nairobi";
+  else if (accountClean.startsWith("rotary")) {
+    const rawName = accountClean.replace(/^rotary/, "");
+    if (rawName.length > 2) {
+      clubName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    }
+  }
   
   const clubRegex = /rotary\s+club\s+of\s+([A-Za-z\s]+?)(?:\s+hosts|\s+invites|\s+will|\s+is|\.|\n)/i;
-  const clubMatch = text.match(clubRegex);
+  const clubMatch = cleaned.match(clubRegex);
   if (clubMatch && clubMatch[1].trim().length > 3 && clubMatch[1].trim().length < 30) {
-    clubName = clubMatch[1].trim();
+    const rawClub = clubMatch[1].trim();
+    const rawClubLower = rawClub.toLowerCase();
+    if (rawClubLower.includes("muthaiga")) clubName = "Nairobi Muthaiga";
+    else if (rawClubLower.includes("upperhill") || rawClubLower.includes("upper hill")) clubName = "Nairobi Upper Hill";
+    else if (rawClubLower.includes("ngong")) clubName = "Ngong Road";
+    else if (rawClubLower.includes("syokimau")) clubName = "Syokimau";
+    else if (rawClubLower.includes("thika")) clubName = "Nairobi Thika Road";
+    else if (rawClubLower.includes("metropolitan")) clubName = "Nairobi Metropolitan";
+    else if (rawClubLower.includes("south") && rawClubLower.includes("nairobi")) clubName = "Nairobi South";
+    else clubName = rawClub;
   }
 
   // 2. Extract Speaker
@@ -108,7 +133,7 @@ export function reformatEventText(text: string, account: string): string {
   ];
   
   for (const regex of speakerRegexes) {
-    const match = text.match(regex);
+    const match = cleaned.match(regex);
     if (match && match[1]) {
       let val = match[1].trim();
       val = val.replace(/^(?:presidents?|rtn\.?|dr\.?|mr\.?|mrs\.?|ms\.?|prof\.?)\s+/i, "").trim();
@@ -128,23 +153,49 @@ export function reformatEventText(text: string, account: string): string {
   const topicQuotesRegex = /['"“‘]([^'"”’\n]{5,100})['"”’]/;
   const topicOnRegex = /(?:present\s+on|speaking\s+on|topic:?)\s+['"“‘]?([^'"”’\n.]{5,100})['"”’]?/i;
   
-  const quotesMatch = text.match(topicQuotesRegex);
+  const quotesMatch = cleaned.match(topicQuotesRegex);
   if (quotesMatch && quotesMatch[1]) {
     topic = quotesMatch[1].trim();
   } else {
-    const onMatch = text.match(topicOnRegex);
+    const onMatch = cleaned.match(topicOnRegex);
     if (onMatch && onMatch[1]) {
       topic = onMatch[1].trim();
     } else {
-      const segments = text.split(/[.,\n]/).map(s => s.trim()).filter(s => s.length > 0);
-      if (segments.length > 0) {
-        let candidate = segments[0];
-        const clubEscaped = clubName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-        const clubPrefixRegex = new RegExp(`^(?:the\\s+)?rotary\\s+club\\s+of\\s+(?:${clubEscaped}|[A-Za-z0-9]+)\\s*(?:to\\s+host|hosts)?`, "i");
-        candidate = candidate.replace(clubPrefixRegex, "");
-        candidate = candidate.trim();
-        if (candidate.length >= 4 && candidate.length <= 60) {
-          topic = candidate.charAt(0).toUpperCase() + candidate.slice(1);
+      // Try keyword matching for common topics first to avoid selecting messy fallback segments
+      const commonTopics = [
+        { pattern: /club\s+assembly/i, label: "Club assembly" },
+        { pattern: /board\s+game/i, label: "Board game fellowship" },
+        { pattern: /movie\s+night/i, label: "Movie night fellowship" },
+        { pattern: /sunshine\s+rally/i, label: "Sunshine rally" },
+        { pattern: /koroga/i, label: "Koroga fellowship" },
+        { pattern: /karaoke/i, label: "Karaoke night" },
+        { pattern: /induction/i, label: "Induction ceremony" },
+        { pattern: /charity\s+walk|walk\s+at/i, label: "Charity walk" },
+        { pattern: /joint\s+fellowship/i, label: "Joint fellowship" },
+        { pattern: /family\s+wellbeing|wellbeing/i, label: "Family wellbeing" },
+        { pattern: /mental\s+health/i, label: "Mental health fellowship" },
+        { pattern: /digital\s+literacy|elimika/i, label: "Digital literacy project" },
+        { pattern: /blood\s+drive/i, label: "Blood donation drive" },
+        { pattern: /redistricting/i, label: "Redistricting town hall" },
+      ];
+      for (const item of commonTopics) {
+        if (item.pattern.test(cleaned)) {
+          topic = item.label;
+          break;
+        }
+      }
+
+      if (!topic) {
+        const segments = cleaned.split(/[.,\n]/).map(s => s.trim()).filter(s => s.length > 0);
+        if (segments.length > 0) {
+          let candidate = segments[0];
+          const clubEscaped = clubName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+          const clubPrefixRegex = new RegExp(`^(?:the\\s+)?rotary\\s+club\\s+of\\s+(?:${clubEscaped}|[A-Za-z0-9]+)\\s*(?:to\\s+host|hosts)?`, "i");
+          candidate = candidate.replace(clubPrefixRegex, "");
+          candidate = candidate.trim();
+          if (candidate.length >= 4 && candidate.length <= 60) {
+            topic = candidate.charAt(0).toUpperCase() + candidate.slice(1);
+          }
         }
       }
     }
@@ -152,8 +203,8 @@ export function reformatEventText(text: string, account: string): string {
 
   // 4. Extract Venue
   let venue = "our fellowship venue";
-  const venueRegex = /at\s+([A-Z0-9][A-Za-z0-9\s-]{2,50})(?=\s+(?:from|on|at|fellowship)|\.|\n|,|$)/i;
-  const venueMatch = text.match(venueRegex);
+  const venueRegex = /(?:at|venue:|📍)\s*([A-Z0-9][A-Za-z0-9\s,-]{2,50})(?=\s+(?:from|on|at|fellowship|🗓️|⏰)|\.|\n|$)/i;
+  const venueMatch = cleaned.match(venueRegex);
   if (venueMatch && venueMatch[1]) {
     const val = venueMatch[1].trim();
     const forbidden = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Zoom"];
@@ -170,24 +221,26 @@ export function reformatEventText(text: string, account: string): string {
 
   // 5. Extract Time
   let time = "6:00 PM";
-  const timeRegex = /\b(\d{1,2}(?::\d{2})?\s*(?:AM|PM|am|pm))\b/i;
-  const timeMatch = text.match(timeRegex);
-  if (timeMatch && timeMatch[1]) {
-    const rawTime = timeMatch[1].trim().toUpperCase();
-    time = rawTime.replace(/(\d)(AM|PM)/, "$1 $2");
+  const timeRegex = /\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM|am|pm)\b/i;
+  const timeMatch = cleaned.match(timeRegex);
+  if (timeMatch) {
+    const hours = timeMatch[1];
+    const mins = timeMatch[2] || "00";
+    const ampm = timeMatch[3].toUpperCase();
+    time = `${hours}:${mins} ${ampm}`;
   }
 
   // 6. Extract Day and Date
   let dayDate = "Friday, February 20, 2026";
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const parsed = parseEventDate(text);
+  const parsed = parseEventDate(cleaned);
   if (parsed) {
     const monthName = months[parsed.getMonth()];
     const dayOfWeek = parsed.toLocaleDateString("en-US", { weekday: 'long' });
     dayDate = `${dayOfWeek}, ${monthName} ${parsed.getDate()}, ${parsed.getFullYear()}`;
   } else {
     const dateRegex = /on\s+([A-Z][a-z]+\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,\s*\d{4})?)/i;
-    const dateMatch = text.match(dateRegex);
+    const dateMatch = cleaned.match(dateRegex);
     if (dateMatch && dateMatch[1]) {
       const matchVal = dateMatch[1].trim();
       const parsedMatch = new Date(matchVal);
@@ -230,7 +283,7 @@ export default component$(() => {
   const previous: Post[] = [];
 
   posts.value.forEach((post, index) => {
-    const text = post.snippet || post.text || "";
+    const text = post.text || post.snippet || "";
     const parsedDate = parseEventDate(text);
     
     if (parsedDate) {
@@ -276,11 +329,12 @@ export default component$(() => {
               </div>
             ) : (
               upcoming.map((post) => {
-                const targetText = post.snippet || post.text || "";
+                const targetText = post.text || post.snippet || "";
                 const eventDate = parseEventDate(targetText);
                 const displayDate = formatExtractedDate(eventDate);
                 const formattedContent = reformatEventText(targetText, post.account || "");
-                const title = targetText ? targetText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Announcement";
+                const cleanedTarget = cleanPostText(targetText);
+                const title = cleanedTarget ? cleanedTarget.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Announcement";
                 
                 return (
                   <div 
@@ -292,7 +346,7 @@ export default component$(() => {
                       drawerState.category = "Upcoming Event";
                       drawerState.mediaSrc = ""; // Text-only inspection drawer
                       drawerState.mediaType = "image";
-                      drawerState.content = post.text || "";
+                      drawerState.content = targetText;
                     }}
                   >
                     <div class="event-item-header">
@@ -321,11 +375,12 @@ export default component$(() => {
               </div>
             ) : (
               previous.map((post) => {
-                const targetText = post.snippet || post.text || "";
+                const targetText = post.text || post.snippet || "";
                 const eventDate = parseEventDate(targetText);
                 const displayDate = formatExtractedDate(eventDate);
                 const formattedContent = reformatEventText(targetText, post.account || "");
-                const title = targetText ? targetText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Recap";
+                const cleanedTarget = cleanPostText(targetText);
+                const title = cleanedTarget ? cleanedTarget.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Recap";
                 
                 return (
                   <div 
@@ -337,7 +392,7 @@ export default component$(() => {
                       drawerState.category = "Past Event";
                       drawerState.mediaSrc = ""; // Text-only inspection drawer
                       drawerState.mediaType = "image";
-                      drawerState.content = post.text || "";
+                      drawerState.content = targetText;
                     }}
                   >
                     <div class="event-item-header">

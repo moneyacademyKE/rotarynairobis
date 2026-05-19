@@ -1,6 +1,8 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useContext } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseInstagramRows } from "../../domain/specs";
+import { DrawerContext } from "../layout";
+import { cleanPostText } from "../twitter";
 
 export const useInstagramData = routeLoader$(async ({ platform }) => {
   const db = platform.env.DB;
@@ -19,9 +21,6 @@ export const useInstagramData = routeLoader$(async ({ platform }) => {
   return { allPhotos };
 });
 
-import { useContext } from "@builder.io/qwik";
-import { DrawerContext } from "../layout";
-
 export default component$(() => {
   const data = useInstagramData();
   const drawerState = useContext(DrawerContext);
@@ -38,7 +37,8 @@ export default component$(() => {
           {data.value.allPhotos.map((photo, i) => {
             const thumb = photo.src;
             const full = thumb.replace('_thumb.jpg', '.jpg');
-            const title = photo.text ? photo.text.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 50) + '...' : `Club Photo #${photo.postId}`;
+            const cleanedText = cleanPostText(photo.text || "");
+            const title = cleanedText ? cleanedText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 50) + '...' : `Club Photo #${photo.postId}`;
             
             return (
               <div 
@@ -46,7 +46,7 @@ export default component$(() => {
                 class="prompt-card"
                 onClick$={() => {
                   drawerState.isOpen = true;
-                  drawerState.title = photo.text ? photo.text.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : `Photo View #${photo.postId}`;
+                  drawerState.title = cleanedText ? cleanedText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : `Photo View #${photo.postId}`;
                   drawerState.category = "Club Photo";
                   drawerState.mediaSrc = `/photos/${full}`;
                   drawerState.mediaType = "image";

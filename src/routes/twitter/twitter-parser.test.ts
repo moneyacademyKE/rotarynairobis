@@ -65,5 +65,24 @@ describe("Twitter Event Text Parsing & Formatting", () => {
       const formatted = reformatEventText(text, "rcns");
       expect(formatted).toBe(text);
     });
+
+    it("should strip social media headers and format correctly", () => {
+      const text = "'rotarymuthaiga' on Instagram\n\nIt’s time to align, connect, and move forward—together. 🔔✨\nour Club Assembly, an important moment where we reflect, plan, and strengthen the vision of the Rotary Club of Muthaiga. This is where ideas come alive, voices are heard, and impact begins.\n📍 Jacaranda Hotel, Westlands\n🗓️ 30th March 2026\n⏰ 6:00 PM – 8:00 PM";
+      const formatted = reformatEventText(text, "rotarymuthaiga");
+      expect(formatted).toContain("The Rotary Club of Nairobi Muthaiga");
+      expect(formatted).toContain("Club assembly");
+      expect(formatted).toContain("at Jacaranda Hotel, Westlands");
+      expect(formatted).toContain("from 6:00 PM");
+      expect(formatted).toContain("on Monday, March 30, 2026");
+    });
+
+    it("should fallback to keyword matching for common topics if regex matching fails", () => {
+      const text = "We invite all members to our upcoming movie night fellowship this Saturday at K1 Parklands starting from 7 PM.";
+      const formatted = reformatEventText(text, "rotarygachie");
+      expect(formatted).toContain("The Rotary Club of Gachie");
+      expect(formatted).toContain("Movie night fellowship");
+      expect(formatted).toContain("at K1 Parklands");
+      expect(formatted).toContain("from 7:00 PM");
+    });
   });
 });
