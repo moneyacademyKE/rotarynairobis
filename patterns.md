@@ -290,3 +290,18 @@
 - **Visual Harmony**: Elimination of styling leaks and legacy variables, ensuring consistent margins, font sizing, and contrast across all routes.
 - **Premium Tactility**: Elevates simple web views to a polished edge-native product.
 
+## Pattern: Self-Healing Webhook & Diagnostics Endpoint
+**Problem**: Maintaining serverless webhook ingestion bindings (e.g. Telegram Bot Webhook) is prone to configuration drift when URLs change, environments redeploy, or cold starts interrupt delivery. This complects routing setup with operations, leading to silent ingestion failures.
+
+**Solution**:
+1. **Dual-Handler Endpoint**: Expose both `GET` and `POST` handlers on the same route `/api/telegram`.
+2. **Dynamic Verification GET**: The `GET` request retrieves current configuration parameters directly from the third-party provider (Telegram `getWebhookInfo`).
+3. **Automated Alignment (Self-Healing)**: If the registered URL mismatches the active request origin, execute an in-flight `setWebhook` alignment, binding the correct secrets and subscription events dynamically.
+4. **Data Fact Counting**: Expose basic metrics (like total row counts in D1 `telegram_raw_facts`) to immediately prove write integrity.
+
+**Benefits**:
+- **Simplicity**: No manual config synchronization; visiting the endpoint via HTTP automatically repairs it.
+- **De-coupling**: Separates configuration deployment from API operation.
+- **Rich Hickey Quality**: Webhook URL is derived dynamically from request coordinates rather than being static, hardcoded configuration.
+
+
