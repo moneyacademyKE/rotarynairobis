@@ -32,7 +32,7 @@
 
   --text-primary: oklch(94% 0.01 35);
   --text-secondary: oklch(75% 0.015 35);
-  --text-muted: oklch(58% 0.02 35);
+  --text-muted: oklch(67% 0.02 35);
 
   --accent-primary: oklch(76% 0.11 70); /* Warm Copper Gold */
   --accent-hover: oklch(81% 0.12 70);

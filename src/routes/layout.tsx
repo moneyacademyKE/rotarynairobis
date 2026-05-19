@@ -53,7 +53,15 @@ export default component$(() => {
   useContextProvider(DrawerContext, drawerState);
 
   return (
-    <div class="app-container" data-theme={theme.value}>
+    <div 
+      class="app-container" 
+      data-theme={theme.value}
+      window:onKeyDown$={(e) => {
+        if (e.key === "Escape") {
+          drawerState.isOpen = false;
+        }
+      }}
+    >
       <header class="app-header">
         <div class="header-brand-row">
           <a href="/twitter/" class="brand-link">

@@ -357,6 +357,10 @@ export default component$(() => {
                     <div class="event-item-body">
                       {formattedContent}
                     </div>
+                    <div class="event-item-footer">
+                      <span class="read-more-text">Read details</span>
+                      <span class="read-more-arrow">→</span>
+                    </div>
                   </div>
                 );
               })
@@ -402,6 +406,10 @@ export default component$(() => {
                     {displayDate && <div class="event-date-extracted">{displayDate}</div>}
                     <div class="event-item-body">
                       {formattedContent}
+                    </div>
+                    <div class="event-item-footer">
+                      <span class="read-more-text">Read details</span>
+                      <span class="read-more-arrow">→</span>
                     </div>
                   </div>
                 );
@@ -469,7 +477,7 @@ export default component$(() => {
         .event-text-item:hover {
           border-color: var(--border-focus);
           transform: translateY(-2px);
-          box-shadow: 0 4px 20px var(--accent-glow);
+          box-shadow: 0 4px 12px var(--accent-glow);
         }
         .event-item-header {
           display: flex;
@@ -512,6 +520,33 @@ export default component$(() => {
           font-style: italic;
           font-size: 1.15rem;
           color: var(--accent-primary);
+        }
+        .event-item-footer {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 0.25rem;
+          margin-top: auto;
+          padding-top: 0.5rem;
+          border-top: 1px dashed var(--border-subtle);
+        }
+        .read-more-text {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          font-weight: 500;
+          transition: color var(--transition-fast);
+        }
+        .read-more-arrow {
+          font-size: 0.9rem;
+          color: var(--text-muted);
+          transition: transform var(--transition-fast), color var(--transition-fast);
+        }
+        .event-text-item:hover .read-more-text {
+          color: var(--accent-primary);
+        }
+        .event-text-item:hover .read-more-arrow {
+          color: var(--accent-primary);
+          transform: translateX(4px);
         }
         .empty-state.text-only {
           padding: 2rem;
