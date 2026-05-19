@@ -110,3 +110,7 @@
 ## Edge Webhook Diagnostics & Ingestion Health Verification
 - **Self-Healing Diagnostics Pattern**: Exposing a `GET` handler on the ingestion endpoint (`/api/telegram`) allows instant health check and webhook registration status querying from Telegram Bot API. If a URL mismatch is detected, it automatically calls `setWebhook` to realign to the active host origin, eliminating manual configuration drift.
 - **D1 Row Fact Auditing**: Directly executing queries on `telegram_raw_facts` and `posts_facts` via `wrangler d1 execute` provides a verifiable count and timestamp sequence of ingested updates. This helps developers prove raw data accretion separate from application display views.
+
+## Split-Payload Caption Ingestion & Epochal Merge Resolution
+- **Telegram Split Webhooks**: Many cross-posting services (such as Instagram-to-Telegram automation) post photos and captions as separate, asynchronous updates. This creates a photo post (with empty text) followed by a reply containing the caption (with empty photos).
+- **Epochal Entity Consolidation**: Rather than executing destructive SQL `UPDATE` commands on existing records (which violates the immutable ledger model), the webhook can query D1 for the parent post's metadata and insert a new fact under the parent's `message_id` containing both the text and the inherited photos. The downstream `posts` VIEW naturally resolves this to the unified state (collapsing the split payload) using `ROW_NUMBER()`.

@@ -305,3 +305,17 @@
 - **Rich Hickey Quality**: Webhook URL is derived dynamically from request coordinates rather than being static, hardcoded configuration.
 
 
+## Pattern: Epochal Ingestion Consolidation for Split Payloads
+**Problem**: Downstream automation tools often split a single conceptual entity (e.g., a photo with a caption) into multiple sequential webhooks (e.g., a photo message followed by a reply text message). In database schemas where routes join posts and media on a single record, this split results in orphaned records that are filtered out of all views.
+
+**Solution**:
+1. **Detect Parent Reference**: In the webhook handler, inspect if the incoming payload is a reply to an existing parent message (`reply_to_message`).
+2. **Immutable Fact Appending**: Fetch the existing parent's attributes (e.g., `photos_json`) from the database view.
+3. **Consolidated Fact Insertion**: Insert a new fact under the parent's ID (`targetPostId`), combining the parent's attributes and the reply's text.
+4. **Natural View Collapse**: Let the database view resolve the entity's latest state by grouping on `id` and selecting the most recent `tx_id`.
+
+**Benefits**:
+- **Data Integrity**: Preserves the immutable ledger model (no destructive `UPDATE` queries).
+- **Seamless Merging**: Correctly merges split photo and caption payloads into a single visible UI post without complicating the schema.
+
+
