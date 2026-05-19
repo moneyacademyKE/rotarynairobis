@@ -63,7 +63,7 @@ export default component$(() => {
         <span class="kicker">District 9212</span>
         <h1 class="main-title">Rotary Nairobi South</h1>
         <p class="main-desc">
-          Service Above Self 🌟 • Edge-native showcase capturing fellowship, service projects, and club celebrations dynamically from the D1 epoch fact ledger.
+          Service Above Self
         </p>
       </header>
 
