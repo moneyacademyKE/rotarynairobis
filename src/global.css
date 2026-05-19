@@ -622,3 +622,15 @@ ul {
   font-weight: 600;
 }
 
+/* Micro-interaction Delight Active Press Effects */
+.pill-btn:active {
+  transform: scale(0.95);
+}
+.close-btn:active {
+  transform: scale(0.9);
+}
+.refresh-btn:active {
+  transform: scale(0.95);
+}
+
+
