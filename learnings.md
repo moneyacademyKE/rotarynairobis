@@ -70,3 +70,18 @@
 - **Pure Value Ingestion**: Validating D1 SQLite database records through Zod specification boundaries (`parseD1PostRows`) before entering Orama guarantees type-safety and visual reliability at the rendering layer.
 - **Resource Footprint**: Garbage collection of the Orama index at query termination prevents memory leaks and scales perfectly inside Cloudflare Workers isolates.
 
+## Subprocess Lifecycle & Resource Leakage
+- **Orphaned Playwright Subprocesses**: In headless testing or scraping scripts, termination of a parent Node.js/tsx process does not automatically cascade to child Chromium instances (`chrome-headless-shell`) on macOS. They are adopted by `launchd` (PID 1) and continue running, leading to silent CPU resource starvation.
+- **Ancestry Tracing via `ps`**: Tracing parent PIDs (`ppid`) recursively up to root system coordinates (such as IDE language servers) reveals the origin context of leaked processes, distinguishing between active runs and stale orphans.
+- **Deterministic Sweep Script**: Rather than relying on human diligence, adding a cron/hook-compatible TypeScript sweep utility (`scripts/cleanup-stale.ts`) ensures that stale processes exceeding a strict time boundary (e.g., 1 hour) are programmatically terminated via signal mapping (`SIGKILL`).
+
+## Wrangler v4 Static Assets Migration (Edge-Native Decoupling)
+- **Elimination of Legacy Assets**: Upgrading to Wrangler `4.92.0` enables the modern Cloudflare Workers Static Assets framework. Legacy configuration constructs like `--legacy-assets` and `workers_sites` are completely removed.
+- **Unified Configuration**: Combining SSR compute, Cron tasks, Background queues, and Edge CDN assets into a single declarative configuration `assets = { directory = "dist" }` preserves the "Simple Made Easy" doctrine.
+- **Pipeline Validation**: Under Wrangler v4, all API routing and SSR pages serve correctly alongside static assets with no runtime wrapping overhead.
+
+## Visual Refactoring & Theme Unification (Obsidian + Gold)
+- **Obsidian Theme Mapping**: Mapping multiple legacy platform-mimicking themes to a single set of CSS variables (e.g. `--bg-obsidian`, `--accent-primary`) forces the frontend to render the unified visual theme while maintaining backwards compatibility with route data loaders.
+- **Top Navigation Category Pills**: Transitioning mobile layout from bottom navigation tabs to top-aligned horizontal category pills enhances visual spacing and aligns with premium desktop editorial styling.
+- **Global Context-Driven Drawer**: Centralizing slide-out detail views in a root layout panel using Qwik's `createContextId` and `useContextProvider` decouples individual cards from drawer logic. Pages simply populate the shared store to render previews, details, and captions dynamically.
+

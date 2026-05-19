@@ -1,4 +1,4 @@
-import { component$, Slot } from "@builder.io/qwik";
+import { component$, Slot, createContextId, useContextProvider, useStore } from "@builder.io/qwik";
 import { routeLoader$, useLocation } from "@builder.io/qwik-city";
 
 /**
@@ -17,6 +17,17 @@ declare global {
   }
 }
 
+export interface DrawerState {
+  isOpen: boolean;
+  title: string;
+  category: string;
+  mediaSrc: string;
+  mediaType: 'image' | 'video' | 'failed';
+  content: string;
+}
+
+export const DrawerContext = createContextId<DrawerState>("rcns-drawer-context");
+
 export const usePlatformTheme = routeLoader$(({ url }) => {
   const path = url.pathname;
   if (path.includes('/instagram')) return 'instagram';
@@ -30,148 +41,130 @@ export const usePlatformTheme = routeLoader$(({ url }) => {
 export default component$(() => {
   const loc = useLocation();
   const theme = usePlatformTheme();
-  
+
+  const drawerState = useStore<DrawerState>({
+    isOpen: false,
+    title: "",
+    category: "",
+    mediaSrc: "",
+    mediaType: "image",
+    content: ""
+  });
+  useContextProvider(DrawerContext, drawerState);
+
   return (
     <div class="app-container" data-theme={theme.value}>
-      <header class="logo-header">
-        <a href="/twitter/">
-          <img src="/images/logo.png" alt="Rotary Club of Nairobi South" class="platform-logo" />
-        </a>
+      <header class="app-header">
+        <div class="header-brand-row">
+          <a href="/twitter/" class="brand-link">
+            <img src="/images/logo.png" alt="Rotary Club of Nairobi South" class="brand-logo" />
+          </a>
+        </div>
+        <span class="kicker">District 9212</span>
+        <h1 class="main-title">Rotary Nairobi South</h1>
+        <p class="main-desc">
+          Service Above Self 🌟 • Edge-native showcase capturing fellowship, service projects, and club celebrations dynamically from the D1 epoch fact ledger.
+        </p>
       </header>
+
+      <div class="controls-wrapper">
+        <div class="category-pills">
+          <a 
+            href="/twitter/" 
+            class={["pill-btn", loc.url.pathname.includes('/twitter') ? "active" : ""]}
+          >
+            Home
+          </a>
+          <a 
+            href="/instagram/" 
+            class={["pill-btn", loc.url.pathname.includes('/instagram') ? "active" : ""]}
+          >
+            Photos
+          </a>
+          <a 
+            href="/tiktok/" 
+            class={["pill-btn", loc.url.pathname.includes('/tiktok') ? "active" : ""]}
+          >
+            Events
+          </a>
+          <a 
+            href="/birthdays/" 
+            class={["pill-btn", loc.url.pathname.includes('/birthdays') ? "active" : ""]}
+          >
+            Babies
+          </a>
+          <a 
+            href="/recaps/" 
+            class={["pill-btn", loc.url.pathname.includes('/recaps') ? "active" : ""]}
+          >
+            Recaps
+          </a>
+          <a 
+            href="/search/" 
+            class={["pill-btn", loc.url.pathname.includes('/search') ? "active" : ""]}
+          >
+            Search
+          </a>
+        </div>
+      </div>
 
       <main class="main-content">
         <Slot />
       </main>
-      
-      <nav class="bottom-nav">
-        <a 
-          href="/twitter/" 
-          class={["nav-item", loc.url.pathname.includes('/twitter') ? "active" : ""]}
-          aria-label="Home Feed"
-        >
-          <span class="icon">𝕏</span>
-          <span class="label">Home</span>
-        </a>
-        <a 
-          href="/instagram/" 
-          class={["nav-item", loc.url.pathname.includes('/instagram') ? "active" : ""]}
-          aria-label="Photo Gallery"
-        >
-          <span class="icon">📷</span>
-          <span class="label">Photos</span>
-        </a>
-        <a 
-          href="/tiktok/" 
-          class={["nav-item", loc.url.pathname.includes('/tiktok') ? "active" : ""]}
-          aria-label="Event Reel"
-        >
-          <span class="icon">📅</span>
-          <span class="label">Events</span>
-        </a>
-        <a 
-          href="/birthdays/" 
-          class={["nav-item", loc.url.pathname.includes('/birthdays') ? "active" : ""]}
-          aria-label="Birthday Showcase"
-        >
-          <span class="icon">🎂</span>
-          <span class="label">Babies</span>
-        </a>
-        <a 
-          href="/recaps/" 
-          class={["nav-item", loc.url.pathname.includes('/recaps') ? "active" : ""]}
-          aria-label="Moments Recap"
-        >
-          <span class="icon">🎞️</span>
-          <span class="label">Recaps</span>
-        </a>
-        <a 
-          href="/search/" 
-          class={["nav-item", loc.url.pathname.includes('/search') ? "active" : ""]}
-          aria-label="Search"
-        >
-          <span class="icon">🔍</span>
-          <span class="label">Search</span>
-        </a>
-      </nav>
 
-      <style dangerouslySetInnerHTML={`
-        .logo-header {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 12px;
-          z-index: 200;
-          pointer-events: none; /* Allow scrolling content underneath */
-        }
-        .logo-header a {
-          pointer-events: auto; /* Re-enable clicks for the logo link */
-        }
-        .platform-logo {
-          height: clamp(80px, 20vh, 200px); /* Massive identity projection */
-          width: auto;
-          max-width: 100%;
-          filter: drop-shadow(0 4px 12px rgba(0,0,0,0.7));
-          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .platform-logo:hover {
-          transform: scale(1.02);
-        }
-        
-        .main-content {
-          padding-top: clamp(100px, 25vh, 220px); /* Space for the amplified logo */
-        }
+      {/* Slide-out Drawer Backdrop */}
+      <div 
+        class={["drawer-backdrop", drawerState.isOpen ? "open" : ""]}
+        onClick$={() => { drawerState.isOpen = false; }}
+      />
 
-        .bottom-nav {
-          position: fixed;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 100%;
-          max-width: var(--max-width);
-          height: var(--tab-height);
-          background-color: oklch(from var(--bg-color) l c h / 0.85);
-          backdrop-filter: blur(12px) saturate(180%);
-          border-top: 1px solid var(--border-color);
-          display: flex;
-          justify-content: space-around;
-          align-items: center;
-          z-index: 100;
-          padding: 0 var(--space-xs);
-        }
-        .nav-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-decoration: none;
-          color: var(--text-dim);
-          font-size: var(--font-size-xs);
-          font-weight: 500;
-          letter-spacing: 0.02em;
-          gap: 4px;
-          flex: 1;
-          transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                      color 0.2s ease;
-        }
-        .nav-item.active {
-          color: var(--accent-color);
-          transform: translateY(-2px);
-        }
-        .nav-item .icon {
-          font-size: 1.4rem;
-          line-height: 1;
-        }
-        .nav-item .label {
-          opacity: 0.8;
-        }
-        .nav-item.active .label {
-          opacity: 1;
-          font-weight: 700;
-        }
-      `}></style>
+      {/* Slide-out Drawer Panel */}
+      <div class={["drawer-panel", drawerState.isOpen ? "open" : ""]}>
+        <div class="drawer-header">
+          <div class="drawer-header-info">
+            <span class="drawer-category">{drawerState.category}</span>
+            <h2 class="drawer-title">{drawerState.title}</h2>
+          </div>
+          <button 
+            class="close-btn" 
+            onClick$={() => { drawerState.isOpen = false; }}
+            aria-label="Close panel"
+          >
+            ×
+          </button>
+        </div>
+        <div class="drawer-body">
+          {drawerState.mediaSrc && (
+            <div class="drawer-media-section">
+              {drawerState.mediaType === 'video' ? (
+                <video 
+                  src={drawerState.mediaSrc} 
+                  controls 
+                  autoplay 
+                  loop 
+                  muted 
+                  class="drawer-video-gif" 
+                />
+              ) : (
+                <img 
+                  src={drawerState.mediaSrc} 
+                  alt={drawerState.title} 
+                  class="drawer-video-gif" 
+                />
+              )}
+            </div>
+          )}
+          <div class="prompt-section-header">
+            <span class="prompt-section-title">Description & Details</span>
+          </div>
+          <div class="codeblock-wrapper">
+            <div class="codeblock-content">
+              {drawerState.content}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 });
+

@@ -83,7 +83,7 @@ async function main() {
   const tasks = files.map(file => limit(async () => {
     // Also skip the full resolution file if we process the thumbnail
     const fullFileName = file.replace('_thumb.jpg', '.jpg');
-    
+
     if (manifest[file]) {
       skipped++;
       return;
@@ -96,14 +96,14 @@ async function main() {
       if (fs.existsSync(path.join(PHOTOS_DIR, fullFileName))) {
         manifest[fullFileName] = result;
       }
-      
+
       count++;
       if (count % 10 === 0) {
         console.log(`Processed ${count} new images...`);
         fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2));
       }
     }
-    
+
     // Safety delay to avoid hitting rate limits too hard
     await new Promise(resolve => setTimeout(resolve, 500));
   }));

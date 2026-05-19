@@ -60,15 +60,15 @@ export function parseD1PostRows(rawRows: unknown[]): Post[] {
   return rawRows.map(parseD1PostRow);
 }
 
-// 3. Instagram-specific projection
 export const instagramRowSchema = z.object({
   id: z.number(),
   photo_src: z.string(),
+  text: z.string().nullable().optional(),
 });
 
 export function parseInstagramRow(rawRow: unknown) {
   const valid = instagramRowSchema.parse(rawRow);
-  return { postId: valid.id, src: valid.photo_src };
+  return { postId: valid.id, src: valid.photo_src, text: valid.text ?? "" };
 }
 
 export function parseInstagramRows(rawRows: unknown[]) {

@@ -225,3 +225,43 @@
 **Benefits**:
 - **Simplicity**: Completely isolates Search query compute from local state sync logic, aligning fully with the "Simple Made Easy" doctrine.
 - **Performance**: Edge in-memory search scales seamlessly with no cold-start synchronization lag or database-level lock contentions.
+
+## Pattern: Stale Subprocess Sweep (Orphaned Process Sweeper)
+**Problem**: Headless browser tasks or scraping subprocesses (e.g., Playwright's `chrome-headless-shell`) often outlive their parent execution script, running indefinitely in the background and starving the host system's CPU.
+
+**Solution**:
+1. **Age and Command Filters**: Formulate a list of known suspect process names/arguments (e.g., `chrome-headless-shell`, specific script files) and define an epoch age limit (e.g., 1 hour).
+2. **Deterministic Process Query**: Use system process status APIs or `ps` (e.g., `ps -Aww -o pid,ppid,lstart,command`) to capture an immutable snapshot of all active OS processes.
+3. **Regex Extraction & Parsing**: Parse output lines to extract the PID, parent PPID, start time, and full command arguments, converting the start date string into a comparable timestamp.
+4. **Targeted Signal Eviction**: Run an automated sweeper at scheduled times or pre-build phases. For any suspect process exceeding the age threshold, issue a terminating signal (`SIGKILL`) directly to the PID to prevent leakage.
+
+**Benefits**:
+- **Simplicity**: No complex stateful process managers (PM2/systemd) needed for transient scripts; uses simple Unix/macOS process trees.
+- **Resource Protection**: Automatically prevents local and CI systems from being bogged down by zombie browsers.
+- **Reliability**: Self-cleaning execution boundary that maintains system health across long-lived development or server contexts.
+
+## Pattern: The Unified Asset Boundary (Wrangler v4 Workers Static Assets)
+**Problem**: Traditional edge/serverless frameworks separate static file hosting (e.g. Pages or Workers Sites) from dynamic edge compute (Workers functions). This separation complects deployment targets, introduces configuration drift, and slows down builds with complex asset synchronization rules.
+
+**Solution**:
+1. **Unified Configuration**: Adopt a single `wrangler.toml` or `wrangler.json` setup mapping both compute (`main` entry point) and assets (`assets = { directory = "dist" }`) into one unified deployment.
+2. **Deterministic Route Mapping**: Let Wrangler automatically resolve static file routing (serving them directly from Cloudflare's edge CDN) and only route unhandled API or SSR endpoints to the Worker's `fetch` handler.
+3. **Decoupled Asset Uploads**: Eliminate legacy wrapper commands (`--legacy-assets`). Upgrading to Wrangler v4 makes the build pipeline idempotent, only uploading changed file hashes directly.
+
+**Benefits**:
+- **Performance**: Static pages and assets are distributed natively across Cloudflare's edge CDN, while dynamic routes benefit from smart compute placement near databases (D1).
+- **Simplicity**: Eliminates middle-tier wrapper routing configurations and routing tables; compute and static content are handled inside a single unit.
+
+## Pattern: The Context-Driven Sliding Inspection Drawer
+**Problem**: Traditional detail/view navigation in responsive social feeds relies on route transitions or nested modals, which interrupts the scanning flow, increases state entanglement, and duplicates modal markup across elements.
+
+**Solution**:
+1. **Root-Level Drawer Shell**: Place a single drawer layout component (`.drawer-panel`) and backdrop (`.drawer-backdrop`) at the top-level root route shell (`layout.tsx`).
+2. **Stateless Context Store**: Define a shared, reactive store (`DrawerState`) and distribute it via Qwik's `createContextId` and `useContextProvider` at the root layout.
+3. **Card-Level Delegation**: Individual post or gallery card items simply consume `DrawerContext` and write visual details (title, full media URL, description text) to the shared store on click. This opens the drawer without triggering layout shifts or sub-route page reloads.
+
+**Benefits**:
+- **Simplicity**: De-complects the *Card Render logic* from the *Detailed Inspection UI*.
+- **Performance**: Zero extra DOM element footprint for each card on the page; modal markup is rendered exactly once.
+- **Experience**: The user gets a smooth, desktop-grade slide-out panel that preserves scroll position and keeps the feed immediately accessible.
+

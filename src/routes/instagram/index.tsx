@@ -19,145 +19,66 @@ export const useInstagramData = routeLoader$(async ({ platform }) => {
   return { allPhotos };
 });
 
+import { useContext } from "@builder.io/qwik";
+import { DrawerContext } from "../layout";
+
 export default component$(() => {
   const data = useInstagramData();
+  const drawerState = useContext(DrawerContext);
   
   return (
     <div class="instagram-profile">
-      <header class="profile-header">
-        <div class="profile-top">
-          <div class="profile-avatar"></div>
-          <div class="profile-stats">
-            <div class="stat">
-              <strong>{data.value.allPhotos.length}</strong>
-              <div>posts</div>
-            </div>
-            <div class="stat">
-              <strong>85</strong>
-              <div>members</div>
-            </div>
-            <div class="stat">
-              <strong>1.2K</strong>
-              <div>followers</div>
-            </div>
-          </div>
+      {data.value.allPhotos.length === 0 ? (
+        <div class="empty-state">
+          <div class="empty-title">No Photos Loaded</div>
+          <div class="empty-text">No active visual media is currently registered in the database ledger.</div>
         </div>
-        <div class="profile-info">
-          <h2 class="full-name">Rotary Club of Nairobi South</h2>
-          <p class="bio">Service Above Self 🌟 • Edge-native showcase capturing fellowship, service projects, and club celebrations in District 9212.</p>
+      ) : (
+        <div class="gallery-grid">
+          {data.value.allPhotos.map((photo, i) => {
+            const thumb = photo.src;
+            const full = thumb.replace('_thumb.jpg', '.jpg');
+            const title = photo.text ? photo.text.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 50) + '...' : `Club Photo #${photo.postId}`;
+            
+            return (
+              <div 
+                key={i} 
+                class="prompt-card"
+                onClick$={() => {
+                  drawerState.isOpen = true;
+                  drawerState.title = photo.text ? photo.text.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : `Photo View #${photo.postId}`;
+                  drawerState.category = "Club Photo";
+                  drawerState.mediaSrc = `/photos/${full}`;
+                  drawerState.mediaType = "image";
+                  drawerState.content = photo.text || "Rotary Nairobi South Activity Photo";
+                }}
+              >
+                <div class="card-media-wrapper">
+                  <img 
+                    src={`/photos/${thumb}`} 
+                    alt={title} 
+                    class="card-media-img poster" 
+                    loading="lazy"
+                  />
+                  <img 
+                    src={`/photos/${full}`} 
+                    alt={title} 
+                    class="card-media-img preview" 
+                    loading="lazy"
+                  />
+                </div>
+                
+                <div class="card-info">
+                  <span class="card-category">Activity Photo</span>
+                  <h3 class="card-title">{title}</h3>
+                  <p class="card-desc">{photo.text ? photo.text.replace(/#\w+/g, '').trim() : 'Rotary Club of Nairobi South'}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </header>
-
-      <div class="view-toggle">
-        <button class="active">📷 Photos</button>
-      </div>
-
-      <div class="grid-container">
-        {data.value.allPhotos.map((photo, i) => (
-          <div key={i} class="grid-item">
-            <img 
-              src={`/photos/${photo.src}`} 
-              alt="Instagram post" 
-              loading="lazy" 
-              width={300} 
-              height={300} 
-            />
-          </div>
-        ))}
-      </div>
-
-      <style dangerouslySetInnerHTML={`
-        .instagram-profile {
-          background-color: var(--bg-color);
-        }
-        .profile-header {
-          padding: 20px 16px;
-        }
-        .profile-top {
-          display: flex;
-          align-items: center;
-          gap: 28px;
-          margin-bottom: 20px;
-        }
-        .profile-avatar {
-          width: 77px;
-          height: 77px;
-          border-radius: 50%;
-          background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-          padding: 3px;
-          position: relative;
-        }
-        .profile-avatar::after {
-          content: '';
-          display: block;
-          width: 100%;
-          height: 100%;
-          background: #ccc;
-          border-radius: 50%;
-          border: 2px solid var(--bg-color);
-        }
-        .profile-stats {
-          display: flex;
-          gap: 20px;
-          flex: 1;
-          justify-content: space-around;
-          font-size: 14px;
-        }
-        .stat { text-align: center; }
-        .profile-info { font-size: 14px; }
-        .full-name { font-weight: 700; }
-        
-        .view-toggle {
-          display: flex;
-          border-top: 1px solid var(--border-color);
-        }
-        .view-toggle button {
-          flex: 1;
-          background: none;
-          border: none;
-          padding: 12px;
-          color: var(--text-dim);
-          cursor: pointer;
-          font-weight: 600;
-        }
-        .view-toggle button.active {
-          color: var(--text-color);
-          border-top: 2px solid var(--text-color);
-          margin-top: -1px;
-        }
-        
-        .feed-post {
-          margin-bottom: 20px;
-          border-bottom: 1px solid var(--border-color);
-        }
-        .feed-post .post-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 12px;
-        }
-        .mini-avatar {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background: #ccc;
-        }
-        .username { font-size: 14px; font-weight: 600; }
-        .post-image img {
-          width: 100%;
-          display: block;
-        }
-        .post-actions {
-          padding: 8px 12px;
-          display: flex;
-          gap: 16px;
-          font-size: 24px;
-        }
-        .post-content {
-          padding: 0 12px 16px;
-          font-size: 14px;
-        }
-      `}></style>
+      )}
     </div>
   );
 });
+
