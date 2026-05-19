@@ -67,12 +67,6 @@ export default component$(() => {
                     loading="lazy"
                   />
                 </div>
-                
-                <div class="card-info">
-                  <span class="card-category">Activity Photo</span>
-                  <h3 class="card-title">{title}</h3>
-                  <p class="card-desc">{photo.text ? photo.text.replace(/#\w+/g, '').trim() : 'Rotary Club of Nairobi South'}</p>
-                </div>
               </div>
             );
           })}

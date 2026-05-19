@@ -68,12 +68,6 @@ export default component$(() => {
                     />
                   </div>
                 )}
-                
-                <div class="card-info">
-                  <span class="card-category">Event</span>
-                  <h3 class="card-title">{title}</h3>
-                  <p class="card-desc">{post.text ? post.text.replace(/#\w+/g, '').trim() : ''}</p>
-                </div>
               </div>
             );
           })}
