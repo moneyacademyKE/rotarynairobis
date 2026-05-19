@@ -165,17 +165,25 @@ function reformatEventText(text: string, account: string): string {
   }
 
   // 6. Extract Day and Date
-  let dayDate = "February 20, 2026";
+  let dayDate = "Friday, February 20, 2026";
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const parsed = parseEventDate(text);
   if (parsed) {
     const monthName = months[parsed.getMonth()];
-    dayDate = `${monthName} ${parsed.getDate()}, ${parsed.getFullYear()}`;
+    const dayOfWeek = parsed.toLocaleDateString("en-US", { weekday: 'long' });
+    dayDate = `${dayOfWeek}, ${monthName} ${parsed.getDate()}, ${parsed.getFullYear()}`;
   } else {
     const dateRegex = /on\s+([A-Z][a-z]+\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,\s*\d{4})?)/i;
     const dateMatch = text.match(dateRegex);
     if (dateMatch && dateMatch[1]) {
-      dayDate = dateMatch[1].trim();
+      const matchVal = dateMatch[1].trim();
+      const parsedMatch = new Date(matchVal);
+      if (!isNaN(parsedMatch.getTime())) {
+        const dayOfWeek = parsedMatch.toLocaleDateString("en-US", { weekday: 'long' });
+        dayDate = `${dayOfWeek}, ${matchVal}`;
+      } else {
+        dayDate = matchVal;
+      }
     }
   }
 
