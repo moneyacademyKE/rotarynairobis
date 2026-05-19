@@ -124,14 +124,30 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
     }
 
     // 5. Fact Projection: Store message_id as entity identifier in posts_facts
-    // New facts for the same message_id will be collapsed in the 'posts' View.
+    // If this is a reply to an existing message (e.g. caption posted as a reply),
+    // merge the text fact into the parent post entity to prevent split records.
+    let targetPostId = message.message_id;
+    let finalPhotosJson = photosJson;
+
+    if (message.reply_to_message && text) {
+      const parentMessageId = message.reply_to_message.message_id;
+      const parentPost = await env.DB.prepare(
+        "SELECT photos_json FROM posts WHERE id = ?"
+      ).bind(parentMessageId).first() as { photos_json?: string } | null;
+      
+      if (parentPost) {
+        targetPostId = parentMessageId;
+        finalPhotosJson = parentPost.photos_json || "[]";
+      }
+    }
+
     await env.DB.prepare(
       "INSERT INTO posts (id, text, account, photos_json, hashtags_json) VALUES (?, ?, ?, ?, ?)"
     ).bind(
-      message.message_id, 
+      targetPostId, 
       text, 
       account, 
-      photosJson, 
+      finalPhotosJson, 
       "[]"
     ).run();
 

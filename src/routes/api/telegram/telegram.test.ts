@@ -77,6 +77,49 @@ describe("Telegram Webhook Ingestion (TDD Green)", () => {
     expect((mockPlatform.env.DB.prepare as any)).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO posts"));
   });
 
+  it("should merge text replies into parent posts if parent has photos", async () => {
+    const jsonMock = vi.fn();
+    
+    // Mock DB behavior specifically for this test to return parent photos_json
+    const mockDbPrepare = mockPlatform.env.DB.prepare as any;
+    mockDbPrepare.mockImplementation((query: string) => {
+      if (query.includes("SELECT photos_json")) {
+        return {
+          bind: vi.fn().mockReturnValue({
+            first: vi.fn().mockResolvedValue({ photos_json: '["parent_photo.jpg"]' }),
+          }),
+        };
+      }
+      return {
+        bind: vi.fn().mockReturnValue({
+          run: vi.fn().mockResolvedValue({ success: true }),
+        }),
+      };
+    });
+
+    const request = new Request("http://localhost/api/telegram", {
+      method: "POST",
+      body: JSON.stringify({ 
+        update_id: 1001,
+        channel_post: {
+          message_id: 2046,
+          reply_to_message: {
+            message_id: 2045,
+            photo: [{ file_id: "xyz", file_unique_id: "abc", file_size: 10 }]
+          },
+          text: "Reply text caption",
+        }
+      }),
+      headers: { "X-Telegram-Bot-Api-Secret-Token": "test_secret_token" }
+    });
+
+    await onPost({ request, platform: mockPlatform, json: jsonMock } as any);
+    
+    expect(jsonMock).toHaveBeenCalledWith(200, expect.objectContaining({ status: "Success" }));
+    expect(mockDbPrepare).toHaveBeenCalledWith(expect.stringContaining("SELECT photos_json FROM posts WHERE id = ?"));
+    expect(mockDbPrepare).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO posts"));
+  });
+
   it("should fail gracefully if TELEGRAM_BOT_TOKEN is missing in environment", async () => {
     const jsonMock = vi.fn();
     const badPlatform = { env: { DB: mockPlatform.env.DB } };
