@@ -275,3 +275,18 @@
 - **Factuality**: Guaranteed correct event description cards, fully aligned with the actual user post.
 - **Visual Purity**: Prevents drawer headers and card contents from showing social media account headers.
 - **Simplicity**: No complex database migrations or relational restructuring needed to fix loose seeder joins.
+
+## Pattern: Unified Interactive Search & Glassmorphic Reel overlays
+**Problem**: Standalone pages like search or cinematic full-bleed feeds often feel isolated or visually incomplete, hardcoding legacy styles or rendering raw media without overlays and click-actions, which breaks the app's interactive loop.
+
+**Solution**:
+1. **Interactive Shared Context Integration**: Bind search items and full-bleed media cards to the root `DrawerContext`. Clicking any search item or reel CTA immediately loads the post metadata and media into the shared slide-out drawer.
+2. **Visual Variable Auditing**: Cleanse legacy standalone pages of hardcoded, outdated style definitions, standardizing inputs, forms, and results layouts against the core Obsidian design tokens.
+3. **Glassmorphic Metadata Badges**: Add a glassmorphic bottom overlay container (`.reel-overlay`) over full-bleed media containing social indicators, cleaned captions, and custom category tags (e.g. `Birthday`, `Event Recap`, `Event Poster`) to project immediate visual information.
+4. **Tactile Spring Active States**: Add subtle scale-down hover transformations and press effects (`transform: scale(0.95)`) to clickable components like navigation pills and buttons, providing satisfying physical click feedback.
+
+**Benefits**:
+- **Cohesion**: The entire app functions as a single unified system, with search results, visual gallery photos, and full-bleed reels all feeding into the same interactive detail drawer.
+- **Visual Harmony**: Elimination of styling leaks and legacy variables, ensuring consistent margins, font sizing, and contrast across all routes.
+- **Premium Tactility**: Elevates simple web views to a polished edge-native product.
+

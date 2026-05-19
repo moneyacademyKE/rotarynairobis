@@ -100,3 +100,10 @@
 - **Interactive Affordance for Text Cards**: Moving from image-heavy cards to a text-only representation requires strong layout affordance (such as a visual arrow and color transition on hover) to ensure users recognize click/tap boundaries.
 - **Escape Key Accessibility for Overlay Drawers**: Binding keydown events to the global window context (`window:onKeyDown$`) is standard practice to enable users to dismiss overlays without manual click/tap targets, reinforcing production accessibility.
 - **WCAG AA Contrast Adjustments**: Dark modes with custom palettes need careful selection of gray levels for muted tags (`--text-muted`) to verify readable contrast ratios against background panels.
+
+## Unified Search Page & Glassmorphic Reel Feed Upgrades
+- **Search System Cohesion:** Custom search layouts should never remain static or decoupled from the app's primary interactive features. Mapping search item actions directly to the shared layout `DrawerContext` makes searching feel deeply integrated and satisfying.
+- **Visual Token Preservation in Search:** Legacy style blocks in standalone pages must be audited to ensure they do not hardcode stale custom variables. Standardizing search-input forms, text, and grids against the primary Obsidian tokens prevents visual slop.
+- **Glassmorphic Reels Enhancements:** A cinematic full-bleed scroll timeline (`ReelFeed.tsx`) that contains only raw images feels incomplete. Adding a glassmorphic bottom overlay (`.reel-overlay`) containing clear metadata badges (e.g., `Birthday`, `Event Recap`), cleaned captions, and action buttons elevates the experience from a placeholder-like screen to a premium visual ledger.
+- **Tactile Micro-interaction Spring Transitions:** Applying subtle scale-down click animations (`transform: scale(0.95)`) on interactive elements (navigation pills, action buttons, close targets) on `:active` mouse states provides immediate tactile feedback and makes the UI feel highly polished and alive.
+
