@@ -60,8 +60,6 @@ export default component$(() => {
             <img src="/images/logo.png" alt="Rotary Club of Nairobi South" class="brand-logo" />
           </a>
         </div>
-        <span class="kicker">District 9212</span>
-        <h1 class="main-title">Rotary Nairobi South</h1>
         <p class="main-desc">
           Service Above Self
         </p>
