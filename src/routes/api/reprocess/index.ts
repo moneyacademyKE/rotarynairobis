@@ -23,7 +23,7 @@ export const onGet: RequestHandler = async ({ request, platform, json }) => {
       FROM posts p
       JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
       WHERE m.type != 'FAILED'
-      ORDER BY p.id DESC
+      ORDER BY p.created_at DESC, p.id DESC
       LIMIT 50
     `).all();
 

@@ -114,3 +114,13 @@
 ## Split-Payload Caption Ingestion & Epochal Merge Resolution
 - **Telegram Split Webhooks**: Many cross-posting services (such as Instagram-to-Telegram automation) post photos and captions as separate, asynchronous updates. This creates a photo post (with empty text) followed by a reply containing the caption (with empty photos).
 - **Epochal Entity Consolidation**: Rather than executing destructive SQL `UPDATE` commands on existing records (which violates the immutable ledger model), the webhook can query D1 for the parent post's metadata and insert a new fact under the parent's `message_id` containing both the text and the inherited photos. The downstream `posts` VIEW naturally resolves this to the unified state (collapsing the split payload) using `ROW_NUMBER()`.
+
+## Edge Temporal Alignment & In-Memory Deduplication
+- **Temporal Fact Alignment**: Resolving relative dates like "this Thursday" or "tomorrow" in stateless edge environments requires a reference point. Storing and passing `created_at` timestamps from the ingestion payload provides the necessary temporal anchor to resolve relative days deterministically using JS date arithmetic.
+- **In-Memory Normalizing & Deduplication**: To fully resolve duplication caused by concurrent ingestion races, network retries, or redundant automation webhooks, the edge route loader can normalize text content (stripping whitespaces/newlines and lowercasing) and filter out duplicate post texts. This guarantees visual uniqueness for the end user without altering the historical ledger.
+
+## Chronological Sorting Alignment (Telegram vs Legacy Seeds)
+- **ID Space Discrepancy**: Live Telegram channel ingestion produces post records with small, sequential message IDs (~2000), while legacy seeded data utilizes artificially large IDs (~1,000,000). 
+- **Sorting Fallacy**: Sorting database queries with `ORDER BY p.id DESC` hides all new live content underneath the large legacy IDs. Queries must sort by `p.created_at DESC, p.id DESC` to guarantee correct chronological order regardless of source ID bounds.
+
+

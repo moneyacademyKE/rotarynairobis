@@ -319,3 +319,44 @@
 - **Seamless Merging**: Correctly merges split photo and caption payloads into a single visible UI post without complicating the schema.
 
 
+## Pattern: The Temporal Alignment Pattern
+**Problem**: Stateless edge components need to parse relative date expressions (e.g. "this Wednesday", "tomorrow", "this coming Thursday") in event flyers, but the system clock at execution time can vary and does not reflect when the announcement was actually published.
+
+**Solution**:
+1. **Fact Accretion**: Capture and persist the original publication timestamp (`created_at`) when receiving updates.
+2. **Context Passing**: Pass `created_at` through the domain layer schemas down to the date parsing utility functions.
+3. **Reference Anchoring**: Use the publication date as the baseline anchor when converting relative day indicators into absolute calendar dates.
+
+**Benefits**:
+- **Accuracy**: Prevents relative dates from drifting as time moves forward (e.g., an event announced as "this Wednesday" remains mapped to that specific Wednesday even when viewed weeks later).
+- **Simplicity**: Retains pure, stateless date parsing functions.
+
+
+## Pattern: The Idempotent View Filter (In-Memory Deduplication)
+**Problem**: Redundant webhooks, duplication of automation records, or concurrent network retries can insert multiple post records with different IDs but identical text content, leading to duplicate cards on the UI.
+
+**Solution**:
+1. **Normalization**: Clean and normalize text strings (strip whitespace, lowercase, condense newlines) inside the edge route loader.
+2. **In-Memory Set Tracking**: Process posts in order and use a local `Set` to keep track of already-rendered normalized captions.
+3. **Idempotent Filtering**: Filter out any posts whose text content has already been seen.
+
+**Benefits**:
+- **Robustness**: Provides an immediate, zero-downtime safety net against ingestion duplication.
+- **Independence**: Leaves the historical raw database facts completely intact and unaltered.
+
+
+## Pattern: Chronological Sorting Alignment (Hybrid ID Spaces)
+**Problem**: An application merges content from distinct sources (e.g., live Telegram feed message IDs vs legacy seeds with generated IDs) that use non-overlapping, differently-scaled ID sequences. Relying on auto-incrementing/integer IDs for chronological sorting hides the live records.
+
+**Solution**:
+1. **Unified Temporal Fact**: Add and maintain a `created_at` timestamp across all fact schemas.
+2. **Deterministic Multi-Key Sorting**: Order all queries and loaders using `created_at DESC, id DESC`.
+3. **Index Coverage**: Ensure that the database view resolves the entities' temporal values cleanly for immediate edge queries.
+
+**Benefits**:
+- **Visual Integrity**: Guarantees that the latest content is presented to the user first.
+- **Independence of ID Space**: Decouples presentation order from the raw primary keys of individual ingestion pipelines.
+
+
+
+

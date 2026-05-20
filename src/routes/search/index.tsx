@@ -12,7 +12,7 @@ export const useSearchResults = routeLoader$(async ({ url, platform }) => {
   const { results } = await db.prepare(`
     SELECT p.* 
     FROM posts p
-    ORDER BY p.id DESC
+    ORDER BY p.created_at DESC, p.id DESC
   `).all();
 
   const searchResults = await executeSearch(results, term);

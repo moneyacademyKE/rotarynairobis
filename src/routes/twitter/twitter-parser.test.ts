@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseEventDate, reformatEventText } from "./index";
+import { parseEventDate, reformatEventText } from "../../lib/twitter-parser";
 
 describe("Twitter Event Text Parsing & Formatting", () => {
   describe("parseEventDate", () => {
@@ -83,6 +83,22 @@ describe("Twitter Event Text Parsing & Formatting", () => {
       expect(formatted).toContain("Movie night fellowship");
       expect(formatted).toContain("at K1 Parklands");
       expect(formatted).toContain("from 7:00 PM");
+    });
+
+    it("should handle relative dates and cancellation format correctly", () => {
+      // Mock post date is Tuesday, May 19, 2026. "this Thursday" is May 21, 2026.
+      const text = "'rcngongroad' on Instagram\n\nNo fellowship this Thursday, because the Rotary Club of Ngong Road will be joining...";
+      const formatted = reformatEventText(text, "rcns", "2026-05-19T12:00:00.000Z");
+      expect(formatted).toContain("The Rotary Club of Ngong Road has no regular fellowship");
+      expect(formatted).toContain("on Thursday, May 21, 2026");
+    });
+
+    it("should handle relative week and cancellation format correctly", () => {
+      // Mock post date is Tuesday, May 19, 2026. "this week" matches Thursday, May 21, 2026.
+      const text = "'rotaryclubofnairobithikard' on Instagram\n\nNo fellowship this week, People of Action. We are pausing our regular rhythm...";
+      const formatted = reformatEventText(text, "rcns", "2026-05-19T12:00:00.000Z");
+      expect(formatted).toContain("The Rotary Club of Nairobi Thika Road has no regular fellowship");
+      expect(formatted).toContain("on Thursday, May 21, 2026");
     });
   });
 });

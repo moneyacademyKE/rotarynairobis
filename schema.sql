@@ -43,7 +43,7 @@ WHERE rn = 1 AND is_retraction = 0;
 
 DROP VIEW IF EXISTS posts;
 CREATE VIEW posts AS
-SELECT id, text, account, photos_json, hashtags_json
+SELECT id, text, account, photos_json, hashtags_json, created_at
 FROM (
     SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY tx_id DESC) as rn
     FROM posts_facts

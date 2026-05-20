@@ -16,6 +16,7 @@ export const dbPostRowSchema = z.object({
   file_name: z.string().nullable().optional(),
   type: z.string().nullable().optional(),
   snippet: z.string().nullable().optional(),
+  created_at: z.string().nullable().optional(),
 });
 
 // 2. Parsed Domain Shape (The Pure Value)
@@ -27,6 +28,7 @@ export const postDomainSchema = z.object({
   hashtags: z.array(z.string()).default([]),
   media_type: z.string().nullable().optional(), // from join
   snippet: z.string().nullable().optional(),
+  created_at: z.string().nullable().optional(),
 });
 
 export type Post = z.infer<typeof postDomainSchema>;
@@ -50,6 +52,7 @@ export function parseD1PostRow(rawRow: unknown): Post {
     hashtags: Array.isArray(parsedHashtags) ? parsedHashtags : [],
     media_type: validRow.type ?? undefined,
     snippet: validRow.snippet ?? undefined,
+    created_at: validRow.created_at ?? undefined,
   };
 
   // Spec check the domain boundary

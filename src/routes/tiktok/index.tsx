@@ -11,7 +11,7 @@ export const useTikTokData = routeLoader$(async ({ platform }) => {
     JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
     WHERE m.type = 'EVENT_POSTER'
     GROUP BY p.id
-    ORDER BY p.id DESC
+    ORDER BY p.created_at DESC, p.id DESC
   `).all();
   return parseD1PostRows(results);
 });

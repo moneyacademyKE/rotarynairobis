@@ -13,7 +13,7 @@ export const useInstagramData = routeLoader$(async ({ platform }) => {
     FROM posts p
     JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
     WHERE m.type = 'PHOTO'
-    ORDER BY p.id DESC
+    ORDER BY p.created_at DESC, p.id DESC
   `).all();
   
   const allPhotos = parseInstagramRows(results);
