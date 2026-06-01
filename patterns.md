@@ -486,3 +486,17 @@
 - **Reliability**: Eliminates runtime reference errors during test execution.
 - **Maintainability**: Clear, logical schema definition order from simplest to most complex.
 - **Security**: Ensures value typing validation is guaranteed at compilation time.
+
+## Pattern: The Transaction Log Sync (Delta Sync)
+**Problem**: Downstream clients need to keep their local state synchronized with an append-only facts database. Fetching the entire database on every check introduces high network overhead, while tracking relative time differences (timestamps) is prone to timezone drift and concurrency races.
+
+**Solution**:
+1. **Monotonic Key Indexing**: Utilize auto-incrementing integer transaction IDs (`tx_id`) as logical clocks for every fact table.
+2. **Delta Extraction Endpoint**: Expose an endpoint (`/api/sync`) that accepts `posts_tx_id` and `media_tx_id` parameters, performing fast indexed queries (`WHERE tx_id > ?`).
+3. **Head Verification Metadata**: Always include the absolute `MAX(tx_id)` currently registered in the database for each table in the response metadata (`meta`). This allows clients to verify if they are fully caught up, even when zero rows are returned in the sync delta.
+4. **Bandwidth Optimization**: Allow clients to toggle the inclusion of static configuration page data using `include_static=false` to reduce network transfer costs during frequent polling.
+
+**Benefits**:
+- **Simplicity**: Keeps database queries lightweight and extremely fast (under 1ms).
+- **Network Efficiency**: Reduces synchronization payloads from megabytes to bytes when no updates exist.
+- **Rich Hickey Quality**: Preserves the value-oriented, append-only nature of the database, treating synchronization as a projection of historical logs since a logical epoch.

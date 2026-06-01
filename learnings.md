@@ -164,4 +164,7 @@
 - **CSS Grid-Based Drawer Reusability**: Utilizing `grid-template-rows: 0fr -> 1fr` coupled with `transition` and `overflow: hidden` remains the gold standard for layout-shift-free accordion expansions in CSS. Reusing this pattern across distinct component types (Glossary, Areas of Focus, Committees) guarantees aesthetic consistency and eliminates layout jank.
 - **Interactive Component Paddings**: Setting container cards to `padding: 0; overflow: hidden` and moving the spacing to the header button (`padding: var(--space-md)`) and internal drawer content container (`padding: var(--space-md)`) ensures that expandable drawers align flush with borders when open, avoiding awkward double-padding.
 
-
+## Edge Sync APIs & D1 Transaction Log Delta Syncing
+- **Transaction-Log Incremental Extraction**: Querying SQLite facts tables using monotonically increasing `tx_id` autoincrement keys maps directly to Datomic's transaction logging principles. It allows clients to sync logs incrementally at O(1) database cost.
+- **Unified Sync Payloads**: Bundling incremental fact queries and static configuration files (`rotary-basics.json`, `rcns-profile.json`, `ri-history.json`) into a single REST endpoint `/api/sync` streamlines client architecture by reducing request roundtrips.
+- **Dynamic Head Tracking**: Returning the database's absolute `MAX(tx_id)` for each fact type (even when the synced list is empty) ensures clients are aware of the latest server state, preventing redundant syncing runs.
