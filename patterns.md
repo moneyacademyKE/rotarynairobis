@@ -473,3 +473,16 @@
 - **Simplicity**: Keeps visual code dry and copy clean. Avoids syntax regressions.
 - **Robustness**: Enforces strict content typing at the boundary.
 - **Testability**: Makes unit testing of content shapes possible.
+
+## Pattern: Schema Dependency Linearization (Zod Hoisting Resolution)
+**Problem**: Interdependent schema structures declared in the same module can cause silent runtime hoisting failures. Referencing a schema before its declaration line results in a reference crash inside test engines or serverless deployment environments.
+
+**Solution**:
+1.  **Define Leaf Schemas First**: Identify the most basic, independent schema building blocks (e.g., individual item specs).
+2.  **Arrange Schemas Linearly**: Lay out schema declarations in the file from leaf level to branch level, ending with the master container schema.
+3.  **Strict Boundary Separation**: Validate database outputs or static files against this linearized schema chain at entry boundaries.
+
+**Benefits**:
+- **Reliability**: Eliminates runtime reference errors during test execution.
+- **Maintainability**: Clear, logical schema definition order from simplest to most complex.
+- **Security**: Ensures value typing validation is guaranteed at compilation time.

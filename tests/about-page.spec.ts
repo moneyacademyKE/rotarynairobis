@@ -71,4 +71,57 @@ test.describe('RCNS About Page E2E Verification', () => {
     // 7. Verify all cards are visible again (auto-polls)
     await expect(glossaryCards).toHaveCount(initialCount);
   });
+
+  test('Should render 7 Areas of Focus and support expandable insight drawers', async ({ page }) => {
+    const focusCards = page.locator('.focus-card');
+    await expect(focusCards).toHaveCount(7);
+
+    // Verify Supporting the Environment is present
+    const envCard = focusCards.filter({ hasText: 'Supporting the Environment' });
+    await expect(envCard).toBeVisible();
+
+    // Verify clicking a card opens the drawer
+    const peaceCard = focusCards.filter({ hasText: 'Peace & Conflict Resolution' });
+    const peaceHeader = peaceCard.locator('.focus-card-header');
+    const peaceDrawer = peaceCard.locator('.focus-drawer');
+
+    // Initially drawer should not be open
+    await expect(peaceDrawer).not.toHaveClass(/focus-drawer--open/);
+
+    // Click header to open
+    await peaceHeader.click();
+    await expect(peaceDrawer).toHaveClass(/focus-drawer--open/);
+    await expect(peaceDrawer.locator('.drawer-overview')).toContainText('grassroots');
+
+    // Click again to close
+    await peaceHeader.click();
+    await expect(peaceDrawer).not.toHaveClass(/focus-drawer--open/);
+  });
+
+  test('Should render Club Leadership & Committees section and support expandable insight drawers', async ({ page }) => {
+    const committeeCards = page.locator('.committee-card');
+    await expect(committeeCards).toHaveCount(7);
+
+    // Verify Membership card is present
+    const memberCard = committeeCards.filter({ hasText: 'Membership & Retention' });
+    await expect(memberCard).toBeVisible();
+
+    // Verify clicking a committee card opens the drawer
+    const leadershipCard = committeeCards.filter({ hasText: 'Executive Board Leadership' });
+    const leadershipHeader = leadershipCard.locator('.committee-card-header');
+    const leadershipDrawer = leadershipCard.locator('.committee-drawer');
+
+    // Initially drawer should not be open
+    await expect(leadershipDrawer).not.toHaveClass(/committee-drawer--open/);
+
+    // Click to open
+    await leadershipHeader.click();
+    await expect(leadershipDrawer).toHaveClass(/committee-drawer--open/);
+    await expect(leadershipDrawer.locator('.drawer-overview')).toContainText('Executive leadership steers');
+    await expect(leadershipDrawer.locator('.drawer-section--example')).toBeVisible();
+
+    // Click again to close
+    await leadershipHeader.click();
+    await expect(leadershipDrawer).not.toHaveClass(/committee-drawer--open/);
+  });
 });

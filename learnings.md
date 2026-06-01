@@ -159,4 +159,9 @@
 ## Decoupled UI Presentation Mapping (Rebranding)
 - **Immutable Fact Preservation**: Rebranding a handle (from `@rcns` to `@rotarynairobis`) should be handled at the frontend projection layer, rather than executing destructive SQL updates or editing seed scripts. This satisfies the Rich Hickey doctrine by preserving historical data integrity (as raw facts remain unmodified) while minimizing implementation complexity and preventing parser/test regressions.
 
+## Zod Schema Hoisting & CSS Grid Drawer Transitions
+- **Zod Schema Initialization Hoisting**: In TypeScript files containing multiple interconnected schemas, referencing a schema (e.g. `GlossaryInsightSchema`) in a schema declared earlier (e.g. `AreaOfFocusItemSchema`) will crash at runtime with a `ReferenceError: Cannot access 'X' before initialization` inside test or execution runners. Always arrange definitions linearly from basic dependencies to composite parent objects to prevent hoisting runtime crashes.
+- **CSS Grid-Based Drawer Reusability**: Utilizing `grid-template-rows: 0fr -> 1fr` coupled with `transition` and `overflow: hidden` remains the gold standard for layout-shift-free accordion expansions in CSS. Reusing this pattern across distinct component types (Glossary, Areas of Focus, Committees) guarantees aesthetic consistency and eliminates layout jank.
+- **Interactive Component Paddings**: Setting container cards to `padding: 0; overflow: hidden` and moving the spacing to the header button (`padding: var(--space-md)`) and internal drawer content container (`padding: var(--space-md)`) ensures that expandable drawers align flush with borders when open, avoiding awkward double-padding.
+
 

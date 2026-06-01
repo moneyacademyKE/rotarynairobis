@@ -65,37 +65,271 @@
       "id": "peace",
       "title": "Peace & Conflict Resolution",
       "description": "Training leaders to prevent and resolve conflict and build peaceful communities.",
-      "icon": "🕊️"
+      "icon": "🕊️",
+      "insight": {
+        "overview": "Rotary builds peace from the grassroots up, training leaders to prevent and resolve conflict and address the structural causes of violence.",
+        "keyFacts": [
+          "Over 1,500 Peace Fellows trained globally since 2002",
+          "Rotary Peace Centers located at premier partner universities across 6 continents",
+          "Focuses on root causes of conflict: poverty, inequality, and lack of education",
+          "Dozens of global grants support mediation training, refugee support, and reconciliation"
+        ],
+        "whyItMatters": "Conflicts destroy communities and undo decades of economic development. Fostering understanding and local mediation capacity builds lasting social stability.",
+        "districtConnection": "District 9212 operates in regions with historical and cross-border tensions. Clubs actively support local peace forums and inter-community dialogue projects.",
+        "tip": "Members can nominate peace advocates and local leaders for the fully funded Rotary Peace Fellowship program annually."
+      }
     },
     {
       "id": "disease",
       "title": "Disease Prevention & Treatment",
       "description": "Improving healthcare infrastructure and funding programs to combat major diseases like polio and malaria.",
-      "icon": "🏥"
+      "icon": "🏥",
+      "insight": {
+        "overview": "Rotary supports healthcare infrastructure, funds immunizations, and improves clinical access to combat major infectious and non-communicable diseases.",
+        "keyFacts": [
+          "Protected over 2.5 billion children from polio globally",
+          "Malaria partners in Zambia reduced disease cases by 90% in target districts",
+          "Sponsors mobile medical clinics, equipment donations, and doctor training programs",
+          "Supports free community health screenings for HIV, tuberculosis, diabetes, and cancers"
+        ],
+        "whyItMatters": "Good health is the foundation of community progress. Preventing disease keeps children in school and parents productive, breaking cycles of poverty.",
+        "districtConnection": "District 9212 clubs lead major outreach campaigns, funding maternal health clinics, malaria net distributions, and mobile health clinics in remote areas.",
+        "tip": "Partner with local public health ministries to align club medical camps with national vaccination calendars for maximum impact."
+      }
     },
     {
       "id": "water",
       "title": "Water & Sanitation",
       "description": "Providing clean water, sanitation systems, and hygiene education to prevent waterborne illness.",
-      "icon": "💧"
+      "icon": "💧",
+      "insight": {
+        "overview": "We provide clean water, build sanitation facilities, and teach hygiene practices to ensure communities stay healthy and self-sufficient.",
+        "keyFacts": [
+          "2.2 billion people globally lack access to safe drinking water",
+          "Rotary WASH projects serve millions in schools and rural communities",
+          "Emphasis is placed on installing local water committees to maintain systems",
+          "Integrates sanitation facilities with hygiene education for complete protection"
+        ],
+        "whyItMatters": "Waterborne diseases are a leading cause of child mortality. Clean water keeps communities healthy, safe, and economically productive.",
+        "districtConnection": "Droughts and water scarcity affect many areas in East Africa. RCNS coordinates borehole drilling, piping, and school rainwater harvesting projects.",
+        "tip": "Never install a water system without training a local water management committee and establishing a local maintenance fund."
+      }
     },
     {
       "id": "maternal",
       "title": "Maternal & Child Health",
       "description": "Expanding access to quality care and resources so mothers and children can lead healthy lives.",
-      "icon": "👶"
+      "icon": "👶",
+      "insight": {
+        "overview": "We expand access to quality care and resources so vulnerable mothers and children can lead healthy, thriving lives.",
+        "keyFacts": [
+          "Rotary provides mobile health clinics, prenatal kits, and midwife training",
+          "Projects supply incubators, solar-powered lighting, and ultrasound machines to rural clinics",
+          "Sponsors cervical cancer screenings and HPV vaccinations for girls",
+          "Educates mothers on nutrition, breastfeeding, and childhood immunizations"
+        ],
+        "whyItMatters": "Safe childbirth and healthy early childhood development are crucial for the long-term well-being and prosperity of societies.",
+        "districtConnection": "Rural health centers in District 9212 receive vital upgrades (solar systems, clean water, medical equipment) sponsored by local and international clubs.",
+        "tip": "Sponsor professional training for local midwives or community health promoters to ensure continuous care after the project ends."
+      }
     },
     {
       "id": "education",
       "title": "Basic Education & Literacy",
       "description": "Supporting programs that train teachers, reduce illiteracy, and provide education materials to children in need.",
-      "icon": "📚"
+      "icon": "📚",
+      "insight": {
+        "overview": "We build schools, train teachers, and provide learning materials to fight illiteracy and build strong educational foundations for children.",
+        "keyFacts": [
+          "Over 250 million children worldwide lack basic reading and writing skills",
+          "Rotary projects train teachers in modern, student-centered pedagogies",
+          "Supports digital learning labs, library builds, and adult literacy courses",
+          "Provides scholarship funding and school supplies to underprivileged pupils"
+        ],
+        "whyItMatters": "Education is the ultimate escape route from poverty. Literacy improves health, income potential, and community engagement.",
+        "districtConnection": "RCNS and other District 9212 clubs fund school library builds, supply textbooks, and support computer labs in underprivileged schools.",
+        "tip": "Focus on teacher training rather than just donating books; skilled educators amplify the impact of every resource."
+      }
     },
     {
       "id": "economy",
       "title": "Economic & Community Development",
       "description": "Fostering local entrepreneurship, creating jobs, and funding community improvement initiatives.",
-      "icon": "📈"
+      "icon": "📈",
+      "insight": {
+        "overview": "We foster local entrepreneurship, provide micro-loans, and run vocational training to reduce poverty and create jobs.",
+        "keyFacts": [
+          "Rotary partners with local micro-lenders to offer interest-free business capital",
+          "Supports agricultural co-ops with equipment and modern farming training",
+          "Focuses on women's empowerment groups and young entrepreneurs",
+          "Provides vocational scholarships for underemployed youth"
+        ],
+        "whyItMatters": "Financial independence breaks cycles of poverty and elevates entire communities, fostering self-reliance.",
+        "districtConnection": "District 9212 clubs support table banking, micro-business training, and vocational scholarships in informal settlements.",
+        "tip": "Always combine microfinance with basic financial literacy training to maximize business survival rates."
+      }
+    },
+    {
+      "id": "environment",
+      "title": "Supporting the Environment",
+      "description": "Conserving natural resources, promoting ecological sustainability, and fostering harmony with nature.",
+      "icon": "🌱",
+      "insight": {
+        "overview": "We conserve natural resources, promote ecological sustainability, and combat climate change to foster harmony with nature.",
+        "keyFacts": [
+          "Adopted in 2020 as Rotary's official seventh Area of Focus",
+          "Over $18 million in environmental global grants approved since inception",
+          "Focuses on reforestation, waste management, clean energy, and conservation",
+          "Supports sustainable agriculture and community-led climate adaptation"
+        ],
+        "whyItMatters": "Environmental degradation directly impacts food security, health, and economic stability, particularly for vulnerable populations.",
+        "districtConnection": "East Africa faces severe climate-related challenges. District 9212 clubs run massive tree planting campaigns, school solar installations, and river cleanups.",
+        "tip": "Initiate waste segregation and recycling programs in local schools to foster environmental consciousness early."
+      }
+    }
+  ],
+  "committeesTitle": "Club Leadership & Committees",
+  "committeesIntro": "A Rotary club functions through a dedicated board of directors and specialized committees that plan, execute, and oversee all operations. Here is a deep dive into our core organizational units:",
+  "committees": [
+    {
+      "id": "leadership",
+      "title": "Executive Board Leadership",
+      "description": "Comprising the President, Secretary, Treasurer, and President-Elect, this core board guides the club's strategy and operations.",
+      "icon": "👑",
+      "insight": {
+        "overview": "Executive leadership steers the club's strategic direction, ensuring compliance with Rotary International bylaws, supervising finances, and maintaining regional alignment.",
+        "howTheyDoIt": [
+          "Presiding over board meetings and bi-monthly club fellowships",
+          "Drafting and auditing the annual club budget and membership targets",
+          "Logging membership status, fellowship attendance, and dues collections in Rotary Club Central",
+          "Liaising with the District 9212 Governor and Assistant Governors to coordinate regional visits"
+        ],
+        "topAchievements": [
+          "Attained a 100% financial audit rating with clear allocations for service and administration",
+          "Maintained a 92% member engagement rate across projects, assemblies, and fellowships",
+          "Awarded the Rotary Club Central Citation for timely goal setting and reporting"
+        ],
+        "example": "RCNS Executive Board successfully streamlined administrative overhead by migrating to a digital accounting and attendance platform, reducing reporting delays by 80%."
+      }
+    },
+    {
+      "id": "admin",
+      "title": "Club Administration",
+      "description": "Manages internal operations, weekly fellowship logistics, guest speaker programs, and social calendars.",
+      "icon": "📅",
+      "insight": {
+        "overview": "The Administration committee is the engine that keeps fellowships running smoothly, ensuring members feel welcome and connected.",
+        "howTheyDoIt": [
+          "Scheduling a diverse lineup of guest speakers covering professional, health, and community topics",
+          "Managing meeting venues, hybrid broadcast setups, and meal bookings",
+          "Organizing internal social events, sports outings, and joint fellowships with other clubs"
+        ],
+        "topAchievements": [
+          "Sustained weekly attendance rates above 85% through highly relevant guest speakers",
+          "Successfully coordinated 4 joint fellowships, fostering cross-club collaboration"
+        ],
+        "example": "Organized a hybrid fellowship featuring a prominent public health specialist that attracted over 120 virtual and in-person attendees from across 5 districts."
+      }
+    },
+    {
+      "id": "membership",
+      "title": "Membership & Retention",
+      "description": "Focuses on recruiting prospective members, engaging current members, and running the fireside onboarding process.",
+      "icon": "👥",
+      "insight": {
+        "overview": "Membership is the lifeblood of Rotary. This committee identifies talent, educates prospects, and pairs mentors with new recruits to maintain high retention.",
+        "howTheyDoIt": [
+          "Conducting informative membership recruitment nights and interest fellowships",
+          "Running structured 'Fireside Chats' to educate prospects on Rotary expectations and avenues of service",
+          "Implementing a formal mentorship program for new inductees during their first year",
+          "Analyzing member satisfaction surveys to adapt club culture and activities"
+        ],
+        "topAchievements": [
+          "Achieved a 15% net membership growth while maintaining a 94% retention rate",
+          "Successfully transitioned 100% of new inductees into active committee roles within 90 days"
+        ],
+        "example": "Created a 'Rotary Buddy' mentorship framework that paired new members with veterans, yielding a perfect 100% retention rate for the 2025 cohort."
+      }
+    },
+    {
+      "id": "public-image",
+      "title": "Public Image & Marketing",
+      "description": "Promotes the club's activities and service projects to the media and public, managing digital and social channels.",
+      "icon": "📢",
+      "insight": {
+        "overview": "Public Image translates service into stories. This committee ensures the public understands who Rotarians are: 'People of Action' making a difference.",
+        "howTheyDoIt": [
+          "Updating and styling the club website and managing active social media channels (Twitter, Instagram, TikTok)",
+          "Drafting press releases and pitches for local media coverage of major projects",
+          "Designing high-impact flyers and video content using official Rotary Brand Center templates",
+          "Ensuring consistent visual and messaging alignment with Rotary's global guidelines"
+        ],
+        "topAchievements": [
+          "Secured major coverage in regional newspapers and television for a clean water project launch",
+          "Grew social media engagement by 120% through weekly video recaps of fellowships and service projects"
+        ],
+        "example": "Produced a high-quality video campaign for the 'Water for Schools' initiative, which received 10,000+ views and directly generated 5 qualified membership leads."
+      }
+    },
+    {
+      "id": "service-projects",
+      "title": "Service Projects",
+      "description": "Develops and implements local community and international service initiatives aligned with the Areas of Focus.",
+      "icon": "🛠️",
+      "insight": {
+        "overview": "Service Projects turn empathy into action. This committee conducts community needs assessments and directs resources where they can create permanent change.",
+        "howTheyDoIt": [
+          "Engaging directly with local community leaders to conduct participatory needs assessments",
+          "Drafting project proposals, budgets, and volunteer mobilization plans",
+          "Coordinating with local partners, contractors, and local government officials for project execution",
+          "Monitoring and evaluating projects long-term to ensure sustainable benefits"
+        ],
+        "topAchievements": [
+          "Delivered 3 sustainable projects serving over 5,000 local community beneficiaries",
+          "Partnered with an international club to design a long-term agricultural vocational program"
+        ],
+        "example": "Partnered with a rural primary school to install a rainwater-harvesting facility, resulting in zero waterborne illnesses and a 30% increase in student attendance."
+      }
+    },
+    {
+      "id": "foundation",
+      "title": "The Rotary Foundation",
+      "description": "Educates members on global grant opportunities and drives annual giving to support global humanitarian service.",
+      "icon": "🛡️",
+      "insight": {
+        "overview": "The Rotary Foundation transforms member contributions into global grants, supporting life-changing initiatives like polio eradication and international health programs.",
+        "howTheyDoIt": [
+          "Promoting 'Every Rotarian, Every Year' (EREY) campaign to encourage regular giving",
+          "Coordinating club applications for District and Global matching grants",
+          "Managing strict financial audits and progress reports for active grant projects",
+          "Tracking and celebrating Paul Harris Fellow (PHF) recognition milestones"
+        ],
+        "topAchievements": [
+          "Achieved 100% EREY member contribution participation, raising over $15,000 in a single year",
+          "Secured and successfully executed a $65,000 matching Global Grant for maternal health clinics"
+        ],
+        "example": "Combined $12,000 of club-raised funds with district matching and TRF funds to secure a $45,000 grant, purchasing modern medical equipment for a local maternity clinic."
+      }
+    },
+    {
+      "id": "youth",
+      "title": "Youth & New Generations",
+      "description": "Nurtures young leaders by sponsoring and mentoring Interact and Rotaract clubs and sending delegates to RYLA.",
+      "icon": "🌱",
+      "insight": {
+        "overview": "New Generations focuses on empowering youth and young adults, supporting leadership training and cross-generational service collaboration.",
+        "howTheyDoIt": [
+          "Sponsoring and attending weekly/monthly meetings of local Interact (high school) and Rotaract (university/young professional) clubs",
+          "Sponsoring delegates to attend the annual Rotary Youth Leadership Awards (RYLA) training camp",
+          "Organizing combined service projects that unite Rotaractors and Rotarians in field service",
+          "Providing career mentoring and vocational guidance to students and recent graduates"
+        ],
+        "topAchievements": [
+          "Successfully chartered a new high school Interact club with 45 founding members",
+          "Sponsored 8 outstanding youth for RYLA leadership development courses"
+        ],
+        "example": "Collaborated with our sponsored Rotaract club to run a regional youth career development summit that trained 150 graduates in resume writing and interview prep."
+      }
     }
   ],
   "foundationFacts": {

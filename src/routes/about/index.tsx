@@ -13,6 +13,8 @@ export default component$(() => {
   const searchGlossary = useSignal("");
   const activeAvenue = useSignal("club");
   const openGlossaryTerm = useSignal<string | null>(null);
+  const openFocusArea = useSignal<string | null>(null);
+  const openCommittee = useSignal<string | null>(null);
 
   useStylesScoped$(STYLES);
 
@@ -135,21 +137,161 @@ export default component$(() => {
           <span class="kicker-centered">Global Impact</span>
           <h2 class="section-title-centered">{data.areasOfFocusTitle}</h2>
           <p class="section-intro-centered">
-            Rotary directs our service in six key areas of focus to address humanity's most pressing challenges.
+            Rotary directs our service in seven key areas of focus to address humanity's most pressing challenges.
           </p>
         </div>
         <div class="focus-grid">
-          {data.areasOfFocus.map((focus) => (
-            <div key={focus.id} class="focus-card">
-              <div class="focus-icon-wrap">
-                <span class="focus-icon">{focus.icon}</span>
+          {data.areasOfFocus.map((focus) => {
+            const isOpen = openFocusArea.value === focus.id;
+            return (
+              <div 
+                key={focus.id} 
+                class={["focus-card", isOpen ? "focus-card--open" : "", focus.insight ? "focus-card--expandable" : ""].filter(Boolean).join(" ")}
+              >
+                <button
+                  class="focus-card-header"
+                  onClick$={() => {
+                    openFocusArea.value = isOpen ? null : focus.id;
+                  }}
+                  aria-expanded={isOpen}
+                >
+                  <div class="focus-icon-wrap">
+                    <span class="focus-icon">{focus.icon}</span>
+                  </div>
+                  <div class="focus-title-wrap">
+                    <h3 class="focus-card-title">{focus.title}</h3>
+                    <p class="focus-card-desc">{focus.description}</p>
+                  </div>
+                  {focus.insight && (
+                    <span class="focus-chevron" aria-hidden="true">{isOpen ? "▲" : "▼"}</span>
+                  )}
+                </button>
+
+                {focus.insight && (
+                  <div class={["focus-drawer", isOpen ? "focus-drawer--open" : ""].join(" ")} aria-hidden={!isOpen}>
+                    <div class="drawer-inner">
+                      {/* Overview */}
+                      <div class="drawer-section">
+                        <p class="drawer-overview">{focus.insight.overview}</p>
+                      </div>
+
+                      {/* Key Facts */}
+                      <div class="drawer-section">
+                        <h4 class="drawer-section-title">📋 Key Facts</h4>
+                        <ul class="drawer-facts-list">
+                          {focus.insight.keyFacts.map((fact, fi) => (
+                            <li key={fi} class="drawer-fact-item">{fact}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Why It Matters */}
+                      <div class="drawer-section drawer-section--highlight">
+                        <h4 class="drawer-section-title">💡 Why It Matters</h4>
+                        <p class="drawer-body">{focus.insight.whyItMatters}</p>
+                      </div>
+
+                      {/* District Connection */}
+                      <div class="drawer-section">
+                        <h4 class="drawer-section-title">🌍 District 9212 Connection</h4>
+                        <p class="drawer-body">{focus.insight.districtConnection}</p>
+                      </div>
+
+                      {/* Pro Tip */}
+                      <div class="drawer-section drawer-section--tip">
+                        <h4 class="drawer-section-title">⭐ Pro Tip</h4>
+                        <p class="drawer-body">{focus.insight.tip}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <h3 class="focus-card-title">{focus.title}</h3>
-              <p class="focus-card-desc">{focus.description}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
+
+      {/* 6. Club Directors & Committees Section */}
+      {data.committees && (
+        <section class="committees-section">
+          <div class="section-header-centered">
+            <span class="kicker-centered">Club Machinery</span>
+            <h2 class="section-title-centered">{data.committeesTitle || "Club Leadership & Committees"}</h2>
+            <p class="section-intro-centered">
+              {data.committeesIntro || "A Rotary club functions through a dedicated board of directors and specialized committees that plan, execute, and oversee all operations."}
+            </p>
+          </div>
+          <div class="committees-grid">
+            {data.committees.map((comm) => {
+              const isOpen = openCommittee.value === comm.id;
+              return (
+                <div 
+                  key={comm.id} 
+                  class={["committee-card", isOpen ? "committee-card--open" : "", comm.insight ? "committee-card--expandable" : ""].filter(Boolean).join(" ")}
+                >
+                  <button
+                    class="committee-card-header"
+                    onClick$={() => {
+                      openCommittee.value = isOpen ? null : comm.id;
+                    }}
+                    aria-expanded={isOpen}
+                  >
+                    <div class="committee-icon-wrap">
+                      <span class="committee-icon">{comm.icon}</span>
+                    </div>
+                    <div class="committee-title-wrap">
+                      <h3 class="committee-card-title">{comm.title}</h3>
+                      <p class="committee-card-desc">{comm.description}</p>
+                    </div>
+                    {comm.insight && (
+                      <span class="committee-chevron" aria-hidden="true">{isOpen ? "▲" : "▼"}</span>
+                    )}
+                  </button>
+
+                  {comm.insight && (
+                    <div class={["committee-drawer", isOpen ? "committee-drawer--open" : ""].join(" ")} aria-hidden={!isOpen}>
+                      <div class="drawer-inner">
+                        {/* Overview */}
+                        <div class="drawer-section">
+                          <p class="drawer-overview">{comm.insight.overview}</p>
+                        </div>
+
+                        {/* How they do it */}
+                        <div class="drawer-section">
+                          <h4 class="drawer-section-title">⚙️ How They Do It</h4>
+                          <ul class="drawer-facts-list">
+                            {comm.insight.howTheyDoIt.map((step, si) => (
+                              <li key={si} class="drawer-fact-item">{step}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Top Achievements */}
+                        <div class="drawer-section drawer-section--highlight">
+                          <h4 class="drawer-section-title">🏆 Top Achievements when done right</h4>
+                          <ul class="drawer-facts-list">
+                            {comm.insight.topAchievements.map((ach, ai) => (
+                              <li key={ai} class="drawer-fact-item">{ach}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Real-world Example */}
+                        {comm.insight.example && (
+                          <div class="drawer-section drawer-section--example">
+                            <h4 class="drawer-section-title">💡 Real-world Example</h4>
+                            <p class="drawer-body">{comm.insight.example}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* 6. The Rotary Foundation & Polio Eradication */}
       <section class="impact-split-section">
@@ -670,10 +812,9 @@ const STYLES = `
   background-color: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
-  padding: var(--space-md);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
   transition: transform var(--transition-fast), border-color var(--transition-fast);
 }
 
@@ -681,6 +822,74 @@ const STYLES = `
   transform: translateY(-2px);
   border-color: var(--accent-primary);
   box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.focus-card--open {
+  border-color: oklch(76% 0.11 70 / 0.5);
+  box-shadow: 0 4px 20px oklch(76% 0.11 70 / 0.1);
+}
+
+.focus-card--expandable .focus-card-header {
+  cursor: pointer;
+}
+
+.focus-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  transition: background-color var(--transition-fast);
+}
+
+.focus-card-header:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+.focus-card-header:hover {
+  background-color: oklch(from var(--accent-primary) l c h / 0.02);
+}
+
+.focus-title-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.focus-chevron {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.focus-card--open .focus-chevron {
+  color: var(--accent-primary);
+}
+
+.focus-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-out-expo), border-top-width 0.1s;
+  border-top: 0px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.focus-drawer--open {
+  grid-template-rows: 1fr;
+  border-top-width: 1px;
+}
+
+.focus-drawer--open .drawer-inner {
+  padding: var(--space-md);
 }
 
 .focus-icon-wrap {
@@ -692,6 +901,7 @@ const STYLES = `
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .focus-icon {
@@ -711,6 +921,149 @@ const STYLES = `
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
+}
+
+/* ── Club Committees Section ──────────────────────── */
+.committees-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--space-lg);
+}
+
+.committees-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .committees-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.committee-card {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.committee-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.committee-card--open {
+  border-color: oklch(76% 0.11 70 / 0.5);
+  box-shadow: 0 4px 20px oklch(76% 0.11 70 / 0.1);
+}
+
+.committee-card--expandable .committee-card-header {
+  cursor: pointer;
+}
+
+.committee-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  transition: background-color var(--transition-fast);
+}
+
+.committee-card-header:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+.committee-card-header:hover {
+  background-color: oklch(from var(--accent-primary) l c h / 0.02);
+}
+
+.committee-title-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.committee-chevron {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.committee-card--open .committee-chevron {
+  color: var(--accent-primary);
+}
+
+.committee-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-out-expo), border-top-width 0.1s;
+  border-top: 0px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.committee-drawer--open {
+  grid-template-rows: 1fr;
+  border-top-width: 1px;
+}
+
+.committee-drawer--open .drawer-inner {
+  padding: var(--space-md);
+}
+
+.committee-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-color: oklch(from var(--accent-primary) l c h / 0.1);
+  border: 1px solid oklch(from var(--accent-primary) l c h / 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.committee-icon {
+  font-size: 1.5rem;
+}
+
+.committee-card-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.committee-card-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.drawer-section--example {
+  background: oklch(140% 0.08 140 / 0.04);
+  border: 1px dashed oklch(140% 0.08 140 / 0.25);
+  border-radius: 10px;
+  padding: var(--space-sm);
 }
 
 /* Impact Split Section */

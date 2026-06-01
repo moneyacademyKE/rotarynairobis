@@ -1,6 +1,14 @@
 import { z } from "zod";
 
 // Zod schemas for the About page content structures
+export const GlossaryInsightSchema = z.object({
+  overview: z.string(),
+  keyFacts: z.array(z.string()),
+  whyItMatters: z.string(),
+  districtConnection: z.string(),
+  tip: z.string(),
+});
+
 export const FourWayTestItemSchema = z.object({
   id: z.number(),
   question: z.string(),
@@ -19,6 +27,22 @@ export const AreaOfFocusItemSchema = z.object({
   title: z.string(),
   description: z.string(),
   icon: z.string(),
+  insight: GlossaryInsightSchema.optional(),
+});
+
+export const CommitteeInsightSchema = z.object({
+  overview: z.string(),
+  howTheyDoIt: z.array(z.string()),
+  topAchievements: z.array(z.string()),
+  example: z.string().optional(),
+});
+
+export const CommitteeItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  icon: z.string(),
+  insight: CommitteeInsightSchema.optional(),
 });
 
 export const FoundationFactsSchema = z.object({
@@ -47,13 +71,6 @@ export const RotaryNumbersSchema = z.object({
   zonesCount: z.string(),
 });
 
-export const GlossaryInsightSchema = z.object({
-  overview: z.string(),
-  keyFacts: z.array(z.string()),
-  whyItMatters: z.string(),
-  districtConnection: z.string(),
-  tip: z.string(),
-});
 
 export const GlossaryItemSchema = z.object({
   term: z.string(),
@@ -74,6 +91,9 @@ export const AboutPageDataSchema = z.object({
   avenuesOfService: z.array(AvenueOfServiceItemSchema),
   areasOfFocusTitle: z.string(),
   areasOfFocus: z.array(AreaOfFocusItemSchema),
+  committeesTitle: z.string().optional(),
+  committeesIntro: z.string().optional(),
+  committees: z.array(CommitteeItemSchema).optional(),
   foundationFacts: FoundationFactsSchema,
   polioEradication: PolioEradicationSchema,
   numbers: RotaryNumbersSchema,

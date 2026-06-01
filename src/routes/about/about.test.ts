@@ -32,12 +32,36 @@ describe("About Page Spec Boundaries & Data Integrity", () => {
     expect(ids).toContain("youth");
   });
 
-  it("should contain all six Areas of Focus", () => {
+  it("should contain all seven Areas of Focus with insight drawers", () => {
     const parsed = parseAboutPageData(rawData);
-    expect(parsed.areasOfFocus).toHaveLength(6);
+    expect(parsed.areasOfFocus).toHaveLength(7);
     const titles = parsed.areasOfFocus.map((f) => f.title);
     expect(titles).toContain("Peace & Conflict Resolution");
     expect(titles).toContain("Water & Sanitation");
+    expect(titles).toContain("Supporting the Environment");
+
+    // Verify insights exist
+    const peaceFocus = parsed.areasOfFocus.find((f) => f.id === "peace");
+    expect(peaceFocus?.insight).toBeDefined();
+    expect(peaceFocus?.insight?.overview).toContain("grassroots");
+  });
+
+  it("should contain all seven Club Leadership and Committees", () => {
+    const parsed = parseAboutPageData(rawData);
+    expect(parsed.committees).toBeDefined();
+    expect(parsed.committees).toHaveLength(7);
+    const ids = parsed.committees!.map((c) => c.id);
+    expect(ids).toContain("leadership");
+    expect(ids).toContain("admin");
+    expect(ids).toContain("membership");
+    expect(ids).toContain("public-image");
+    expect(ids).toContain("service-projects");
+    expect(ids).toContain("foundation");
+    expect(ids).toContain("youth");
+
+    const membershipComm = parsed.committees!.find((c) => c.id === "membership");
+    expect(membershipComm?.insight).toBeDefined();
+    expect(membershipComm?.insight?.overview).toContain("lifeblood");
   });
 
   it("should parse Foundation and Polio statistics accurately", () => {
