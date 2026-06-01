@@ -500,3 +500,18 @@
 - **Simplicity**: Keeps database queries lightweight and extremely fast (under 1ms).
 - **Network Efficiency**: Reduces synchronization payloads from megabytes to bytes when no updates exist.
 - **Rich Hickey Quality**: Preserves the value-oriented, append-only nature of the database, treating synchronization as a projection of historical logs since a logical epoch.
+
+## Pattern: The Layout-Shift-Free Responsive Image Wrapper
+**Problem**: Lazily loading heavy image assets (like the District team leadership photo or flyers) causes Cumulative Layout Shift (CLS) when the image is downloaded and rendered, pushing other content blocks down and creating layout jank.
+
+**Solution**:
+1. **Aspect-Ratio Allocations**: Set a native `aspect-ratio` property (e.g. `16 / 9`) on the wrapping container or the image itself to reserve precise screen dimensions in the browser's rendering tree before loading.
+2. **Object-Fit Containment**: Combine `aspect-ratio` with `object-fit: cover` to preserve image visual proportions without horizontal or vertical stretching.
+3. **Glassmorphic Boundaries**: Overlay cards and image borders with soft semi-transparent highlights (`border: 1px solid var(--border-subtle)`) and dark backdrops (`background-color: var(--bg-obsidian)`) to elevate premium aesthetic visuals.
+4. **Interaction Scale Transitions**: Apply micro-interactions via `transform: scale()` on hover to elevate the premium user experience.
+
+**Benefits**:
+- **Zero CLS score**: Eliminates Cumulative Layout Shift completely.
+- **Premium Visual Fidelity**: Fluid layout adapts gracefully across varying device screen sizes.
+- **Micro-animations**: Enhances user engagement with soft, hardware-accelerated transitions.
+

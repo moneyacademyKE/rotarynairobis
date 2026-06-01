@@ -124,4 +124,80 @@ test.describe('RCNS About Page E2E Verification', () => {
     await leadershipHeader.click();
     await expect(leadershipDrawer).not.toHaveClass(/committee-drawer--open/);
   });
+
+  test('Should render expandable Four-Way Test cards and support drawers', async ({ page }) => {
+    const fourWayCards = page.locator('.four-way-card');
+    await expect(fourWayCards).toHaveCount(4);
+
+    const firstCard = fourWayCards.first();
+    const firstHeader = firstCard.locator('.four-way-card-header');
+    const firstDrawer = firstCard.locator('.four-way-drawer');
+
+    // Initially closed
+    await expect(firstDrawer).not.toHaveClass(/four-way-drawer--open/);
+
+    // Open it
+    await firstHeader.click();
+    await expect(firstDrawer).toHaveClass(/four-way-drawer--open/);
+    await expect(firstDrawer.locator('.drawer-overview')).toContainText('foundation of trust');
+
+    // Close it
+    await firstHeader.click();
+    await expect(firstDrawer).not.toHaveClass(/four-way-drawer--open/);
+  });
+
+  test('Should support Avenues of Service tab switching and deep insights drawer', async ({ page }) => {
+    const pills = page.locator('.avenue-pill');
+    await expect(pills).toHaveCount(5);
+
+    // Click community service pill
+    const communityPill = pills.filter({ hasText: 'Community Service' });
+    await communityPill.click();
+
+    const detailContainer = page.locator('.avenue-active-details');
+    await expect(detailContainer.locator('.avenue-details-title')).toContainText('Community Service');
+
+    // Try opening deep insights drawer
+    const detailsHeaderBtn = detailContainer.locator('.avenue-details-header-btn');
+    const detailsDrawer = detailContainer.locator('.avenue-drawer');
+
+    await expect(detailsDrawer).not.toHaveClass(/avenue-drawer--open/);
+
+    // Open it
+    await detailsHeaderBtn.click();
+    await expect(detailsDrawer).toHaveClass(/avenue-drawer--open/);
+    await expect(detailsDrawer.locator('.drawer-overview')).toContainText('quality of life');
+
+    // Close it
+    await detailsHeaderBtn.click();
+    await expect(detailsDrawer).not.toHaveClass(/avenue-drawer--open/);
+  });
+
+  test('Should render District Transition section and support toggling details', async ({ page }) => {
+    const transitionSection = page.locator('.transition-section');
+    await expect(transitionSection).toBeVisible();
+    await expect(transitionSection.locator('.section-title-centered')).toContainText('Historic District Reorganization');
+
+    const transitionCard = page.locator('.transition-card');
+    const toggleBtn = transitionCard.locator('.transition-header-btn');
+    const transitionDrawer = transitionCard.locator('.transition-drawer');
+
+    // Initially closed
+    await expect(transitionDrawer).not.toHaveClass(/transition-drawer--open/);
+
+    // Open it
+    await toggleBtn.click();
+    await expect(transitionDrawer).toHaveClass(/transition-drawer--open/);
+    await expect(transitionDrawer.locator('.district-split-grid')).toBeVisible();
+    await expect(transitionDrawer.locator('.drawer-section--highlight')).toContainText('District 9215');
+    
+    // Verify leadership photo is visible and styled properly
+    const leadershipPhoto = transitionDrawer.locator('.transition-team-photo');
+    await expect(leadershipPhoto).toBeVisible();
+    await expect(leadershipPhoto).toHaveAttribute('src', '/images/district-9215-team.jpg');
+
+    // Close it
+    await toggleBtn.click();
+    await expect(transitionDrawer).not.toHaveClass(/transition-drawer--open/);
+  });
 });

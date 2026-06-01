@@ -12,16 +12,19 @@ describe("About Page Spec Boundaries & Data Integrity", () => {
     expect(parsed.glossaryTitle).toBe("Rotary Glossary");
   });
 
-  it("should contain exactly four elements in the Four-Way Test", () => {
+  it("should contain exactly four elements in the Four-Way Test with insights", () => {
     const parsed = parseAboutPageData(rawData);
     expect(parsed.fourWayTest).toHaveLength(4);
     expect(parsed.fourWayTest[0].question).toContain("TRUTH");
     expect(parsed.fourWayTest[1].question).toContain("FAIR");
     expect(parsed.fourWayTest[2].question).toContain("GOODWILL");
     expect(parsed.fourWayTest[3].question).toContain("BENEFICIAL");
+
+    expect(parsed.fourWayTest[0].insight).toBeDefined();
+    expect(parsed.fourWayTest[0].insight?.overview).toContain("foundation");
   });
 
-  it("should contain exactly five Avenues of Service", () => {
+  it("should contain exactly five Avenues of Service with insights", () => {
     const parsed = parseAboutPageData(rawData);
     expect(parsed.avenuesOfService).toHaveLength(5);
     const ids = parsed.avenuesOfService.map((a) => a.id);
@@ -30,6 +33,20 @@ describe("About Page Spec Boundaries & Data Integrity", () => {
     expect(ids).toContain("community");
     expect(ids).toContain("international");
     expect(ids).toContain("youth");
+
+    expect(parsed.avenuesOfService[0].insight).toBeDefined();
+    expect(parsed.avenuesOfService[0].insight?.overview).toContain("Focuses on making");
+  });
+
+  it("should parse District Transition information accurately", () => {
+    const parsed = parseAboutPageData(rawData);
+    expect(parsed.districtTransition).toBeDefined();
+    expect(parsed.districtTransition?.title).toBe("The Historic District Reorganization");
+    expect(parsed.districtTransition?.effectiveDate).toBe("July 1, 2026");
+    expect(parsed.districtTransition?.newDistricts).toHaveLength(2);
+    expect(parsed.districtTransition?.newDistricts[0].name).toBe("District 9215");
+    expect(parsed.districtTransition?.newDistricts[1].name).toBe("District 9216");
+    expect(parsed.districtTransition?.rcnsAssignment).toContain("District 9215");
   });
 
   it("should contain all seven Areas of Focus with insight drawers", () => {

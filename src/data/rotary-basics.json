@@ -7,22 +7,70 @@
     {
       "id": 1,
       "question": "Is it the TRUTH?",
-      "description": "Truth is the foundation of trust. We commit to factual accuracy and personal integrity in all our dealings."
+      "description": "Truth is the foundation of trust. We commit to factual accuracy and personal integrity in all our dealings.",
+      "insight": {
+        "overview": "Truth is the foundation of trust. In Rotary, we commit to absolute integrity, transparent communication, and factual precision in all personal, business, and volunteer dealings.",
+        "keyFacts": [
+          "Conceived by Rotarian Herbert J. Taylor in 1932 during the Great Depression",
+          "Adopted officially by Rotary International in 1943",
+          "Translated into over 100 languages worldwide",
+          "Guides ethical and professional standards for over 1.4 million Rotarians globally"
+        ],
+        "whyItMatters": "Without truth, collaboration collapses. Practicing truthfulness builds a reputation of integrity, making partnerships and community projects far more reliable.",
+        "districtConnection": "In District 9212, verifying truth ensures that community needs assessments reflect genuine local priorities rather than inflated expectations.",
+        "tip": "Always verify project metrics and reporting data before submitting grant applications to ensure absolute compliance with TRF guidelines."
+      }
     },
     {
       "id": 2,
       "question": "Is it FAIR to all concerned?",
-      "description": "Fairness removes conflict and builds equality. We treat others with respect and seek mutual benefit."
+      "description": "Fairness removes conflict and builds equality. We treat others with respect and seek mutual benefit.",
+      "insight": {
+        "overview": "Fairness removes conflict and builds equality. We treat others with respect and seek mutual benefit.",
+        "keyFacts": [
+          "Ensures equitable distribution of club and project resources",
+          "Promotes diverse perspectives in club leadership and project selection",
+          "Prevents conflicts of interest in procurement and vendor selection",
+          "Supports marginalized groups through inclusive community project targeting"
+        ],
+        "whyItMatters": "Fairness ensures that no one is left behind or exploited, creating sustainable project outcomes that the community supports long-term.",
+        "districtConnection": "RCNS ensures fairness by involving local community committees in the decision-making process for borehole installations and school bursary distributions.",
+        "tip": "Pair community projects with a representative local committee (comprising men, women, and youth) to ensure equitable project management."
+      }
     },
     {
       "id": 3,
       "question": "Will it build GOODWILL and BETTER FRIENDSHIPS?",
-      "description": "Friendship is our core bond. We foster harmony and connection across all social and geographic boundaries."
+      "description": "Friendship is our core bond. We foster harmony and connection across all social and geographic boundaries.",
+      "insight": {
+        "overview": "Friendship is our core bond. We foster harmony and connection across all social and geographic boundaries.",
+        "keyFacts": [
+          "Rotary fellowships connect members across 200+ countries and territories",
+          "Joint club projects build strong local and regional networks",
+          "Encourages diversity, equity, and inclusion in membership",
+          "Promotes peace by building international personal friendships"
+        ],
+        "whyItMatters": "Goodwill and friendship make service enjoyable and sustainable. Strong personal connections prevent friction and build cooperative strength.",
+        "districtConnection": "District 9212 cross-border fellowships (e.g., Kenya and Ethiopia joints) build peace and regional unity in East Africa.",
+        "tip": "Attend joint fellowships and District conferences to expand your network and establish joint service partnerships."
+      }
     },
     {
       "id": 4,
       "question": "Will it be BENEFICIAL to all concerned?",
-      "description": "Beneficial service leaves the world better. We strive for positive and sustainable outcomes for our communities."
+      "description": "Beneficial service leaves the world better. We strive for positive and sustainable outcomes for our communities.",
+      "insight": {
+        "overview": "Beneficial service leaves the world better. We strive for positive and sustainable outcomes.",
+        "keyFacts": [
+          "Projects must show long-term sustainable impact",
+          "Encourages self-sufficiency rather than dependency",
+          "Evaluated through formal monitoring and evaluation",
+          "Ensures positive outcomes for donors, volunteers, and beneficiaries"
+        ],
+        "whyItMatters": "Service that is not beneficial is a waste of resources. Focus on projects that yield measurable, lasting improvements in quality of life.",
+        "districtConnection": "RCNS water harvesting systems are beneficial because they provide a permanent source of clean water, cutting school absenteeism to zero.",
+        "tip": "Design project handovers with training programs so local beneficiaries can manage and maintain facilities independently."
+      }
     }
   ],
   "avenuesOfServiceTitle": "Avenues of Service",
@@ -32,31 +80,91 @@
       "id": "club",
       "title": "Club Service",
       "description": "We have fun, build lasting friendships, and make sure that our club runs well and operates effectively.",
-      "icon": "🤝"
+      "icon": "🤝",
+      "insight": {
+        "overview": "Focuses on making the club run well, fostering relationships, and keeping members engaged.",
+        "keyFacts": [
+          "Manages fellowship schedules, guest speakers, and club logistics",
+          "Oversees membership growth and onboarding",
+          "Creates social events and opportunities for professional networking",
+          "Underpins all other avenues of service by maintaining a healthy club"
+        ],
+        "whyItMatters": "A well-run club retains members, keeps enthusiasm high, and provides the administrative platform needed to execute large-scale projects.",
+        "districtConnection": "RCNS Club Service uses digital platforms to track attendance and fellowships, ensuring Nairobi South members stay connected.",
+        "tip": "Volunteer for the administration committee to learn the inner workings of club governance and prepare for leadership roles."
+      }
     },
     {
       "id": "vocational",
       "title": "Vocational Service",
       "description": "We volunteer our professional skills to serve others and promote integrity, honesty, and high ethical standards in everything we do.",
-      "icon": "💼"
+      "icon": "💼",
+      "insight": {
+        "overview": "Promotes high ethical standards in business and uses members' professional skills to address community needs.",
+        "keyFacts": [
+          "Encourages members to act as ambassadors of ethical business",
+          "Organizes career mentoring and youth internships",
+          "Leverages professional expertise (e.g., doctors, engineers) to design service projects",
+          "Promotes The Four-Way Test in workplaces"
+        ],
+        "whyItMatters": "Vocational service bridges professional lives with humanitarian values, turning daily careers into instruments of social good.",
+        "districtConnection": "RCNS members run mentoring camps for university students in Nairobi, preparing them for the local job market.",
+        "tip": "Identify your professional strengths and offer them to the Service Projects committee for specialized technical assessments."
+      }
     },
     {
       "id": "community",
       "title": "Community Service",
       "description": "We identify local needs and work hand-in-hand with our community to bring lasting improvements, clean water, and social support.",
-      "icon": "🏡"
+      "icon": "🏡",
+      "insight": {
+        "overview": "Directs efforts toward improving the quality of life in the club's local community.",
+        "keyFacts": [
+          "Focuses on local schools, clinics, and environment",
+          "Conducts participatory needs assessments with community members",
+          "Deploys local club resources and hands-on volunteer labor",
+          "Creates immediate, tangible improvements in the immediate neighborhood"
+        ],
+        "whyItMatters": "Service starts at home. Active community service builds the club's local reputation and attracts community-minded members.",
+        "districtConnection": "RCNS Community Service leads library builds and sanitation campaigns in schools around Nairobi South.",
+        "tip": "Always involve local community leaders in project planning to secure local ownership and project durability."
+      }
     },
     {
       "id": "international",
       "title": "International Service",
       "description": "We sponsor international projects, meet humanitarian needs around the globe, and promote world understanding, collaboration, and peace.",
-      "icon": "🌍"
+      "icon": "🌍",
+      "insight": {
+        "overview": "Sponsors global projects to meet humanitarian needs, promote peace, and build cross-border understanding.",
+        "keyFacts": [
+          "Partners with international clubs on Global Grants",
+          "Supports global polio eradication and disaster response",
+          "Facilitates cultural exchanges and peace fellow sponsorships",
+          "Leverages The Rotary Foundation matches to expand project scope"
+        ],
+        "whyItMatters": "Global challenges require global partnerships. International service leverages international funds to solve large-scale problems.",
+        "districtConnection": "RCNS partners with clubs in Europe and North America to fund large maternal healthcare upgrades in Kenya.",
+        "tip": "Connect with visiting international Rotarians at fellowships to discuss prospective joint Global Grant projects."
+      }
     },
     {
       "id": "youth",
       "title": "New Generations Service",
       "description": "We work with young people to help them develop leadership, vocational skills, and become the next generation of visionaries and peacemakers.",
-      "icon": "🌱"
+      "icon": "🌱",
+      "insight": {
+        "overview": "Works with youth and young adults to build leadership skills, vocational training, and global citizenship.",
+        "keyFacts": [
+          "Sponsors Interact clubs (ages 12-18) in secondary schools",
+          "Sponsors Rotaract clubs (ages 18-30) for university and young professionals",
+          "Sends outstanding youth delegates to RYLA leadership training",
+          "Sponsors international youth exchanges"
+        ],
+        "whyItMatters": "Youth are the future of Rotary. Empowering young leaders ensures the continuity of service and builds ethical leadership in society.",
+        "districtConnection": "RCNS actively mentors sponsored Interact and Rotaract clubs in Nairobi, integrating them into joint service field work.",
+        "tip": "Invite Rotaractors to present at regular fellowships and collaborate on hands-on community service projects."
+      }
     }
   ],
   "areasOfFocusTitle": "Areas of Focus",
@@ -619,5 +727,26 @@
         "tip": "The strongest RYLA sponsorships include a post-program mentorship component — pairing each RYLA graduate with a Rotarian mentor for 6–12 months to help them apply their new skills in a real leadership role."
       }
     }
-  ]
+  ],
+  "districtTransition": {
+    "title": "The Historic District Reorganization",
+    "intro": "After 13 years of growth and impact across East Africa, District 9212 is undergoing a strategic division to bring governance closer to individual clubs and support future expansion.",
+    "effectiveDate": "July 1, 2026",
+    "oldDistrict": "District 9212 (comprising Kenya, Ethiopia, South Sudan, and Eritrea)",
+    "rationale": "Due to a massive surge in membership, new club charters, and active community projects, the vast geographical expanse of District 9212 has grown beyond the administrative capacity of a single district leadership team. Splitting the district ensures closer support, localized training, and faster coordination for all clubs.",
+    "newDistricts": [
+      {
+        "name": "District 9215",
+        "coverage": "South Sudan and the Western & Rift Valley regions of Kenya (including Western Nairobi)",
+        "focus": "Expanding rural outreach, managing water/sanitation programs, and supporting growing clubs in the agricultural heartlands."
+      },
+      {
+        "name": "District 9216",
+        "coverage": "Ethiopia, Eritrea, and the Central Highlands, Eastern, & Coast regions of Kenya (including Southern & Eastern Nairobi)",
+        "focus": "Fostering cross-border peace initiatives, scaling urban club collaborations, and expanding healthcare/maternal outreach."
+      }
+    ],
+    "rcnsAssignment": "The Rotary Club of Nairobi South (RCNS) will officially transition into District 9215 alongside several other clubs in Nairobi. This aligns the club with regional initiatives spanning South Sudan and the Western & Rift Valley corridor of Kenya.",
+    "teamPhoto": "/images/district-9215-team.jpg"
+  }
 }

@@ -13,6 +13,7 @@ export const FourWayTestItemSchema = z.object({
   id: z.number(),
   question: z.string(),
   description: z.string(),
+  insight: GlossaryInsightSchema.optional(),
 });
 
 export const AvenueOfServiceItemSchema = z.object({
@@ -20,6 +21,7 @@ export const AvenueOfServiceItemSchema = z.object({
   title: z.string(),
   description: z.string(),
   icon: z.string(),
+  insight: GlossaryInsightSchema.optional(),
 });
 
 export const AreaOfFocusItemSchema = z.object({
@@ -79,6 +81,21 @@ export const GlossaryItemSchema = z.object({
   insight: GlossaryInsightSchema.optional(),
 });
 
+export const DistrictTransitionSchema = z.object({
+  title: z.string(),
+  intro: z.string(),
+  effectiveDate: z.string(),
+  oldDistrict: z.string(),
+  rationale: z.string(),
+  newDistricts: z.array(z.object({
+    name: z.string(),
+    coverage: z.string(),
+    focus: z.string(),
+  })),
+  rcnsAssignment: z.string(),
+  teamPhoto: z.string().optional(),
+});
+
 // The master schema for the About Page data ledger
 export const AboutPageDataSchema = z.object({
   welcomeTitle: z.string(),
@@ -94,6 +111,7 @@ export const AboutPageDataSchema = z.object({
   committeesTitle: z.string().optional(),
   committeesIntro: z.string().optional(),
   committees: z.array(CommitteeItemSchema).optional(),
+  districtTransition: DistrictTransitionSchema.optional(),
   foundationFacts: FoundationFactsSchema,
   polioEradication: PolioEradicationSchema,
   numbers: RotaryNumbersSchema,

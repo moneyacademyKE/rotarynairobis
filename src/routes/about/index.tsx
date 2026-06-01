@@ -15,6 +15,9 @@ export default component$(() => {
   const openGlossaryTerm = useSignal<string | null>(null);
   const openFocusArea = useSignal<string | null>(null);
   const openCommittee = useSignal<string | null>(null);
+  const openFourWay = useSignal<number | null>(null);
+  const openAvenueDrawer = useSignal<string | null>(null);
+  const openDistrictTransition = useSignal<boolean>(false);
 
   useStylesScoped$(STYLES);
 
@@ -82,13 +85,71 @@ export default component$(() => {
           <p class="section-intro-centered">{data.fourWayTestIntro}</p>
         </div>
         <div class="four-way-grid">
-          {data.fourWayTest.map((item) => (
-            <div key={item.id} class="four-way-card">
-              <div class="four-way-num">0{item.id}</div>
-              <h3 class="four-way-question">{item.question}</h3>
-              <p class="four-way-desc">{item.description}</p>
-            </div>
-          ))}
+          {data.fourWayTest.map((item) => {
+            const isOpen = openFourWay.value === item.id;
+            return (
+              <div 
+                key={item.id} 
+                class={["four-way-card", isOpen ? "four-way-card--open" : "", item.insight ? "four-way-card--expandable" : ""].filter(Boolean).join(" ")}
+              >
+                <button
+                  class="four-way-card-header"
+                  onClick$={() => {
+                    openFourWay.value = isOpen ? null : item.id;
+                  }}
+                  aria-expanded={isOpen}
+                >
+                  <div class="four-way-num">0{item.id}</div>
+                  <div class="four-way-title-wrap">
+                    <h3 class="four-way-question">{item.question}</h3>
+                    <p class="four-way-desc">{item.description}</p>
+                  </div>
+                  {item.insight && (
+                    <span class="four-way-chevron" aria-hidden="true">{isOpen ? "▲" : "▼"}</span>
+                  )}
+                </button>
+
+                {item.insight && (
+                  <div class={["four-way-drawer", isOpen ? "four-way-drawer--open" : ""].join(" ")} aria-hidden={!isOpen}>
+                    <div class="drawer-inner">
+                      {/* Overview */}
+                      <div class="drawer-section">
+                        <p class="drawer-overview">{item.insight.overview}</p>
+                      </div>
+
+                      {/* Key Facts */}
+                      <div class="drawer-section">
+                        <h4 class="drawer-section-title">📋 Key Facts</h4>
+                        <ul class="drawer-facts-list">
+                          {item.insight.keyFacts.map((fact, fi) => (
+                            <li key={fi} class="drawer-fact-item">{fact}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Why It Matters */}
+                      <div class="drawer-section drawer-section--highlight">
+                        <h4 class="drawer-section-title">💡 Why It Matters</h4>
+                        <p class="drawer-body">{item.insight.whyItMatters}</p>
+                      </div>
+
+                      {/* District Connection */}
+                      <div class="drawer-section">
+                        <h4 class="drawer-section-title">🌍 District Connection</h4>
+                        <p class="drawer-body">{item.insight.districtConnection}</p>
+                      </div>
+
+                      {/* Pro Tip */}
+                      <div class="drawer-section drawer-section--tip">
+                        <h4 class="drawer-section-title">⭐ Pro Tip</h4>
+                        <p class="drawer-body">{item.insight.tip}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -106,7 +167,10 @@ export default component$(() => {
               <button
                 key={ave.id}
                 class={["avenue-pill", activeAvenue.value === ave.id ? "active" : ""]}
-                onClick$={() => { activeAvenue.value = ave.id; }}
+                onClick$={() => {
+                  activeAvenue.value = ave.id;
+                  openAvenueDrawer.value = null;
+                }}
               >
                 <span class="avenue-icon">{ave.icon}</span>
                 <span class="avenue-pill-title">{ave.title}</span>
@@ -117,13 +181,67 @@ export default component$(() => {
           <div class="avenue-content-box">
             {data.avenuesOfService.map((ave) => {
               if (activeAvenue.value !== ave.id) return null;
+              const isOpen = openAvenueDrawer.value === ave.id;
               return (
-                <div key={ave.id} class="avenue-active-details animate-fade-in">
-                  <div class="avenue-details-header">
-                    <span class="avenue-details-icon">{ave.icon}</span>
-                    <h3 class="avenue-details-title">{ave.title}</h3>
-                  </div>
-                  <p class="avenue-details-desc">{ave.description}</p>
+                <div key={ave.id} class={["avenue-active-details animate-fade-in", isOpen ? "avenue-active-details--open" : ""].join(" ")}>
+                  <button
+                    class="avenue-details-header-btn"
+                    onClick$={() => {
+                      openAvenueDrawer.value = isOpen ? null : ave.id;
+                    }}
+                    aria-expanded={isOpen}
+                  >
+                    <div class="avenue-details-header">
+                      <span class="avenue-details-icon">{ave.icon}</span>
+                      <h3 class="avenue-details-title">{ave.title}</h3>
+                    </div>
+                    <p class="avenue-details-desc">{ave.description}</p>
+                    {ave.insight && (
+                      <div class="avenue-toggle-hint">
+                        <span class="view-insights-text">{isOpen ? "Hide Details" : "View Deep Insights"}</span>
+                        <span class="avenue-chevron">{isOpen ? "▲" : "▼"}</span>
+                      </div>
+                    )}
+                  </button>
+
+                  {ave.insight && (
+                    <div class={["avenue-drawer", isOpen ? "avenue-drawer--open" : ""].join(" ")} aria-hidden={!isOpen}>
+                      <div class="drawer-inner">
+                        {/* Overview */}
+                        <div class="drawer-section">
+                          <p class="drawer-overview">{ave.insight.overview}</p>
+                        </div>
+
+                        {/* Key Facts */}
+                        <div class="drawer-section">
+                          <h4 class="drawer-section-title">📋 Key Facts</h4>
+                          <ul class="drawer-facts-list">
+                            {ave.insight.keyFacts.map((fact, fi) => (
+                              <li key={fi} class="drawer-fact-item">{fact}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Why It Matters */}
+                        <div class="drawer-section drawer-section--highlight">
+                          <h4 class="drawer-section-title">💡 Why It Matters</h4>
+                          <p class="drawer-body">{ave.insight.whyItMatters}</p>
+                        </div>
+
+                        {/* District Connection */}
+                        <div class="drawer-section">
+                          <h4 class="drawer-section-title">🌍 District Connection</h4>
+                          <p class="drawer-body">{ave.insight.districtConnection}</p>
+                        </div>
+
+                        {/* Pro Tip */}
+                        <div class="drawer-section drawer-section--tip">
+                          <h4 class="drawer-section-title">⭐ Pro Tip</h4>
+                          <p class="drawer-body">{ave.insight.tip}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -293,7 +411,77 @@ export default component$(() => {
         </section>
       )}
 
-      {/* 6. The Rotary Foundation & Polio Eradication */}
+      {/* 7. District Transition Section */}
+      {data.districtTransition && (
+        <section class="transition-section">
+          <div class="section-header-centered">
+            <span class="kicker-centered">Historic Realignment</span>
+            <h2 class="section-title-centered">{data.districtTransition.title}</h2>
+            <p class="section-intro-centered">{data.districtTransition.intro}</p>
+          </div>
+          <div class="transition-card">
+            <button
+              class="transition-header-btn"
+              onClick$={() => {
+                openDistrictTransition.value = !openDistrictTransition.value;
+              }}
+              aria-expanded={openDistrictTransition.value}
+            >
+              <div class="transition-header-left">
+                <span class="transition-icon">🗺️</span>
+                <div>
+                  <h3 class="transition-card-title">July 1, 2026: Reorganization of {data.districtTransition.oldDistrict}</h3>
+                  <p class="transition-card-subtitle">Click to view geographic coverage and RCNS assignment details</p>
+                </div>
+              </div>
+              <span class="transition-chevron" aria-hidden="true">{openDistrictTransition.value ? "▲" : "▼"}</span>
+            </button>
+
+            <div class={["transition-drawer", openDistrictTransition.value ? "transition-drawer--open" : ""].join(" ")} aria-hidden={!openDistrictTransition.value}>
+              <div class="drawer-inner">
+                <div class="drawer-section">
+                  <h4 class="drawer-section-title">Why the Reorganization?</h4>
+                  <p class="drawer-body">{data.districtTransition.rationale}</p>
+                </div>
+
+                <div class="drawer-section">
+                  <h4 class="drawer-section-title">New District Division of Countries & Regions</h4>
+                  <div class="district-split-grid">
+                    {data.districtTransition.newDistricts.map((dist, di) => (
+                      <div key={di} class="district-split-card">
+                        <h5 class="district-split-name">{dist.name}</h5>
+                        <p class="district-split-body"><strong>Geographic Coverage:</strong> {dist.coverage}</p>
+                        <p class="district-split-body"><strong>Strategic Focus:</strong> {dist.focus}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {data.districtTransition.teamPhoto && (
+                  <div class="drawer-section transition-photo-section">
+                    <h4 class="drawer-section-title">👥 District 9215 Leadership Team</h4>
+                    <div class="transition-photo-wrapper">
+                      <img 
+                        src={data.districtTransition.teamPhoto} 
+                        alt="District 9215 Leadership Team" 
+                        class="transition-team-photo"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div class="drawer-section drawer-section--highlight">
+                  <h4 class="drawer-section-title">🌍 RCNS Assignment Details</h4>
+                  <p class="drawer-body">{data.districtTransition.rcnsAssignment}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 8. The Rotary Foundation & Polio Eradication */}
       <section class="impact-split-section">
         <div class="impact-column">
           <div class="impact-header">
@@ -645,9 +833,8 @@ const STYLES = `
   background-color: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
-  padding: var(--space-md);
-  position: relative;
   overflow: hidden;
+  position: relative;
   transition: transform var(--transition-smooth), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -655,6 +842,60 @@ const STYLES = `
   transform: translateY(-4px) scale(1.01);
   border-color: var(--accent-primary);
   box-shadow: 0 12px 30px rgba(0, 103, 200, 0.4);
+}
+
+.four-way-card--open {
+  border-color: oklch(76% 0.11 70 / 0.5);
+  box-shadow: 0 4px 20px oklch(76% 0.11 70 / 0.1);
+}
+
+.four-way-card--expandable .four-way-card-header {
+  cursor: pointer;
+}
+
+.four-way-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  position: relative;
+  z-index: 2;
+  transition: background-color var(--transition-fast);
+}
+
+.four-way-card-header:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+.four-way-card-header:hover {
+  background-color: oklch(from var(--accent-primary) l c h / 0.02);
+}
+
+.four-way-title-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.four-way-chevron {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  flex-shrink: 0;
+  z-index: 3;
+  transition: color var(--transition-fast);
+}
+
+.four-way-card--open .four-way-chevron {
+  color: var(--accent-primary);
 }
 
 .four-way-num {
@@ -668,6 +909,7 @@ const STYLES = `
   line-height: 1;
   pointer-events: none;
   user-select: none;
+  z-index: 1;
 }
 
 .four-way-question {
@@ -684,6 +926,25 @@ const STYLES = `
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
+}
+
+.four-way-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-out-expo), border-top-width 0.1s;
+  border-top: 0px solid var(--border-subtle);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.four-way-drawer--open {
+  grid-template-rows: 1fr;
+  border-top-width: 1px;
+}
+
+.four-way-drawer--open .drawer-inner {
+  padding: var(--space-md);
 }
 
 /* Avenues of Service */
@@ -736,20 +997,42 @@ const STYLES = `
   background-color: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
-  padding: var(--space-md);
-  min-height: 180px;
+  min-height: 120px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
   backdrop-filter: blur(12px);
 }
 
 .avenue-active-details {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
-  text-align: center;
   width: 100%;
+}
+
+.avenue-details-header-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.avenue-details-header-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+.avenue-details-header-btn:hover {
+  background-color: oklch(from var(--accent-primary) l c h / 0.02);
 }
 
 .avenue-details-header {
@@ -780,6 +1063,180 @@ const STYLES = `
   font-weight: 300;
 }
 
+.avenue-toggle-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-primary);
+}
+
+.avenue-chevron {
+  font-size: 0.65rem;
+  color: var(--accent-primary);
+}
+
+.avenue-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-out-expo), border-top-width 0.1s;
+  border-top: 0px solid var(--border-subtle);
+  overflow: hidden;
+  text-align: left;
+}
+
+.avenue-drawer--open {
+  grid-template-rows: 1fr;
+  border-top-width: 1px;
+}
+
+.avenue-drawer--open .drawer-inner {
+  padding: var(--space-md);
+}
+
+/* District Transition Section */
+.transition-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--space-lg);
+}
+
+.transition-card {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.transition-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.transition-header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.transition-header-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+.transition-header-btn:hover {
+  background-color: oklch(from var(--accent-primary) l c h / 0.02);
+}
+
+.transition-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.transition-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.transition-card-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+  line-height: 1.3;
+}
+
+.transition-card-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 300;
+}
+
+.transition-chevron {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.transition-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-out-expo), border-top-width 0.1s;
+  border-top: 0px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.transition-drawer--open {
+  grid-template-rows: 1fr;
+  border-top-width: 1px;
+}
+
+.transition-drawer--open .drawer-inner {
+  padding: var(--space-md);
+}
+
+.district-split-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+  margin-top: 8px;
+}
+
+@media (min-width: 640px) {
+  .district-split-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.district-split-card {
+  background-color: var(--bg-obsidian);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.district-split-name {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin: 0;
+}
+
+.district-split-body {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
 .animate-fade-in {
   animation: fadeIn 0.4s var(--ease-out-expo);
 }
@@ -787,6 +1244,44 @@ const STYLES = `
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.transition-photo-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.transition-photo-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  background-color: var(--bg-obsidian);
+  box-shadow: 0 4px 12px oklch(0% 0 0 / 0.25);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.transition-photo-wrapper:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 8px 24px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.transition-team-photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s var(--ease-out-expo);
+}
+
+.transition-photo-wrapper:hover .transition-team-photo {
+  transform: scale(1.02);
 }
 
 /* Focus Section */

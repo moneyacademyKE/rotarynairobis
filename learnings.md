@@ -168,3 +168,9 @@
 - **Transaction-Log Incremental Extraction**: Querying SQLite facts tables using monotonically increasing `tx_id` autoincrement keys maps directly to Datomic's transaction logging principles. It allows clients to sync logs incrementally at O(1) database cost.
 - **Unified Sync Payloads**: Bundling incremental fact queries and static configuration files (`rotary-basics.json`, `rcns-profile.json`, `ri-history.json`) into a single REST endpoint `/api/sync` streamlines client architecture by reducing request roundtrips.
 - **Dynamic Head Tracking**: Returning the database's absolute `MAX(tx_id)` for each fact type (even when the synced list is empty) ensures clients are aware of the latest server state, preventing redundant syncing runs.
+
+## Cumulative Layout Shift Prevention & Administrative Data Alignment
+- **Layout-Shift-Free Rendering (Aspect-Ratio Reservation)**: When loading large images asynchronously (such as the 414KB District 9215 team photo), setting a solid `aspect-ratio` (e.g. `16/9`) on the wrapping element or the image itself reserves layout space in the browser's render tree before the file is downloaded. This eliminates Cumulative Layout Shift (CLS) entirely and provides a seamless layout flow.
+- **Micro-interactions for Media Content**: Applying subtle scaling transitions (`transform: scale(1.02)`) on hover combined with wrapper overflows (`overflow: hidden`) adds high-quality tactile feedback, contributing to a premium user experience.
+- **Administrative Realignment Integrity**: Aligning data ledgers and test expectations to match real-world changes (such as the District 9212 split into District 9215 and 9216) ensures that codebase, tests, and actual administrative boundaries remain unified, avoiding silent test drifts.
+
