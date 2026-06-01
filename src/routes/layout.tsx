@@ -2,6 +2,45 @@ import { component$, Slot, createContextId, useContextProvider, useStore } from 
 import { routeLoader$, useLocation } from "@builder.io/qwik-city";
 
 /**
+ * Linkify URLs and hashtags within text content.
+ * Wraps URLs in <a> tags and hashtags in accent-colored spans.
+ */
+function linkifyContent(text: string): any[] {
+  if (!text) return [text];
+  // Match URLs and hashtags
+  const pattern = /(https?:\/\/[^\s]+)|(#\w+)/g;
+  const parts: any[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    if (match[1]) {
+      // URL
+      parts.push(
+        <a key={`link-${key++}`} href={match[1]} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>
+          {match[1]}
+        </a>
+      );
+    } else if (match[2]) {
+      // Hashtag
+      parts.push(
+        <span key={`tag-${key++}`} style={{ color: 'var(--accent-primary)', fontWeight: '600' }}>
+          {match[2]}
+        </span>
+      );
+    }
+    lastIndex = pattern.lastIndex;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return parts;
+}
+
+/**
  * Define the Platform interface for Cloudflare.
  */
 declare global {
@@ -34,7 +73,7 @@ export const usePlatformTheme = routeLoader$(({ url }) => {
   if (path.includes('/tiktok')) return 'tiktok';
   if (path.includes('/birthdays')) return 'birthdays';
   if (path.includes('/recaps')) return 'recaps';
-  if (path.includes('/search')) return 'twitter';
+  if (path.includes('/search')) return 'search';
   return 'twitter';
 });
 
@@ -62,59 +101,58 @@ export default component$(() => {
         }
       }}
     >
-      <header class="app-header">
-        <div class="header-brand-row">
-          <a href="/twitter/" class="brand-link">
-            <img src="/images/logo.png" alt="Rotary Club of Nairobi South" class="brand-logo" />
-          </a>
-        </div>
-        <p class="main-desc">
-          Service Above Self
-        </p>
-      </header>
+      <div class="sticky-header">
+        <header class="app-header">
+          <div class="header-brand-row">
+            <a href="/twitter/" class="brand-link">
+              <img src="/images/logo.png" alt="Rotary Club of Nairobi South" class="brand-logo" />
+            </a>
+          </div>
+        </header>
 
-      <div class="controls-wrapper">
-        <div class="category-pills">
-          <a 
-            href="/twitter/" 
-            class={["pill-btn", loc.url.pathname.includes('/twitter') ? "active" : ""]}
-          >
-            Home
-          </a>
-          <a 
-            href="/instagram/" 
-            class={["pill-btn", loc.url.pathname.includes('/instagram') ? "active" : ""]}
-          >
-            Photos
-          </a>
-          <a 
-            href="/tiktok/" 
-            class={["pill-btn", loc.url.pathname.includes('/tiktok') ? "active" : ""]}
-          >
-            Events
-          </a>
-          <a 
-            href="/birthdays/" 
-            class={["pill-btn", loc.url.pathname.includes('/birthdays') ? "active" : ""]}
-          >
-            Babies
-          </a>
-          <a 
-            href="/recaps/" 
-            class={["pill-btn", loc.url.pathname.includes('/recaps') ? "active" : ""]}
-          >
-            Recaps
-          </a>
-          <a 
-            href="/search/" 
-            class={["pill-btn", loc.url.pathname.includes('/search') ? "active" : ""]}
-          >
-            Search
-          </a>
+        <div class="controls-wrapper">
+          <div class="category-pills">
+            <a 
+              href="/twitter/" 
+              class={["pill-btn", loc.url.pathname.includes('/twitter') ? "active" : ""]}
+            >
+              Home
+            </a>
+            <a 
+              href="/instagram/" 
+              class={["pill-btn", loc.url.pathname.includes('/instagram') ? "active" : ""]}
+            >
+              Photos
+            </a>
+            <a 
+              href="/tiktok/" 
+              class={["pill-btn", loc.url.pathname.includes('/tiktok') ? "active" : ""]}
+            >
+              Events
+            </a>
+            <a 
+              href="/birthdays/" 
+              class={["pill-btn", loc.url.pathname.includes('/birthdays') ? "active" : ""]}
+            >
+              Birthdays
+            </a>
+            <a 
+              href="/recaps/" 
+              class={["pill-btn", loc.url.pathname.includes('/recaps') ? "active" : ""]}
+            >
+              Recaps
+            </a>
+            <a 
+              href="/search/" 
+              class={["pill-btn", loc.url.pathname.includes('/search') ? "active" : ""]}
+            >
+              Search
+            </a>
+          </div>
         </div>
       </div>
 
-      <main class="main-content">
+      <main class="main-content" inert={drawerState.isOpen ? true : undefined}>
         <Slot />
       </main>
 
@@ -146,7 +184,7 @@ export default component$(() => {
                 <video 
                   src={drawerState.mediaSrc} 
                   controls 
-                  autoplay 
+                  preload="metadata"
                   loop 
                   muted 
                   class="drawer-video-gif" 
@@ -165,7 +203,7 @@ export default component$(() => {
           </div>
           <div class="codeblock-wrapper">
             <div class="codeblock-content">
-              {drawerState.content}
+              {linkifyContent(drawerState.content)}
             </div>
           </div>
         </div>

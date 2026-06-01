@@ -40,15 +40,30 @@ export function parseD1PostRow(rawRow: unknown): Post {
   // Spec check the input boundary
   const validRow = dbPostRowSchema.parse(rawRow);
   
-  const parsedPhotos = validRow.photos_json ? JSON.parse(validRow.photos_json) : [];
-  const parsedHashtags = validRow.hashtags_json ? JSON.parse(validRow.hashtags_json) : [];
+  let parsedPhotos: unknown = [];
+  try {
+    parsedPhotos = validRow.photos_json ? JSON.parse(validRow.photos_json) : [];
+  } catch {
+    parsedPhotos = [];
+  }
+  let parsedHashtags: unknown = [];
+  try {
+    parsedHashtags = validRow.hashtags_json ? JSON.parse(validRow.hashtags_json) : [];
+  } catch {
+    parsedHashtags = [];
+  }
+
+  let photos = Array.isArray(parsedPhotos) ? parsedPhotos : [];
+  if (validRow.file_name && typeof validRow.file_name === "string") {
+    photos = [validRow.file_name, ...photos.filter((p) => p !== validRow.file_name)];
+  }
 
   // Construct domain object
   const domainObj = {
     id: validRow.id,
     text: validRow.text,
     account: validRow.account,
-    photos: Array.isArray(parsedPhotos) ? parsedPhotos : [],
+    photos: photos,
     hashtags: Array.isArray(parsedHashtags) ? parsedHashtags : [],
     media_type: validRow.type ?? undefined,
     snippet: validRow.snippet ?? undefined,

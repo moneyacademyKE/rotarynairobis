@@ -111,7 +111,7 @@ function run() {
   for (const proc of staleSuspects) {
     try {
       console.log(`  Killing PID ${proc.pid}...`);
-      process.kill(proc.pid, 'SIGKILL');
+      process.kill(proc.pid, 'SIGTERM');
     } catch (e: any) {
       console.error(`  Failed to kill PID ${proc.pid}: ${e.message}`);
     }

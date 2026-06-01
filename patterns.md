@@ -357,6 +357,79 @@
 - **Visual Integrity**: Guarantees that the latest content is presented to the user first.
 - **Independence of ID Space**: Decouples presentation order from the raw primary keys of individual ingestion pipelines.
 
+## Pattern: The Safe-Gate Edge Authentication (Zero-Dependency Constant-Time Compare)
+**Problem**: Timing attacks can recover environment secrets if string equality operators (`===` or `!==`) are used in API authentication handlers. Edge runtimes may lack native crypto helpers (such as `crypto.timingSafeEqual`) or require importing heavy node packages.
+
+**Solution**:
+1. Implement a vanilla JS constant-time comparison that does not short-circuit.
+2. Ensure the string comparison loop execution time depends only on the length of the strings, processing bitwise XOR differences across all characters.
+3. Keep the logic synchronous and completely self-contained to maximize edge efficiency.
+
+**Benefits**:
+- **Simplicity**: No environment-specific Node/Bun imports.
+- **Portability**: Runs on Cloudflare Workers, Node, Deno, Bun, or frontends.
+
+## Pattern: The Normal-Form Array JOIN (json_each)
+**Problem**: Social media posts contain arrays of image links stored as JSON strings in database rows. Joining posts to media tables via SQL `LIKE` queries with string concatenation is fragile and can easily return wrong results if filename subsets exist, causing data contamination.
+
+**Solution**:
+1. Replace SQL `LIKE` joins with SQLite's native `json_each(photos_json)` function.
+2. Join the media table on `m.file_name = je.value` where `je` is the `json_each` generator.
+3. Apply `DISTINCT` to the select query to prevent row duplication on posts with multiple images.
+
+**Benefits**:
+- **Robustness**: Prevents accidental query collisions.
+- **Data Purity**: Complete separation of image lists from string matching logic.
+
+## Pattern: Compound Location Parsing & Matched Media Projection
+**Problem**: 
+1. Informal social media copy has highly unstructured location tags (e.g. `📍 Venue: Argyle Hotel`, `at K1 Parklands`, or emojis) and greedy regex matching will overrun to the end of the text if it includes dates or times, capturing too much noise.
+2. In posts containing multiple photos, a simple index-based image selector (`post.photos[0]`) can render a generic photo in the details drawer rather than the actual event flyer/poster that matched the classification query.
+
+**Solution**:
+1. **Non-Greedy Match + Delimiter Lookahead**: Use a non-greedy regex capture group `([A-Z0-9][A-Za-z0-9\s,':-]{2,50}?)` paired with a lookahead group containing all structural delimiter keywords (e.g., `starting`, `from`, `on`, `at`, `date`, `time`, `🗓️`, `⏰`) to cleanly stop at the end of the venue segment.
+2. **Explicit Media Field Selection**: Modify SQL queries to select `m.file_name AS file_name` from the joined `media` table.
+3. **Array Pre-ordering on Load**: In the edge domain mapper (`parseD1PostRow`), check if `file_name` is present. If it is, reorder the `photos` array to place this matched filename at index `0`, preserving full compatibility with generic card renderers while guaranteeing the correct flyer is always opened.
+
+**Benefits**:
+- **Simplicity**: No complex client state or new API handlers needed to bind correct images.
+- **Robustness**: Extracted locations are clean, concise, and do not carry trailing copy or noise.
+
+## Pattern: Unified Dual-Environment Testing (Type-Casted Mocking Parity)
+**Problem**: Maintaining testing suites across distinct local development and serverless runtimes (such as Bun and Node/Vitest) often introduces runtime errors when utilizing environment-specific mocking APIs (such as Vitest's `vi.mocked`), complecting the test suite with the runner itself.
+
+**Solution**:
+1. **De-complect Mocking APIs**: Eliminate proprietary test-runner wrapper utilities like `vi.mocked` or `jest.mocked`.
+2. **Explicit Type-Casting**: Use standard TypeScript type-casting `(globalThis.fetch as any)` to bind mock-assertion properties (`mockResolvedValueOnce`, `mockImplementation`) directly to spies.
+3. **Hermetic Global Interception**: Mock the global `fetch` using a delimiter-matching mock utility within test suites to avoid leakage.
+
+**Benefits**:
+- **Simplicity**: Code runs natively under both `bun test` and `vitest run` with zero changes.
+- **Speed**: Harnesses Bun's native C++ runtime test execution speed without losing Vitest's rich mocking capabilities.
+- **Parity**: Guarantees unit tests run successfully across different runner ecosystems.
 
 
+## Pattern: Vector Topographical Layer & Interactive Onboarding
+**Problem**: Flat dark themes look generic, and standard search/empty states block user exploration by forcing them to hit empty lists or dead-end notifications.
 
+**Solution**:
+1. **Inline Encoded SVG Layering**: Load repeating topographical contour maps via URL data-encoded SVG lines directly inside CSS background properties.
+2. **Translucent Contrast Containment**: Style container panels using glassmorphism structures (`rgba()` backgrounds with backdrop blurs) to keep layouts readable.
+3. **Interactive Action Suggetions**: Build search pill keywords and path navigation buttons directly inside empty states, allowing one-click queries.
+
+**Benefits**:
+- **Branding**: Immersive vector map background.
+- **Onboarding**: Direct, visual exploration guides for new visitors.
+- **Efficiency**: No external graphic asset downloads.
+
+## Pattern: Platform-Header Attribution & Venue Isolation
+**Problem**: When parsing social media captions, a post's metadata can contain null or generic account IDs (e.g., the `rcns` bot handle). Simply searching the raw text for keyword substrings (like "Upper Hill", "Thika Road") to attribute the hosting club results in location contamination/leakage, because venue mentions (like "Bonds Garden, Upper Hill") hijack the identity of the event host.
+
+**Solution**:
+1.  **De-complect Source from Content**: Match and parse the platform header prefix (e.g., `'rotarycluboflangata' on Instagram`) *before* running any body keyword checks. Use the extracted username to resolve the actual host club.
+2.  **Explicit Mapping dictionary**: Map clean platform usernames (like `langata` -> `Lang'ata` and `madaraka` -> `Nairobi Madaraka`) explicitly.
+3.  **Venue Exclusion Boundaries**: Prior to executing fallback substring checks on generic accounts, extract the venue location. If any club keyword (e.g., "Upper Hill") is present only inside the resolved venue name and is not explicitly formatted as a club handle or name (e.g., `rcupperhill`), skip attributing the post to that club, preventing location name leakage.
+
+**Benefits**:
+- **Rich Hickey Quality**: Cleanly de-complects the *Source Identity fact* (who posted) from the *Content venue fact* (where they meet).
+- **Data Integrity**: Stops location venue text from polluting host club metadata.

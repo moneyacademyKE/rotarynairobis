@@ -7,7 +7,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { drizzle } from "drizzle-orm/d1";
 import { media } from "./data/schema";
 import { parseGeminiResponse } from "./lib/gemini-parser";
-import { indexPost } from "./lib/orama-engine";
 
 // Consolidating QwikCityPlatform into src/routes/layout.tsx to avoid empty interface errors and achieve architectural single-truth.
 
@@ -73,9 +72,12 @@ You MUST return a strict, minified JSON object with no markdown block formatting
       if (!res.ok) throw new Error("Image not accessible");
       
       const arrayBuffer = await res.arrayBuffer();
-      const base64String = btoa(
-        new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-      );
+      const bytes = new Uint8Array(arrayBuffer);
+      const chunks = [];
+      for (let i = 0; i < bytes.length; i += 8192) {
+        chunks.push(String.fromCharCode(...bytes.subarray(i, i + 8192)));
+      }
+      const base64String = btoa(chunks.join(''));
 
       const result = await model.generateContent([
         PROMPT,
@@ -92,19 +94,17 @@ You MUST return a strict, minified JSON object with no markdown block formatting
         rawData: rawText
       });
 
-      // 2. Index in Orama (Full-Text Search Boundary)
-      await indexPost({
-        id: fileName,
-        text: parsed.snippet,
-        account: "RCNS_SYSTEM", // Originator fact
-        type: parsed.type,
-        snippet: parsed.snippet
-      });
-
       message.ack();
     } catch (e) {
       console.error("Queue Classification Error:", e);
-      message.retry();
+      const attempts = message.attempts || 0;
+      if (attempts > 3) {
+        console.error(`Message for ${fileName} exceeded max retries (${attempts}). Acknowledging and dropping.`);
+        message.ack();
+      } else {
+        const delaySeconds = Math.min(30 * Math.pow(2, attempts), 300);
+        message.retry({ delaySeconds });
+      }
     }
   }
 };

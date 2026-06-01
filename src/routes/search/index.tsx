@@ -1,5 +1,5 @@
-import { component$, useContext } from "@builder.io/qwik";
-import { routeLoader$, useLocation } from "@builder.io/qwik-city";
+import { component$, useContext, useStylesScoped$ } from "@builder.io/qwik";
+import { routeLoader$, useLocation, useNavigate } from "@builder.io/qwik-city";
 import { executeSearch } from "~/lib/search-service";
 import { DrawerContext } from "~/routes/layout";
 import { cleanPostText } from "~/routes/twitter";
@@ -23,6 +23,9 @@ export default component$(() => {
   const searchLoader = useSearchResults();
   const loc = useLocation();
   const drawerState = useContext(DrawerContext);
+  const nav = useNavigate();
+
+  useStylesScoped$(STYLES);
 
   return (
     <div class="search-container">
@@ -59,8 +62,27 @@ export default component$(() => {
         {searchLoader.value.results.length === 0 ? (
           <div class="search-empty">
             <span class="empty-icon">📂</span>
-            <h3>No results found</h3>
-            <p>Try searching for different keywords like "fellowship", "tree", "birthday", or "service".</p>
+            <h3>{searchLoader.value.term ? 'No results found' : 'Start searching to explore the archive'}</h3>
+            <p>{searchLoader.value.term
+              ? 'Try searching for different keywords like "fellowship", "tree", "birthday", or "service".'
+              : 'Enter a keyword above to search the club\'s history, events, and photo archives.'}
+            </p>
+            <div class="suggested-tags-wrapper">
+              <span class="suggested-label">Or try searching for:</span>
+              <div class="suggested-tags">
+                {['fellowship', 'birthday', 'induction', 'tree', 'speaker', 'recap'].map((tag) => (
+                  <button 
+                    key={tag}
+                    class="tag-pill-btn"
+                    onClick$={() => {
+                      nav(`/search/?q=${encodeURIComponent(tag)}`);
+                    }}
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <div class="search-items-list">
@@ -74,13 +96,26 @@ export default component$(() => {
                 <div 
                   key={post.id} 
                   class="search-item"
+                  role="button"
+                  tabIndex={0}
                   onClick$={() => {
                     drawerState.isOpen = true;
                     drawerState.title = title;
                     drawerState.category = "Search Result";
                     drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
                     drawerState.mediaType = "image";
-                    drawerState.content = post.text || "";
+                    drawerState.content = cleanedText;
+                  }}
+                  onKeyDown$={(e: KeyboardEvent) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      drawerState.isOpen = true;
+                      drawerState.title = title;
+                      drawerState.category = "Search Result";
+                      drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
+                      drawerState.mediaType = "image";
+                      drawerState.content = cleanedText;
+                    }
                   }}
                 >
                   <div class="avatar search-avatar"></div>
@@ -93,6 +128,7 @@ export default component$(() => {
                     </div>
                     
                     <div class="post-body">
+                      <h3 class="search-item-title">{title}</h3>
                       <p class="post-text">{cleanedText}</p>
                       
                       {post.photos && post.photos.length > 0 && (
@@ -126,16 +162,20 @@ export default component$(() => {
         )}
       </main>
 
-      <style dangerouslySetInnerHTML={`
+    </div>
+  );
+});
+
+const STYLES = `
         .search-container {
-          background-color: var(--bg-app);
+          background-color: var(--bg-color);
           min-height: calc(100vh - var(--tab-height));
           padding: var(--space-md);
         }
         .search-header {
           padding: var(--space-md) 0;
           border-bottom: 1px dashed var(--border-subtle);
-          background-color: var(--bg-app);
+          background-color: var(--bg-color);
           margin-bottom: var(--space-md);
         }
         .heading {
@@ -296,11 +336,62 @@ export default component$(() => {
           color: var(--text-muted);
         }
         
+        .search-item-title {
+          font-family: var(--font-serif);
+          font-size: var(--font-size-lg);
+          color: var(--accent-primary);
+          font-weight: 500;
+          margin: 0 0 8px 0;
+          line-height: 1.25;
+        }
         .post-text {
           font-size: 0.95rem;
-          line-height: 1.5;
-          color: var(--text-primary);
+          line-height: 1.6;
+          color: var(--text-secondary);
           white-space: pre-wrap;
+          margin-top: 0;
+        }
+        .suggested-tags-wrapper {
+          margin-top: var(--space-md);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: var(--space-xs);
+          width: 100%;
+        }
+        .suggested-label {
+          font-size: var(--font-size-sm);
+          color: var(--text-muted);
+          font-weight: 500;
+        }
+        .suggested-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          justify-content: center;
+          max-width: 450px;
+          margin-top: 4px;
+        }
+        .tag-pill-btn {
+          background: rgba(0, 103, 200, 0.15);
+          border: 1px solid rgba(0, 103, 200, 0.3);
+          color: var(--text-primary);
+          padding: 6px 14px;
+          border-radius: 9999px;
+          font-size: var(--font-size-sm);
+          cursor: pointer;
+          transition: all var(--transition-fast);
+          font-family: var(--font-sans);
+          font-weight: 500;
+        }
+        .tag-pill-btn:hover {
+          background: var(--accent-primary);
+          border-color: var(--accent-primary);
+          color: var(--bg-obsidian);
+          transform: translateY(-1px);
+        }
+        .tag-pill-btn:active {
+          transform: scale(0.95);
         }
         
         @keyframes search-item-in {
@@ -367,7 +458,4 @@ export default component$(() => {
           color: var(--accent-primary);
           transform: translateX(4px);
         }
-      `}></style>
-    </div>
-  );
-});
+`;

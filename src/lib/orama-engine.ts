@@ -23,7 +23,7 @@ export interface OramaPost {
   snippet: string;
 }
 
-let _index: any;
+let _index: Orama<any> | null = null;
 
 /**
  * Initialize or get existing Orama index.

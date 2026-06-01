@@ -6,11 +6,11 @@ import { parseD1PostRows } from "../../domain/specs";
 export const useBirthdayData = routeLoader$(async ({ platform }) => {
   const db = platform.env.DB;
   const { results } = await db.prepare(`
-    SELECT p.* 
+    SELECT DISTINCT p.*, m.file_name AS file_name 
     FROM posts p
-    JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
+    JOIN json_each(p.photos_json) AS je
+    JOIN media m ON m.file_name = je.value
     WHERE m.type = 'BIRTHDAY'
-    GROUP BY p.id
     ORDER BY p.created_at DESC, p.id DESC
   `).all();
   return parseD1PostRows(results);

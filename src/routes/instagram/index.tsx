@@ -9,9 +9,10 @@ export const useInstagramData = routeLoader$(async ({ platform }) => {
   
   // Visual media classified strictly as PHOTO (excluding posters, recaps, birthdays to prevent cross-tab duplication)
   const { results } = await db.prepare(`
-    SELECT p.*, m.file_name as photo_src
+    SELECT DISTINCT p.*, m.file_name as photo_src
     FROM posts p
-    JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
+    JOIN json_each(p.photos_json) AS je
+    JOIN media m ON m.file_name = je.value
     WHERE m.type = 'PHOTO'
     ORDER BY p.created_at DESC, p.id DESC
   `).all();
@@ -34,23 +35,37 @@ export default component$(() => {
         </div>
       ) : (
         <div class="gallery-grid">
-          {data.value.allPhotos.map((photo, i) => {
+          {data.value.allPhotos.map((photo) => {
             const thumb = photo.src;
-            const full = thumb.replace('_thumb.jpg', '.jpg');
             const cleanedText = cleanPostText(photo.text || "");
             const title = cleanedText ? cleanedText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 50) + '...' : `Club Photo #${photo.postId}`;
+            const hashtags = photo.text ? (photo.text.match(/#\w+/g) || []).slice(0, 3) : [];
+            const displayTitle = cleanedText ? cleanedText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 45) : `Photo #${photo.postId}`;
             
             return (
               <div 
-                key={i} 
+                key={photo.postId + '-' + photo.src} 
                 class="prompt-card"
+                role="button"
+                tabIndex={0}
                 onClick$={() => {
                   drawerState.isOpen = true;
                   drawerState.title = cleanedText ? cleanedText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : `Photo View #${photo.postId}`;
                   drawerState.category = "Club Photo";
-                  drawerState.mediaSrc = `/photos/${full}`;
+                  drawerState.mediaSrc = `/photos/${thumb}`;
                   drawerState.mediaType = "image";
-                  drawerState.content = photo.text || "Rotary Nairobi South Activity Photo";
+                  drawerState.content = cleanedText || "Rotary Nairobi South Activity Photo";
+                }}
+                onKeyDown$={(e: KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                     e.preventDefault();
+                     drawerState.isOpen = true;
+                     drawerState.title = cleanedText ? cleanedText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : `Photo View #${photo.postId}`;
+                     drawerState.category = "Club Photo";
+                     drawerState.mediaSrc = `/photos/${thumb}`;
+                     drawerState.mediaType = "image";
+                     drawerState.content = cleanedText || "Rotary Nairobi South Activity Photo";
+                  }
                 }}
               >
                 <div class="card-media-wrapper">
@@ -60,12 +75,19 @@ export default component$(() => {
                     class="card-media-img poster" 
                     loading="lazy"
                   />
-                  <img 
-                    src={`/photos/${full}`} 
-                    alt={title} 
-                    class="card-media-img preview" 
-                    loading="lazy"
-                  />
+                  <div class="card-hover-overlay">
+                    <div class="overlay-content">
+                      <span class="overlay-badge">📷 Club Photo</span>
+                      <p class="overlay-caption">{displayTitle}</p>
+                      {hashtags.length > 0 && (
+                        <div class="overlay-tags">
+                          {hashtags.map((tag) => (
+                            <span key={tag} class="tag-pill">{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             );

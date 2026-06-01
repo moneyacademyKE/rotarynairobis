@@ -8,10 +8,15 @@ describe("AI Reprocessing Endpoint", () => {
         TELEGRAM_SECRET_TOKEN: "secure_token"
       }
     };
-    const request = new Request("http://localhost/api/reprocess?secret=wrong");
+    const request = new Request("http://localhost/api/reprocess", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer wrong"
+      }
+    });
 
-    const { onGet } = await import("./index");
-    await onGet({ request, platform: mockPlatform, json: jsonMock } as any);
+    const { onPost } = await import("./index");
+    await onPost({ request, platform: mockPlatform, json: jsonMock } as any);
     expect(jsonMock).toHaveBeenCalledWith(401, expect.objectContaining({ error: "Unauthorized" }));
   });
 
@@ -40,10 +45,15 @@ describe("AI Reprocessing Endpoint", () => {
       }
     };
 
-    const request = new Request("http://localhost/api/reprocess?secret=secure_token");
+    const request = new Request("http://localhost/api/reprocess", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer secure_token"
+      }
+    });
 
-    const { onGet } = await import("./index");
-    await onGet({ request, platform: mockPlatform, json: jsonMock } as any);
+    const { onPost } = await import("./index");
+    await onPost({ request, platform: mockPlatform, json: jsonMock } as any);
 
     expect(mockDB.prepare).toHaveBeenCalled();
     expect(mockSend).toHaveBeenCalledTimes(2);
@@ -60,4 +70,42 @@ describe("AI Reprocessing Endpoint", () => {
       })
     );
   });
+
+  it("should fail with 500 if TELEGRAM_SECRET_TOKEN is not configured in environment", async () => {
+    const jsonMock = vi.fn();
+    const mockPlatform = { env: {} }; // Missing TELEGRAM_SECRET_TOKEN
+    const request = new Request("http://localhost/api/reprocess", {
+      method: "POST"
+    });
+
+    const { onPost } = await import("./index");
+    await onPost({ request, platform: mockPlatform, json: jsonMock } as any);
+    expect(jsonMock).toHaveBeenCalledWith(500, expect.objectContaining({ error: "TELEGRAM_SECRET_TOKEN not configured" }));
+  });
+
+  it("should fail with 500 if database query fails and throws error", async () => {
+    const jsonMock = vi.fn();
+    const mockDB = {
+      prepare: vi.fn().mockImplementation(() => {
+        throw new Error("DB Connection Interrupted");
+      })
+    };
+    const mockPlatform = {
+      env: {
+        TELEGRAM_SECRET_TOKEN: "secure_token",
+        DB: mockDB
+      }
+    };
+    const request = new Request("http://localhost/api/reprocess", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer secure_token"
+      }
+    });
+
+    const { onPost } = await import("./index");
+    await onPost({ request, platform: mockPlatform, json: jsonMock } as any);
+    expect(jsonMock).toHaveBeenCalledWith(500, expect.objectContaining({ error: "DB Connection Interrupted" }));
+  });
 });
+

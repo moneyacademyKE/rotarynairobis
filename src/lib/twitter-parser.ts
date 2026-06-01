@@ -118,8 +118,18 @@ export function reformatEventText(text: string, account: string, created_at?: st
   const rawTextLower = text.toLowerCase();
   
   // 1. Extract Club Name
+  let derivedAccount = account || "";
+  const headerMatch = text.match(/^'([^']+)'\s+on\s+(Instagram|Twitter|Telegram|Social)/i);
+  if (headerMatch && headerMatch[1]) {
+    const genericAccounts = ["rcns", "social", "bot", "twitter", "instagram", "telegram", "facebook"];
+    const isGeneric = !derivedAccount || genericAccounts.includes(derivedAccount.toLowerCase().replace(/[^a-z0-9]/g, ''));
+    if (isGeneric) {
+      derivedAccount = headerMatch[1];
+    }
+  }
+
   let clubName = "Nairobi South";
-  const accountClean = (account || 'rcns').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const accountClean = derivedAccount.toLowerCase().replace(/[^a-z0-9]/g, '');
   
   if (accountClean.includes("muthaiga")) clubName = "Nairobi Muthaiga";
   else if (accountClean.includes("upperhill")) clubName = "Nairobi Upper Hill";
@@ -127,7 +137,15 @@ export function reformatEventText(text: string, account: string, created_at?: st
   else if (accountClean.includes("syokimau")) clubName = "Syokimau";
   else if (accountClean.includes("thika")) clubName = "Nairobi Thika Road";
   else if (accountClean.includes("metropolitan")) clubName = "Nairobi Metropolitan";
+  else if (accountClean.includes("langata")) clubName = "Lang'ata";
+  else if (accountClean.includes("madaraka")) clubName = "Nairobi Madaraka";
   else if (accountClean.includes("nairobi")) clubName = "Nairobi";
+  else if (accountClean.startsWith("rotaryclubof")) {
+    const rawName = accountClean.replace(/^rotaryclubof/, "");
+    if (rawName.length > 2) {
+      clubName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    }
+  }
   else if (accountClean.startsWith("rotary")) {
     const rawName = accountClean.replace(/^rotary/, "");
     if (rawName.length > 2) {
@@ -136,15 +154,21 @@ export function reformatEventText(text: string, account: string, created_at?: st
   }
 
   // Fallback scan of the raw text headers for correct attribution if account is a generic bot/telegram name (e.g. rcns)
-  if (accountClean === "rcns" || !account) {
+  if (accountClean === "rcns" || !derivedAccount) {
+    const venueLower = (extractVenue(text) || "").toLowerCase();
+    const isVenueUpperHill = venueLower.includes("upper hill") || venueLower.includes("upperhill") || venueLower.includes("bonds garden") || venueLower.includes("radisson");
+    const isVenueThikaRoad = venueLower.includes("thika road") || venueLower.includes("thikard");
+    const isVenueNgongRoad = venueLower.includes("ngong road");
+
     if (rawTextLower.includes("rcnairobieast") || rawTextLower.includes("nairobi east")) clubName = "Nairobi East";
-    else if (rawTextLower.includes("rotaryclubofnairobithikard") || rawTextLower.includes("thika road")) clubName = "Nairobi Thika Road";
-    else if (rawTextLower.includes("rcngongroad") || rawTextLower.includes("ngong road")) clubName = "Ngong Road";
+    else if (rawTextLower.includes("rotaryclubofnairobithikard") || (!isVenueThikaRoad && rawTextLower.includes("thika road"))) clubName = "Nairobi Thika Road";
+    else if (rawTextLower.includes("rcngongroad") || (!isVenueNgongRoad && rawTextLower.includes("ngong road"))) clubName = "Ngong Road";
     else if (rawTextLower.includes("rotaryjabali")) clubName = "Jabali";
     else if (rawTextLower.includes("rotarymuthaiga") || rawTextLower.includes("muthaiga")) clubName = "Nairobi Muthaiga";
     else if (rawTextLower.includes("rotary_madaraka") || rawTextLower.includes("madaraka")) clubName = "Nairobi Madaraka";
     else if (rawTextLower.includes("syokimau")) clubName = "Syokimau";
-    else if (rawTextLower.includes("upperhill") || rawTextLower.includes("upper hill")) clubName = "Nairobi Upper Hill";
+    else if (rawTextLower.includes("langata") || rawTextLower.includes("lang'ata")) clubName = "Lang'ata";
+    else if (rawTextLower.includes("rcupperhill") || (!isVenueUpperHill && (rawTextLower.includes("upperhill") || rawTextLower.includes("upper hill")))) clubName = "Nairobi Upper Hill";
     else if (rawTextLower.includes("metropolitan")) clubName = "Nairobi Metropolitan";
   }
   
@@ -249,27 +273,8 @@ export function reformatEventText(text: string, account: string, created_at?: st
   }
 
   // 4. Extract Venue
-  let venue = "our fellowship venue";
-  if (lowercase.includes("zoom")) {
-    venue = "Zoom (Virtual)";
-  } else {
-    // Note the \b word boundaries around 'at' and 'venue' to avoid false matching substrings like 'Information' or 'that'
-    const venueRegex = /(?:\b(?:at|venue)\b|📍)\s*([A-Z0-9][A-Za-z0-9\s,-]{2,50})(?=\s+(?:from|on|\bat\b|fellowship|🗓️|⏰)|\.|\n|$)/i;
-    const venueMatch = cleaned.match(venueRegex);
-    if (venueMatch && venueMatch[1]) {
-      const val = venueMatch[1].trim();
-      const forbidden = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Zoom"];
-      if (!forbidden.some(word => val.toLowerCase().includes(word.toLowerCase()))) {
-        venue = val;
-      }
-    } else {
-      if (lowercase.includes("braeburn")) venue = "Braeburn Theatre, Gitanga Road";
-      else if (lowercase.includes("radisson")) venue = "Radisson Blu, Upper Hill";
-      else if (lowercase.includes("laico")) venue = "Laico Regency";
-      else if (lowercase.includes("serena")) venue = "Nairobi Serena Hotel";
-      else if (lowercase.includes("jacaranda")) venue = "Jacaranda Hotel, Westlands";
-    }
-  }
+  const extractedVenue = extractVenue(text);
+  const venue = extractedVenue || "our fellowship venue";
 
   // 5. Extract Time
   let time = "6:00 PM";
@@ -347,4 +352,47 @@ export function reformatEventText(text: string, account: string, created_at?: st
   }
 
   return `The Rotary Club of ${clubName} invites you to a fellowship gathering at ${venue} from ${time} on ${dayDate}.`;
+}
+
+export function extractVenue(text: string): string | null {
+  const cleaned = cleanPostText(text);
+  const lowercase = cleaned.toLowerCase();
+  
+  if (lowercase.includes("zoom")) {
+    return "Zoom (Virtual)";
+  }
+  
+  // Look for compound location indicators (e.g. '📍 Venue:', '📍', 'Venue:', 'at')
+  const venueRegex = /(?:📍\s*(?:venue\b[:\-]?\s*)?|\bvenue\b[:\-]?\s*|\bat\b\s*)([A-Z0-9][A-Za-z0-9\s,':-]{2,50}?)(?=\s+(?:\b(?:from|on|at|fellowship|date|time|kes|rotarians|starting|join|register|save|tomorrow|this)\b|🗓️|⏰)|\.|\n|$)/i;
+  const venueMatch = cleaned.match(venueRegex);
+  if (venueMatch && venueMatch[1]) {
+    let val = venueMatch[1].trim();
+    // Normalize multiple spaces
+    val = val.replace(/\s+/g, " ");
+    const forbidden = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Zoom", "Date", "Time", "From", "Rotarians"];
+    if (!forbidden.some(word => val.toLowerCase().includes(word.toLowerCase()))) {
+      const valLower = val.toLowerCase();
+      if (valLower.includes("braeburn")) return "Braeburn Theatre, Gitanga Road";
+      if (valLower.includes("radisson")) return "Radisson Blu, Upper Hill";
+      if (valLower.includes("laico")) return "Laico Regency";
+      if (valLower.includes("serena")) return "Nairobi Serena Hotel";
+      if (valLower.includes("jacaranda")) return "Jacaranda Hotel, Westlands";
+      if (valLower.includes("bonds garden")) return "Bonds Garden, Upper Hill";
+      if (valLower.includes("argyle")) return "Argyle Hotel";
+      if (valLower.includes("67 airport")) return "67 Airport Hotel";
+      
+      return val;
+    }
+  }
+  
+  if (lowercase.includes("braeburn")) return "Braeburn Theatre, Gitanga Road";
+  if (lowercase.includes("radisson")) return "Radisson Blu, Upper Hill";
+  if (lowercase.includes("laico")) return "Laico Regency";
+  if (lowercase.includes("serena")) return "Nairobi Serena Hotel";
+  if (lowercase.includes("jacaranda")) return "Jacaranda Hotel, Westlands";
+  if (lowercase.includes("bonds garden")) return "Bonds Garden, Upper Hill";
+  if (lowercase.includes("argyle")) return "Argyle Hotel";
+  if (lowercase.includes("67 airport")) return "67 Airport Hotel";
+  
+  return null;
 }

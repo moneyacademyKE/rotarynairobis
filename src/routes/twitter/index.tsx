@@ -1,4 +1,4 @@
-import { component$, useContext } from "@builder.io/qwik";
+import { component$, useContext, useStylesScoped$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseD1PostRows, type Post } from "../../domain/specs";
 import { DrawerContext } from "../layout";
@@ -8,14 +8,14 @@ export const usePosts = routeLoader$(async ({ platform }) => {
   
   // Clean 'Home' feed: Text-only upcoming rotary club events (EVENT_POSTER)
   const { results } = await db.prepare(`
-    SELECT p.*, m.snippet, m.type 
+    SELECT DISTINCT p.*, m.snippet, m.type, m.file_name AS file_name 
     FROM posts p
-    JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
+    JOIN json_each(p.photos_json) AS je
+    JOIN media m ON m.file_name = je.value
     WHERE m.type = 'EVENT_POSTER' 
       AND p.text IS NOT NULL 
       AND p.text != '' 
       AND p.text NOT LIKE 'Legacy media archive%'
-    GROUP BY p.id
     ORDER BY p.created_at DESC, p.id DESC
   `).all();
   
@@ -35,19 +35,18 @@ export const usePosts = routeLoader$(async ({ platform }) => {
   return uniquePosts;
 });
 
-import { cleanPostText, parseEventDate, formatExtractedDate, reformatEventText } from "../../lib/twitter-parser";
-export { cleanPostText, parseEventDate, formatExtractedDate, reformatEventText };
+import { cleanPostText, parseEventDate, formatExtractedDate, reformatEventText, extractVenue } from "../../lib/twitter-parser";
+export { cleanPostText, parseEventDate, formatExtractedDate, reformatEventText, extractVenue };
 
 
 export default component$(() => {
   const posts = usePosts();
   const drawerState = useContext(DrawerContext);
+
+  useStylesScoped$(STYLES);
   
   // Partition posts into upcoming and previous events using D1 text copy
   const today = new Date();
-  if (today.getFullYear() < 2026) {
-    today.setFullYear(2026, 4, 20); // Default local/test fallback to May 20, 2026
-  }
   today.setHours(0, 0, 0, 0);
   
   const upcoming: Post[] = [];
@@ -106,25 +105,42 @@ export default component$(() => {
                 const formattedContent = reformatEventText(targetText, post.account || "", post.created_at || undefined);
                 const cleanedTarget = cleanPostText(targetText);
                 const title = cleanedTarget ? cleanedTarget.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Announcement";
+                const venue = extractVenue(targetText);
                 
                 return (
                   <div 
                     key={post.id} 
                     class="event-text-item"
+                    role="button"
+                    tabIndex={0}
                     onClick$={() => {
                       drawerState.isOpen = true;
                       drawerState.title = title;
                       drawerState.category = "Upcoming Event";
-                      drawerState.mediaSrc = ""; // Text-only inspection drawer
+                      drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
                       drawerState.mediaType = "image";
-                      drawerState.content = targetText;
+                      drawerState.content = formattedContent;
+                    }}
+                    onKeyDown$={(e: KeyboardEvent) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        drawerState.isOpen = true;
+                        drawerState.title = title;
+                        drawerState.category = "Upcoming Event";
+                        drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
+                        drawerState.mediaType = "image";
+                        drawerState.content = formattedContent;
+                      }
                     }}
                   >
                     <div class="event-item-header">
                       <span class="event-account">@{post.account || 'rcns'}</span>
                       <span class="event-badge upcoming">Upcoming</span>
                     </div>
-                    {displayDate && <div class="event-date-extracted">{displayDate}</div>}
+                    <div class="event-meta-extracted">
+                      {displayDate && <div class="event-date-extracted">{displayDate}</div>}
+                      {venue && <div class="event-venue-extracted">📍 {venue}</div>}
+                    </div>
                     <div class="event-item-body">
                       {formattedContent}
                     </div>
@@ -156,25 +172,42 @@ export default component$(() => {
                 const formattedContent = reformatEventText(targetText, post.account || "", post.created_at || undefined);
                 const cleanedTarget = cleanPostText(targetText);
                 const title = cleanedTarget ? cleanedTarget.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Recap";
+                const venue = extractVenue(targetText);
                 
                 return (
                   <div 
                     key={post.id} 
                     class="event-text-item"
+                    role="button"
+                    tabIndex={0}
                     onClick$={() => {
                       drawerState.isOpen = true;
                       drawerState.title = title;
                       drawerState.category = "Past Event";
-                      drawerState.mediaSrc = ""; // Text-only inspection drawer
+                      drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
                       drawerState.mediaType = "image";
-                      drawerState.content = targetText;
+                      drawerState.content = formattedContent;
+                    }}
+                    onKeyDown$={(e: KeyboardEvent) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        drawerState.isOpen = true;
+                        drawerState.title = title;
+                        drawerState.category = "Past Event";
+                        drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
+                        drawerState.mediaType = "image";
+                        drawerState.content = formattedContent;
+                      }
                     }}
                   >
                     <div class="event-item-header">
                       <span class="event-account">@{post.account || 'rcns'}</span>
                       <span class="event-badge previous">Past Event</span>
                     </div>
-                    {displayDate && <div class="event-date-extracted">{displayDate}</div>}
+                    <div class="event-meta-extracted">
+                      {displayDate && <div class="event-date-extracted">{displayDate}</div>}
+                      {venue && <div class="event-venue-extracted">📍 {venue}</div>}
+                    </div>
                     <div class="event-item-body">
                       {formattedContent}
                     </div>
@@ -190,7 +223,11 @@ export default component$(() => {
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={`
+    </div>
+  );
+});
+
+const STYLES = `
         .events-page-container {
           max-width: 1400px;
           margin: 0 auto;
@@ -213,7 +250,7 @@ export default component$(() => {
           gap: 1.5rem;
         }
         .column-title {
-          font-family: var(--font-display);
+          font-family: var(--font-serif);
           font-size: 2rem;
           font-style: italic;
           color: var(--accent-primary);
@@ -225,7 +262,7 @@ export default component$(() => {
           justify-content: space-between;
         }
         .column-count {
-          font-family: var(--font-body);
+          font-family: var(--font-sans);
           font-size: 0.9rem;
           font-style: normal;
           color: var(--text-secondary);
@@ -286,11 +323,22 @@ export default component$(() => {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
+        .event-meta-extracted {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
         .event-date-extracted {
           font-family: var(--font-display);
           font-style: italic;
           font-size: 1.15rem;
           color: var(--accent-primary);
+        }
+        .event-venue-extracted {
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+          font-weight: 600;
+          font-style: italic;
         }
         .event-item-footer {
           display: flex;
@@ -326,7 +374,4 @@ export default component$(() => {
           border-radius: 16px;
           text-align: center;
         }
-      `}></style>
-    </div>
-  );
-});
+`;

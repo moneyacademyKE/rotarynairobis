@@ -9,13 +9,15 @@
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, copyFileSync } from 'fs';
-import { join, resolve } from 'path';
+import { join, resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 // ─── Configuration ─────────────────────────────────────────────────────
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const EXPORT_DIR = resolve('/Users/moe/Desktop/chatexport_2026-04-15');
 const HTML_PATH = join(EXPORT_DIR, 'messages.html');
 const PHOTOS_SRC = join(EXPORT_DIR, 'photos');
-const PROJECT_ROOT = resolve((import.meta as any).dir, '..');
+const PROJECT_ROOT = resolve(__dirname, '..');
 const DATA_DIR = join(PROJECT_ROOT, 'src', 'data');
 const PHOTOS_DEST = join(PROJECT_ROOT, 'public', 'photos');
 

@@ -50,25 +50,52 @@ const TELEGRAM_BASE_URL = "https://api.telegram.org/bot";
 
 /**
  * Sets the webhook for the bot.
+ * 
+ * Bug H8 fix: accepts allowedUpdates parameter, defaults to channel_post + edited_channel_post.
+ * Bug H9 fix: checks response.ok and data.ok, throws descriptive errors on failure.
  */
-export async function setWebhook(token: string, url: string, secretToken?: string) {
+export async function setWebhook(
+  token: string,
+  url: string,
+  secretToken?: string,
+  allowedUpdates: string[] = ["channel_post", "edited_channel_post"]
+) {
   const response = await fetch(`${TELEGRAM_BASE_URL}${token}/setWebhook`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       url,
       secret_token: secretToken,
-      allowed_updates: ["message"],
+      allowed_updates: allowedUpdates,
     }),
   });
-  return response.json();
+
+  if (!response.ok) {
+    throw new Error(`Telegram setWebhook HTTP error: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json() as any;
+  if (!data.ok) {
+    throw new Error(`Telegram setWebhook failed: ${data.description}`);
+  }
+
+  return data;
 }
 
 /**
  * Gets file information from Telegram.
+ * 
+ * Bug M10 fix: fileId is URI-encoded to prevent injection.
  */
 export async function getFile(token: string, fileId: string): Promise<TelegramFile> {
-  const response = await fetch(`${TELEGRAM_BASE_URL}${token}/getFile?file_id=${fileId}`);
+  const response = await fetch(
+    `${TELEGRAM_BASE_URL}${token}/getFile?file_id=${encodeURIComponent(fileId)}`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Telegram getFile HTTP error: ${response.status} ${response.statusText}`);
+  }
+
   const data = await response.json() as any;
   if (!data.ok) throw new Error(`Telegram getFile failed: ${data.description}`);
   return data.result;
@@ -83,6 +110,8 @@ export function getDownloadUrl(token: string, filePath: string): string {
 
 /**
  * Sends a simple text message back to a chat.
+ * 
+ * Bug H9 fix: checks response.ok and data.ok, throws descriptive errors on failure.
  */
 export async function sendMessage(token: string, chatId: number, text: string) {
   const response = await fetch(`${TELEGRAM_BASE_URL}${token}/sendMessage`, {
@@ -93,5 +122,15 @@ export async function sendMessage(token: string, chatId: number, text: string) {
       text,
     }),
   });
-  return response.json();
+
+  if (!response.ok) {
+    throw new Error(`Telegram sendMessage HTTP error: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json() as any;
+  if (!data.ok) {
+    throw new Error(`Telegram sendMessage failed: ${data.description}`);
+  }
+
+  return data;
 }

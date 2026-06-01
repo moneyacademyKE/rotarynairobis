@@ -22,5 +22,6 @@ export const posts = sqliteTable('posts', {
   text: text('text'),
   account: text('account'),
   photosJson: text('photos_json'),
-  hashtagsJson: text('hashtags_json')
+  hashtagsJson: text('hashtags_json'),
+  createdAt: text('created_at')
 });

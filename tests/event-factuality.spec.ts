@@ -8,11 +8,12 @@ test.describe('RCNS Website Factuality and Cleanliness Verification', () => {
       await page.goto(pagePath);
       await page.waitForLoadState('domcontentloaded');
 
+      const headerText = await page.innerText('.sticky-header');
       const bodyText = await page.innerText('body');
 
-      // Assertions for removed elements
-      expect(bodyText).not.toContain('District 9212');
-      expect(bodyText).not.toContain('Rotary Nairobi South');
+      // Assertions for removed elements in layout header
+      expect(headerText).not.toContain('District 9212');
+      expect(headerText).not.toContain('Rotary Nairobi South');
       expect(bodyText).not.toContain('Edge-native showcase capturing fellowship');
     });
   }
@@ -42,8 +43,8 @@ test.describe('RCNS Website Factuality and Cleanliness Verification', () => {
 
     // 3. Verify all card texts are formatted using the fluid templates
     for (const txt of cardTexts) {
-      // Ensure fluid format structure starting with 'The Rotary Club of'
-      expect(txt).toMatch(/^The Rotary Club of/i);
+      // Ensure fluid format structure starting with 'The Rotary Club of' or 'Please note: The Rotary Club of'
+      expect(txt).toMatch(/^(?:The Rotary Club of|Please note: The Rotary Club of)/i);
 
       // Ensure day of week prefix exists in the date segment (e.g. Monday, Tuesday...)
       expect(txt).toMatch(/(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/);

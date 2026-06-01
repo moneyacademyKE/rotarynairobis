@@ -24,11 +24,11 @@
   --font-serif: 'Instrument Serif', serif;
 
   /* Obsidian Design Tokens */
-  --bg-obsidian: oklch(14% 0.015 35);
-  --bg-panel: oklch(18% 0.02 35);
-  --bg-panel-hover: oklch(22% 0.022 35);
-  --border-subtle: oklch(28% 0.02 35 / 0.4);
-  --border-focus: oklch(50% 0.05 35);
+  --bg-obsidian: #17458f;
+  --bg-panel: rgba(10, 30, 70, 0.75);
+  --bg-panel-hover: rgba(15, 45, 95, 0.85);
+  --border-subtle: rgba(0, 103, 200, 0.3);
+  --border-focus: rgba(0, 103, 200, 0.6);
 
   --text-primary: oklch(94% 0.01 35);
   --text-secondary: oklch(75% 0.015 35);
@@ -51,7 +51,7 @@
   --border-color: var(--border-subtle);
   --card-bg: var(--bg-panel);
 
-  --tab-height: 72px;
+  --tab-height: 140px;
   --max-width: 1400px; /* Expand max width for grid desktop view */
 }
 
@@ -60,6 +60,7 @@
 [data-theme="tiktok"],
 [data-theme="birthdays"],
 [data-theme="recaps"],
+[data-theme="search"],
 [data-theme="twitter"] {
   --bg-color: var(--bg-obsidian);
   --text-color: var(--text-primary);
@@ -72,6 +73,9 @@
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-color);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath d='M10 80 C 40 10, 60 10, 90 80 C 120 150, 140 150, 170 80 M20 80 C 45 25, 55 25, 80 80 C 105 135, 115 135, 140 80 M30 80 C 50 40, 50 40, 70 80 C 90 120, 90 120, 110 80 M110 150 C 130 90, 150 90, 170 150 C 190 210, 210 210, 230 150 M120 150 C 135 105, 145 105, 160 150 C 175 195, 185 195, 200 150 M130 150 C 140 120, 140 120, 150 150' fill='none' stroke='%230067c8' stroke-width='1' stroke-opacity='0.18'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-attachment: fixed;
   color: var(--text-color);
   font-size: var(--font-size-base);
   line-height: 1.6;
@@ -104,7 +108,7 @@ ul {
 
 .main-content {
   flex: 1;
-  padding-bottom: var(--tab-height);
+  margin-top: var(--tab-height);
   width: 100%;
 }
 
@@ -391,7 +395,7 @@ ul {
 
 .drawer-backdrop.open {
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto;
 }
 
 .drawer-panel {
@@ -475,18 +479,23 @@ ul {
 
 .drawer-media-section {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  max-height: 500px;
   border-radius: 12px;
   overflow: hidden;
   background: var(--bg-obsidian);
   border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .drawer-video-gif {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  max-width: 100%;
+  max-height: 500px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .prompt-section-header {
@@ -528,22 +537,33 @@ ul {
 /* ==========================================
    Header & Filter Controls Styling
    ========================================== */
+.sticky-header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--max-width);
+  z-index: 800;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
 .app-header {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: clamp(2rem, 5vw, 4rem) var(--space-md) var(--space-md) var(--space-md);
-  border-bottom: 1px solid var(--border-subtle);
+  padding: var(--space-sm) var(--space-md) 0 var(--space-md);
   text-align: center;
 }
 
 .header-brand-row {
   display: flex;
   justify-content: center;
-  margin-bottom: var(--space-sm);
+  margin-bottom: 0;
 }
 
 .brand-logo {
-  height: clamp(60px, 12vh, 120px);
+  height: clamp(40px, 8vh, 72px);
   width: auto;
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
   transition: transform var(--transition-smooth);
@@ -583,7 +603,7 @@ ul {
 
 .controls-wrapper {
   max-width: var(--max-width);
-  margin: var(--space-md) auto;
+  margin: var(--space-xs) auto var(--space-sm) auto;
   padding: 0 var(--space-md);
   display: flex;
   justify-content: center;
@@ -631,6 +651,99 @@ ul {
 }
 .refresh-btn:active {
   transform: scale(0.95);
+}
+
+/* Instagram Hover Overlay Styles */
+.instagram-profile .prompt-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-smooth), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.instagram-profile .prompt-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--accent-primary);
+  box-shadow: 0 12px 30px rgba(0, 103, 200, 0.4);
+}
+
+.card-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 30, 70, 0.95) 0%, rgba(23, 69, 143, 0.4) 60%, transparent 100%);
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-sm);
+  transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+  backdrop-filter: blur(0px);
+  pointer-events: none; /* Let clicks pass to the card link/action */
+}
+
+.prompt-card:hover .card-hover-overlay {
+  opacity: 1;
+  backdrop-filter: blur(3px);
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transform: translateY(10px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.prompt-card:hover .overlay-content {
+  transform: translateY(0);
+}
+
+.overlay-badge {
+  align-self: flex-start;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--accent-primary);
+  color: var(--bg-obsidian);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.overlay-caption {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-weight: 500;
+}
+
+.overlay-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.overlay-tags .tag-pill {
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* Glassmorphism panels and cards */
+.prompt-card, .search-item, .drawer-panel {
+  background-color: var(--bg-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
 }
 
 

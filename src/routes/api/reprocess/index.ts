@@ -4,14 +4,23 @@ import type { RequestHandler } from "@builder.io/qwik-city";
  * Administrative Reprocessing Endpoint
  * Fetches the last 50 visual media items from D1 and enqueues them 
  * back into the Gemini classification queue to trigger comprehensive reprocessing.
+ * 
+ * Bug C4 fixes:
+ * (a) Changed from onGet to onPost — this is a mutating operation.
+ * (b) Auth uses Authorization header (Bearer token) instead of query param.
+ *     Fails-closed: returns 500 if TELEGRAM_SECRET_TOKEN is not configured.
  */
-export const onGet: RequestHandler = async ({ request, platform, json }) => {
+export const onPost: RequestHandler = async ({ request, platform, json }) => {
   const env = platform.env as any;
-  const url = new URL(request.url);
-  const secret = url.searchParams.get("secret");
 
-  // Security Boundary
-  if (env.TELEGRAM_SECRET_TOKEN && secret !== env.TELEGRAM_SECRET_TOKEN) {
+  // Security Boundary — fail-closed
+  if (!env.TELEGRAM_SECRET_TOKEN) {
+    json(500, { error: "TELEGRAM_SECRET_TOKEN not configured" });
+    return;
+  }
+
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader !== `Bearer ${env.TELEGRAM_SECRET_TOKEN}`) {
     json(401, { error: "Unauthorized" });
     return;
   }
@@ -19,15 +28,17 @@ export const onGet: RequestHandler = async ({ request, platform, json }) => {
   try {
     // 1. Fetch the last 50 image posts
     const { results } = await env.DB.prepare(`
-      SELECT p.id, m.file_name
+      SELECT DISTINCT p.id, m.file_name
       FROM posts p
-      JOIN media m ON p.photos_json LIKE '%"' || m.file_name || '"%'
+      JOIN json_each(p.photos_json) AS je
+      JOIN media m ON m.file_name = je.value
       WHERE m.type != 'FAILED'
       ORDER BY p.created_at DESC, p.id DESC
       LIMIT 50
     `).all();
 
     // 2. Loop and dispatch each payload to the Cloudflare Queue binding
+    const url = new URL(request.url);
     const origin = url.origin;
     let count = 0;
     

@@ -25,7 +25,11 @@ export const onGet: RequestHandler = async ({ request, platform, json }) => {
   let healStatus = "Webhook is perfectly aligned. No action needed.";
 
   if (info.ok && info.result.url !== targetWebhookUrl) {
-    const secretToken = env.TELEGRAM_SECRET_TOKEN || "test_secret_token";
+    if (!env.TELEGRAM_SECRET_TOKEN) {
+      json(500, { error: "TELEGRAM_SECRET_TOKEN not configured" });
+      return;
+    }
+    const secretToken = env.TELEGRAM_SECRET_TOKEN;
     const setRes = await fetch(
       `https://api.telegram.org/bot${botToken}/setWebhook`,
       {
@@ -60,8 +64,12 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
   const secretToken = request.headers.get("X-Telegram-Bot-Api-Secret-Token");
   const env = platform.env as any;
 
-  // 1. Security Boundary (Rich Hickey "Spec")
-  if (env.TELEGRAM_SECRET_TOKEN && secretToken !== env.TELEGRAM_SECRET_TOKEN) {
+  // 1. Security Boundary (Rich Hickey "Spec") — fail-closed
+  if (!env.TELEGRAM_SECRET_TOKEN) {
+    json(500, { error: "TELEGRAM_SECRET_TOKEN not configured" });
+    return;
+  }
+  if (secretToken !== env.TELEGRAM_SECRET_TOKEN) {
     json(401, { error: "Unauthorized" });
     return;
   }
@@ -142,7 +150,7 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
     }
 
     await env.DB.prepare(
-      "INSERT INTO posts (id, text, account, photos_json, hashtags_json) VALUES (?, ?, ?, ?, ?)"
+      `INSERT OR REPLACE INTO posts_facts (id, text, account, photos_json, hashtags_json) VALUES (?, ?, ?, ?, ?)`
     ).bind(
       targetPostId, 
       text, 
