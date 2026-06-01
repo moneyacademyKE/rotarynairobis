@@ -102,6 +102,12 @@
 - **WCAG AA Contrast Adjustments**: Dark modes with custom palettes need careful selection of gray levels for muted tags (`--text-muted`) to verify readable contrast ratios against background panels.
 - **Platform Header Attribution Extraction**: When processing posts with null/generic account fields, parsing the platform username from the social media header (e.g. `'rotarycluboflangata' on Instagram`) *before* executing keyword fallbacks decouples the posting source fact from text content, achieving precise event attribution.
 - **Location Leakage Isolation**: Substring scanning for club names in raw captions is highly vulnerable to location leakage (e.g., matching "Upper Hill" in a venue caption like "Bonds Garden, Upper Hill"). Resolving the event venue beforehand and excluding venue keywords from the fallback club attribution checks isolates distinct data facts and prevents UI contamination.
+ 
+ 
+## Decoupled Content Routing & Playwright E2E Testing
+- **Decoupled Factual Loader Projection for Static Pages**: Reading structured JSON static files validated via a Zod schema boundary inside `routeLoader$` is a highly simple, testable, and robust pattern for content-heavy layout pages. This de-complects the textual copy from JSX layout markup, ensuring zero client bundle bloat while maintaining excellent resumability.
+- **Playwright Sequential Typings for Hydration**: Qwik's lazy-loaded handlers might not be hydrated immediately on DOMContentLoaded. In Playwright E2E tests, using `pressSequentially` with a slight delay gives the resumable runtime time to download and mount the event handlers, and utilizing auto-polling assertions (like `expect(locator).toHaveCount(...)`) prevents race conditions.
+- **Vite Local Environment DB Constraints**: Qwik City loaders that query Edge bindings (like D1 database) will fail under local standard Vite SSR dev server if bindings are empty or unconfigured. To test those pages locally, Wrangler dev bindings are required, whereas static JSON ledger decoupled pages resolve on Vite SSR dev server out of the box with zero external configuration.
 
 ## Unified Search Page & Glassmorphic Reel Feed Upgrades
 - **Search System Cohesion:** Custom search layouts should never remain static or decoupled from the app's primary interactive features. Mapping search item actions directly to the shared layout `DrawerContext` makes searching feel deeply integrated and satisfying.
@@ -141,5 +147,16 @@
 
 ## Layered SVG Background and Glassmorphic UX Design
 - **Vector-Contour Map Performance**: Encoding repeating SVG topographical contour lines directly inside CSS background properties avoids the overhead of loading heavy assets or making additional network requests. Keeping path nodes simple ensures that repaint boundaries are optimized during page scroll.
-- **Onboarding Suggestion Recovery UX**: Designing empty states to show clickable search tag buttons and path navigation suggestions instead of static notices dramatically decreases bounce rates and improves user discovery routes.
 - **Glassmorphic Contrast Tuning**: Overriding flat obsidian colors to a deep blue color space (`#17458f`) necessitates shifting background panel colors to semi-transparent white/blue values (e.g. `rgba(10, 30, 70, 0.75)`) and using backdrop blur properties. This preserves layout depth while maintaining high readability contrast (WCAG AA) for typography elements.
+
+## Reusable Layout Refactoring & Decoupled Unit Testing
+- **Decoupled Route Compilations in Vitest**: Importing from edge route loaders or layouts (which pull in Qwik City) inside unit tests triggers missing dependency errors (like `@qwik-city-plan` missing) in Vitest's Node.js environment. Moving helper functions (like `getCategoryBadge`) to a pure TypeScript library file (`gallery-utils.ts`) completely resolves the resolution issue, allowing tests to run rapidly in under 1ms with no environment mocks.
+- **Unified Card Grid Presentation**: Generalizing Photos, Events, Birthdays, and Recaps pages under a single `<GalleryGrid>` component ensures layout alignment. It guarantees that any future changes to grids, transitions, alt tags, or layout boundaries cascade automatically across all four tabs.
+- **Responsive Aspect-Ratio Stabilization**: Reserving card layout space using a stable `aspect-ratio: 4/3` on gallery card containers prevents cumulative layout shifts (CLS) when images render asynchronously.
+- **Static Card Interaction & Cursor Alignment**: When layout pages (Photos, Events, Birthdays, Recaps) do not require a details drawer, stripping the click handlers and setting the CSS `cursor` of `.prompt-card` to `default` ensures clear UX boundaries. This prevents users from trying to interact with static informational elements.
+- **Native Anchor Image Link**: Utilizing standard `<a>` HTML5 elements wrapping the image cards, with `target="_blank"`, provides an intuitive fallback for full-resolution media viewing without complicating component memory footprint.
+
+## Decoupled UI Presentation Mapping (Rebranding)
+- **Immutable Fact Preservation**: Rebranding a handle (from `@rcns` to `@rotarynairobis`) should be handled at the frontend projection layer, rather than executing destructive SQL updates or editing seed scripts. This satisfies the Rich Hickey doctrine by preserving historical data integrity (as raw facts remain unmodified) while minimizing implementation complexity and preventing parser/test regressions.
+
+

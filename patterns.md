@@ -433,3 +433,43 @@
 **Benefits**:
 - **Rich Hickey Quality**: Cleanly de-complects the *Source Identity fact* (who posted) from the *Content venue fact* (where they meet).
 - **Data Integrity**: Stops location venue text from polluting host club metadata.
+
+## Pattern: The Decoupled Gallery Grid Pattern
+**Problem**: How to scale similar, visually identical tab layouts (Photos, Events, Birthdays, Recaps) across an application without duplicating HTML markup, hover interactions, or side-drawer binding logic.
+
+**Solution**:
+1.  **Decoupled Interface Value**: Define a flat, framework-agnostic `GalleryItem` data contract interface (containing `id`, `mediaSrc`, `text`, `category`).
+2.  **Unified Component**: Implement a single `<GalleryGrid>` component that accepts `items: GalleryItem[]` and encapsulates the CSS grid, card structure, and native anchor links (`<a>`) pointing to full-size media files.
+3.  **Domain Mapping Logic**: Have individual route pages fetch their own data loader queries (e.g. `EVENT_POSTER`, `BIRTHDAY`, etc.) and map them onto the `GalleryItem` value interface before passing them to `<GalleryGrid>`.
+4.  **Pure Logic Utilities**: Move helper functions (like `getCategoryBadge`) to a pure TS library (`src/lib/gallery-utils.ts`) completely divorced from JSX/Qwik runtime modules. This allows Vitest to run lightning-fast tests.
+
+**Benefits**:
+- **Simplicity**: HTML markup and hover styles are maintained in exactly one file.
+- **Maintainability**: Adding new columns or styling transitions updates all four pages instantly.
+- **Testability**: Separating logic mapping from presentation components enables 100% unit test coverage with zero node/SSR environment complications.
+
+## Pattern: Decoupled View Rebranding (UI Projection Map)
+**Problem**: How to perform a system-wide brand or handle rename (e.g. from `@rcns` to `@rotarynairobis` on cards) without updating historical database records (which destroys fact accuracy) or introducing runtime environment/schema complexity.
+
+**Solution**:
+1.  **Preserve Historical Source Facts**: Retain the original raw values (like `'rcns'`) in the immutable database and ingestion records.
+2.  **UI Projection Mapping**: Map the display username at the frontend template rendering layer during iteration. If `post.account` matches the legacy handle or is null, map it to the rebranded handle before rendering.
+3.  **Localized Component Isolation**: Isolate this logic inside the home page cards (`src/routes/twitter/index.tsx`) without polluting parser utilities, analytics workers, or backend classification scripts.
+
+**Benefits**:
+- **Simplicity**: Keeps database/ingestion state clean and un-complected.
+- **Fact Integrity**: Historical records remain accurate representations of what occurred at that epoch in time.
+- **Maintainability**: Changing the handle again in the future only requires updating the template conditional, avoiding complex data migrations.
+
+## Pattern: The Decoupled Factual Loader (Copy/View Projection)
+**Problem**: Interleaving heavy copywriting with TSX layout components creates complected codebase files. It introduces compile-time bugs when editing textual paragraphs, makes translations difficult, and obscures visual rendering logic.
+
+**Solution**:
+1.  **Static Data Ledger**: Store textual and structured content as a clean static JSON data ledger (`rotary-basics.json`).
+2.  **Schema Spec Boundary**: Define a Zod schema spec boundary to validate its properties on compilation and loading.
+3.  **Dynamic Projection**: Retrieve the data inside a QwikCity `routeLoader$`, passing it to the UI component. Use declarative TSX mapping to render cards, accordions, and statistics dynamically.
+
+**Benefits**:
+- **Simplicity**: Keeps visual code dry and copy clean. Avoids syntax regressions.
+- **Robustness**: Enforces strict content typing at the boundary.
+- **Testability**: Makes unit testing of content shapes possible.

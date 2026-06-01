@@ -1,0 +1,389 @@
+{
+  "welcomeTitle": "Welcome to Rotary",
+  "welcomeMessage": "You are now part of a global network of business, professional, and community volunteers. In Rotary clubs around the world, Rotarians like you are changing lives in their own communities and those abroad — and forming strong, lasting friendships in the process. If you truly want to give back to the community — and to the world at large — you join Rotary. It has an arm that reaches across all barriers. To be part of that is very powerful.",
+  "fourWayTestTitle": "The Four-Way Test",
+  "fourWayTestIntro": "Created by a Rotarian, this test underscores our commitment to integrity and ethical leadership. Of the things we think, say or do:",
+  "fourWayTest": [
+    {
+      "id": 1,
+      "question": "Is it the TRUTH?",
+      "description": "Truth is the foundation of trust. We commit to factual accuracy and personal integrity in all our dealings."
+    },
+    {
+      "id": 2,
+      "question": "Is it FAIR to all concerned?",
+      "description": "Fairness removes conflict and builds equality. We treat others with respect and seek mutual benefit."
+    },
+    {
+      "id": 3,
+      "question": "Will it build GOODWILL and BETTER FRIENDSHIPS?",
+      "description": "Friendship is our core bond. We foster harmony and connection across all social and geographic boundaries."
+    },
+    {
+      "id": 4,
+      "question": "Will it be BENEFICIAL to all concerned?",
+      "description": "Beneficial service leaves the world better. We strive for positive and sustainable outcomes for our communities."
+    }
+  ],
+  "avenuesOfServiceTitle": "Avenues of Service",
+  "avenuesOfServiceIntro": "Our motto, SERVICE ABOVE SELF, embodies our humanitarian spirit. Rotary's Avenues of Service guide all of our club activities:",
+  "avenuesOfService": [
+    {
+      "id": "club",
+      "title": "Club Service",
+      "description": "We have fun, build lasting friendships, and make sure that our club runs well and operates effectively.",
+      "icon": "🤝"
+    },
+    {
+      "id": "vocational",
+      "title": "Vocational Service",
+      "description": "We volunteer our professional skills to serve others and promote integrity, honesty, and high ethical standards in everything we do.",
+      "icon": "💼"
+    },
+    {
+      "id": "community",
+      "title": "Community Service",
+      "description": "We identify local needs and work hand-in-hand with our community to bring lasting improvements, clean water, and social support.",
+      "icon": "🏡"
+    },
+    {
+      "id": "international",
+      "title": "International Service",
+      "description": "We sponsor international projects, meet humanitarian needs around the globe, and promote world understanding, collaboration, and peace.",
+      "icon": "🌍"
+    },
+    {
+      "id": "youth",
+      "title": "New Generations Service",
+      "description": "We work with young people to help them develop leadership, vocational skills, and become the next generation of visionaries and peacemakers.",
+      "icon": "🌱"
+    }
+  ],
+  "areasOfFocusTitle": "Areas of Focus",
+  "areasOfFocus": [
+    {
+      "id": "peace",
+      "title": "Peace & Conflict Resolution",
+      "description": "Training leaders to prevent and resolve conflict and build peaceful communities.",
+      "icon": "🕊️"
+    },
+    {
+      "id": "disease",
+      "title": "Disease Prevention & Treatment",
+      "description": "Improving healthcare infrastructure and funding programs to combat major diseases like polio and malaria.",
+      "icon": "🏥"
+    },
+    {
+      "id": "water",
+      "title": "Water & Sanitation",
+      "description": "Providing clean water, sanitation systems, and hygiene education to prevent waterborne illness.",
+      "icon": "💧"
+    },
+    {
+      "id": "maternal",
+      "title": "Maternal & Child Health",
+      "description": "Expanding access to quality care and resources so mothers and children can lead healthy lives.",
+      "icon": "👶"
+    },
+    {
+      "id": "education",
+      "title": "Basic Education & Literacy",
+      "description": "Supporting programs that train teachers, reduce illiteracy, and provide education materials to children in need.",
+      "icon": "📚"
+    },
+    {
+      "id": "economy",
+      "title": "Economic & Community Development",
+      "description": "Fostering local entrepreneurship, creating jobs, and funding community improvement initiatives.",
+      "icon": "📈"
+    }
+  ],
+  "foundationFacts": {
+    "totalContributed": "$2.4 Billion",
+    "description": "The Rotary Foundation helps Rotary clubs and districts work together to provide meaningful, sustainable service. Foundation grants support projects that provide clean water, medical care, literacy classes, and other essentials to people in need all around the world.",
+    "peaceFellowshipYears": "Since 2002-03",
+    "peaceFellowsCount": "480+",
+    "peaceFellowsCost": "$31 Million"
+  },
+  "polioEradication": {
+    "topPriority": "Eradicating Polio Worldwide",
+    "casesDroppedPercentage": "99%",
+    "challengeGoal": "$200 Million",
+    "gatesFoundationGrant": "$355 Million",
+    "partners": [
+      "United Nations Children's Fund (UNICEF)",
+      "U.S. Centers for Disease Control and Prevention (CDC)",
+      "World Health Organization (WHO)",
+      "Bill & Melinda Gates Foundation"
+    ]
+  },
+  "numbers": {
+    "membersCount": "1.2M",
+    "clubsCount": "34,000",
+    "interactCount": "13,200",
+    "rotaractCount": "8,500",
+    "rccCount": "7,000",
+    "districtsCount": "532",
+    "zonesCount": "34"
+  },
+  "glossaryTitle": "Rotary Glossary",
+  "glossary": [
+    {
+      "term": "Club Assembly",
+      "definition": "A meeting to discuss the club's programs, plans, and budget. Open to all club members to help shape the future direction of club activities.",
+      "icon": "🏛️",
+      "insight": {
+        "overview": "The Club Assembly is one of Rotary's most democratic and inclusive governance tools. Unlike board meetings reserved for officers, the Assembly opens the floor to every member — giving all voices equal weight in shaping the club's future.",
+        "keyFacts": [
+          "Typically held 2–4 times per year, often before or after the district conference season",
+          "Agenda includes budget review, program planning, membership goals, and service project voting",
+          "The President-elect often uses Club Assemblies to introduce their theme and priorities for the coming year",
+          "Members can raise motions, propose new projects, and vote on major financial commitments"
+        ],
+        "whyItMatters": "Strong clubs use assemblies to surface member ideas early, build consensus, and ensure everyone is invested in the club's mission. Clubs that skip or rush assemblies often struggle with disengaged members and poor attendance at service events.",
+        "districtConnection": "Clubs in District 9212 (Kenya, Ethiopia, South Sudan, Eritrea) are encouraged to hold at least one assembly focused on the district's annual theme, aligning local initiatives with regional goals.",
+        "tip": "The most impactful assemblies include a 'member spotlight' segment — giving ordinary Rotarians the floor to propose passion projects that the club can rally behind."
+      }
+    },
+    {
+      "term": "District Conference",
+      "definition": "An annual motivational meeting that showcases club and district accomplishments. It is open to all Rotarians in that district and their families.",
+      "icon": "🎯",
+      "insight": {
+        "overview": "The District Conference is Rotary's biggest annual celebration — a multi-day gathering where hundreds of Rotarians from across a district come together to celebrate impact, hear inspiring speakers, and forge cross-club friendships.",
+        "keyFacts": [
+          "District 9212 conferences rotate between Kenya, Ethiopia, South Sudan, and Eritrea",
+          "Events typically span 2–3 days and include formal sessions, gala dinners, and cultural programs",
+          "The District Governor delivers a year-end report on clubs' combined service impact",
+          "Rotary International's President-elect or a special representative often attends as a keynote speaker",
+          "Outstanding clubs and Rotarians receive awards for service excellence at the conference"
+        ],
+        "whyItMatters": "Beyond celebration, the conference serves as a critical networking event. Rotarians form partnerships across clubs that lead to joint projects, resource sharing, and matching grant applications to the Rotary Foundation.",
+        "districtConnection": "For RCNS members, the District 9212 conference is also an opportunity to showcase Nairobi South's unique programs and recruit collaboration from other clubs in the region.",
+        "tip": "First-time conference attendees should prioritize the breakout sessions over the main plenaries — that's where the most actionable ideas and new partnerships emerge."
+      }
+    },
+    {
+      "term": "Interact",
+      "definition": "Service and social clubs for youth ages 12 to 18 sponsored by local Rotary clubs, engaging them in community service and global citizenship.",
+      "icon": "🌟",
+      "insight": {
+        "overview": "Founded in 1962, Interact is Rotary's fastest-growing youth program. It introduces secondary school students to ethical leadership, community service, and international understanding — building the pipeline for tomorrow's Rotarians.",
+        "keyFacts": [
+          "Over 13,200 Interact clubs exist in 140+ countries, with more than 270,000 members worldwide",
+          "Each club must carry out at least two service projects per year — one local, one international",
+          "Interact clubs are sponsored and mentored by a local Rotary club, which provides guidance and funding",
+          "Members are not required to pay full Rotary dues — clubs set their own minimal membership fees",
+          "In Kenya, Interact clubs have delivered school library builds, sanitation campaigns, and blood donation drives"
+        ],
+        "whyItMatters": "Studies show Interact alumni are 3x more likely to join Rotaract or Rotary as adults. Sponsoring an Interact club is one of the highest-ROI investments a Rotary club can make in its own long-term membership.",
+        "districtConnection": "RCNS has the opportunity to sponsor Interact clubs at secondary schools in Nairobi South — a natural feeder into the club's Rotaract chapter and eventual full membership.",
+        "tip": "The best Interact clubs give students real decision-making power — let them choose their own projects, elect their own leaders, and present their work at Club Assemblies."
+      }
+    },
+    {
+      "term": "PolioPlus",
+      "definition": "The Rotary Foundation's premier program focused on global polio eradication efforts, funding vaccines, transport, and monitoring systems.",
+      "icon": "💉",
+      "insight": {
+        "overview": "PolioPlus is arguably Rotary's greatest achievement. Launched in 1985, it was the world's first child health initiative of its scale and has directly contributed to reducing polio cases by 99.9% globally. The program pioneered the model that inspired GPEI — the Global Polio Eradication Initiative.",
+        "keyFacts": [
+          "Rotary has contributed more than $2.1 billion to polio eradication efforts since 1985",
+          "In 1988, when PolioPlus began, polio paralysed 350,000 children per year across 125 countries",
+          "Today, wild poliovirus remains endemic only in Afghanistan and Pakistan",
+          "The Bill & Melinda Gates Foundation matches every $1 Rotary raises for polio 2:1 (up to $35M/year)",
+          "Rotary volunteers have immunised over 2.5 billion children in 122 countries",
+          "Africa was certified polio-free by the WHO in August 2020 — a milestone celebrated across District 9212"
+        ],
+        "whyItMatters": "PolioPlus proved that a volunteer organisation could drive a global health campaign at scale. The strategies developed — multi-country partnerships, community health worker training, surveillance systems — now underpin responses to Ebola, COVID-19, and other outbreaks.",
+        "districtConnection": "Kenya has been polio-free for decades, but District 9212 clubs support surveillance and funding campaigns to maintain zero-case status across East Africa and the Horn.",
+        "tip": "Every Rotarian can donate directly to PolioPlus at rotary.org — even a small annual gift, multiplied by Gates Foundation matching, has measurable impact on the remaining eradication challenge."
+      }
+    },
+    {
+      "term": "ProjectLINK",
+      "definition": "A database at www.rotary.org that lists active Rotary service projects needing volunteer or financial assistance, highlighting global models.",
+      "icon": "🔗",
+      "insight": {
+        "overview": "ProjectLINK is Rotary's global matchmaking platform for service — connecting clubs that have resources with projects that need them. It transforms isolated local initiatives into globally-supported models of change.",
+        "keyFacts": [
+          "Projects listed include water wells, school builds, medical camps, micro-lending programmes, and vocational training",
+          "Any club can list a project seeking partners, volunteers, or matching funds",
+          "The platform facilitates the partner club relationships required for Rotary Foundation Global Grants",
+          "Projects from District 9212 can connect with sponsor clubs in North America, Europe, and Asia",
+          "Clubs using ProjectLINK for Global Grants must meet vocational training visit requirements from partner clubs"
+        ],
+        "whyItMatters": "A single well-listed project can attract funding from multiple international clubs simultaneously. RCNS projects — if listed with compelling data and photos — can draw five-figure international grants within a single Rotary year.",
+        "districtConnection": "District 9212 has a dedicated grants committee that helps clubs prepare project proposals that meet Rotary Foundation standards for ProjectLINK submission and Global Grant eligibility.",
+        "tip": "Use the 'Model Project' category when listing — projects recognised as models receive extra visibility and are featured in Rotary's The Rotarian magazine and district newsletters."
+      }
+    },
+    {
+      "term": "Rotaract",
+      "definition": "Service and social clubs for young adults ages 18 to 30 sponsored by Rotary clubs, focusing on professional development and hands-on service.",
+      "icon": "🚀",
+      "insight": {
+        "overview": "Founded in 1968, Rotaract bridges the gap between Interact's youthful idealism and full Rotary membership. It gives young adults the freedom to lead their own service agenda while benefiting from the mentorship, resources, and global network of a sponsoring Rotary club.",
+        "keyFacts": [
+          "Over 8,500 Rotaract clubs exist in 177+ countries with more than 250,000 members worldwide",
+          "In 2019, Rotary granted Rotaract clubs full voting membership status in Rotary International — a historic shift",
+          "Members are encouraged to transition into full Rotary membership after age 30",
+          "Rotaract clubs run their own boards, elect their own presidents, and manage their own budgets",
+          "The Rotaract Club of Nairobi South is one of RCNS's most valued youth engagement channels"
+        ],
+        "whyItMatters": "Rotaract is Rotary's most powerful membership pipeline. Clubs that actively mentor their Rotaract chapters see significantly higher youth-to-adult conversion rates. In East Africa, Rotaract clubs have become major service delivery partners in their own right.",
+        "districtConnection": "District 9212 Rotaract clubs collaborate on district-level projects and send delegates to the annual District Rotaract Representative (DRR) conference alongside Rotary's District Conference.",
+        "tip": "The healthiest Rotary-Rotaract relationships are partnerships, not parent-child hierarchies. Invite Rotaract leaders to RCNS board meetings and give them real decision-making roles in joint projects."
+      }
+    },
+    {
+      "term": "Rotarian Action Groups",
+      "definition": "International groups of individuals who share a passion for a specific humanitarian issue or service activity (e.g., Water and Sanitation).",
+      "icon": "⚡",
+      "insight": {
+        "overview": "Rotarian Action Groups (RAGs) are Rotary's specialist task forces — informal networks of Rotarians and alumni who share deep expertise in a specific humanitarian domain. They cut across club and district boundaries to bring concentrated knowledge and resources to the world's toughest challenges.",
+        "keyFacts": [
+          "There are over 30 officially recognised RAGs, including groups for Addiction Prevention, Blindness, Clean Water, Diabetes, and Hunger",
+          "The Rotarian Action Group for Water and Sanitation (RAGFAS) has supported hundreds of water projects across Sub-Saharan Africa",
+          "RAG membership is open to any Rotarian, Rotaractor, or Rotary alumni who shares the group's focus area",
+          "RAGs are self-funding — members pay a small annual fee to cover coordination and communication costs",
+          "Partnering with a RAG often unlocks technical expertise and international co-funding opportunities"
+        ],
+        "whyItMatters": "For RCNS, connecting with a relevant RAG can exponentially multiply the impact of a local service project. A water borehole project backed by RAGFAS gets access to engineering consultants, vetted contractors, and co-funding from clubs on four continents.",
+        "districtConnection": "District 9212's East African context makes the Water & Sanitation, Health, and Hunger RAGs especially relevant. Several District 9212 clubs have used RAG partnerships to scale projects from local to regional impact.",
+        "tip": "To engage a RAG, email their coordinator (listed on rotary.org) with a one-paragraph description of your project. Most RAGs respond within two weeks and offer free advisory calls."
+      }
+    },
+    {
+      "term": "Rotary Community Corps (RCC)",
+      "definition": "Groups of non-Rotarians who work on service projects for their own communities, sponsored and guided by local Rotary clubs.",
+      "icon": "🌍",
+      "insight": {
+        "overview": "The Rotary Community Corps is Rotary's most grassroots model of service delivery. RCCs empower community members — who are not Rotarians and may never become Rotarians — to lead their own development projects with Rotary's backing and guidance.",
+        "keyFacts": [
+          "Over 7,000 RCCs operate across 69 countries, with the highest concentration in Africa and Asia",
+          "RCC members elect their own leaders and set their own service agendas with Rotary mentorship",
+          "RCCs are especially effective in rural and underserved communities where Rotary clubs have limited presence",
+          "A single Rotary club can sponsor multiple RCCs across different geographic areas",
+          "In Kenya, RCCs have driven community-led sanitation, school feeding, and micro-enterprise programmes"
+        ],
+        "whyItMatters": "RCCs represent Rotary's most scalable service model — the sponsoring club provides training, seed funding, and accountability frameworks, but the community owns the project. This ownership dramatically improves sustainability beyond the initial grant period.",
+        "districtConnection": "RCNS can sponsor RCCs in Nairobi South's informal settlements and peri-urban areas — creating a multiplied service presence without requiring direct club involvement in every activity.",
+        "tip": "The most successful RCCs meet monthly and submit quarterly reports to their sponsoring club. Structure your RCC launch with clear governance documents — a constitution, elected officers, and a service plan — to ensure long-term viability."
+      }
+    },
+    {
+      "term": "Rotary Fellowships",
+      "definition": "International recreational or vocational groups of individuals sharing common interests (e.g., International Skiing Fellowship of Rotarians).",
+      "icon": "🤗",
+      "insight": {
+        "overview": "Rotary Fellowships are Rotary's social glue — international groups united by shared hobbies, professions, or recreational interests. They exist alongside service work and remind Rotarians that friendship and joy are as central to the organisation as humanitarian impact.",
+        "keyFacts": [
+          "There are over 90 officially recognised Rotary Fellowships, ranging from the International Fellowship of Flying Rotarians to the Rotarian Wine Fellowship",
+          "Fellowships relevant to East Africa include Aviation, Golf, Travel, and Medical professions",
+          "Members travel internationally to attend Fellowship gatherings — creating Rotary friendships that span continents",
+          "The Healthcare Rotarian Action Group Fellowship is particularly valuable for RCNS's medically-inclined members",
+          "Fellowship membership has no age restriction — they are open to Rotarians, Rotaractors, and alumni"
+        ],
+        "whyItMatters": "Fellowships are often the 'hidden door' through which passive members become deeply engaged. A Rotarian who finds their professional tribe within a fellowship becomes a more committed club member — because now Rotary speaks their language.",
+        "districtConnection": "District 9212 hosts an annual fellowship showcase at its conference — a great opportunity for RCNS members to discover and join fellowships aligned with their professions and interests.",
+        "tip": "If no existing fellowship matches your interest, Rotary makes it possible to found a new one. With 12 founding members from at least 3 countries, you can apply to create an officially recognised Rotary Fellowship."
+      }
+    },
+    {
+      "term": "The Rotary Foundation",
+      "definition": "The philanthropic arm of Rotary International. It helps Rotarians advance world understanding, goodwill, and peace through humanitarian grants.",
+      "icon": "🏦",
+      "insight": {
+        "overview": "The Rotary Foundation (TRF) is the financial engine behind Rotary's global impact. Established in 1917 with a single $26.50 donation, it has grown into one of the world's top-rated charitable organisations, distributing hundreds of millions of dollars annually to humanitarian projects worldwide.",
+        "keyFacts": [
+          "TRF has distributed more than $4 billion in grants since its founding",
+          "The Foundation operates two main grant types: District Simplified Grants (DSGs) and Global Grants",
+          "Global Grants require a partner club from another country and focus on one of Rotary's six Areas of Focus",
+          "The Annual Fund is the Foundation's primary donation vehicle — clubs earn District Designated Funds (DDF) based on their members' Annual Fund contributions",
+          "Every Paul Harris Fellow recognition ($1,000 cumulative donation) funds approximately one scholarship week for a Rotary Peace Fellow",
+          "TRF holds a 4-star rating from Charity Navigator and is regularly recognised for financial transparency"
+        ],
+        "whyItMatters": "Understanding TRF is essential for any Rotarian wanting to multiply their club's impact. A $1,000 club contribution to the Annual Fund can return $3,000–$5,000 in District Designated Funds available for local projects over a three-year cycle.",
+        "districtConnection": "District 9212 has a Foundation Committee that hosts grant writing workshops and connects clubs with international partners. RCNS members who complete Rotary's Grant Management Seminar are certified to manage Foundation grants.",
+        "tip": "Every Rotarian should know their Paul Harris Fellow status and contribution history. Consistent annual giving — even $100/year — builds the club's DDF allocation and unlocks larger grant opportunities over time."
+      }
+    },
+    {
+      "term": "Rotary International (RI)",
+      "definition": "The global association composed of 34,000 Rotary clubs in nearly every country of the world. It is headquartered in Evanston, Illinois, USA.",
+      "icon": "🌐",
+      "insight": {
+        "overview": "Rotary International is the umbrella organisation that unifies all Rotary clubs worldwide under a shared constitution, code of policies, and set of core values. Founded in 1905 by Paul Harris in Chicago, it has grown into one of the world's largest and most respected volunteer organisations.",
+        "keyFacts": [
+          "RI is governed by a Board of Directors elected by delegates from the 34 Rotary zones worldwide",
+          "The RI President is elected two years in advance and sets the global theme for their year",
+          "RI's General Secretary manages day-to-day operations from Evanston headquarters, with regional offices on every continent",
+          "Rotary's constitution mandates that each club maintain at least 20 active members to retain club status",
+          "RI publishes The Rotarian magazine — the world's oldest service club magazine, founded in 1911",
+          "Rotary's consultative status with the United Nations gives Rotarians formal voice in international policy discussions"
+        ],
+        "whyItMatters": "RI's global infrastructure is what transforms a local club's service project into a internationally recognised, grant-eligible, and globally-connected initiative. Without RI's systems — the Foundation, My Rotary platform, and zone structure — Rotary clubs would be isolated charitable groups rather than a unified global force.",
+        "districtConnection": "RCNS belongs to RI Zone 20A and District 9212. The Zone Representative bridges RI leadership and district clubs — attending the International Assembly and bringing RI's strategic priorities to the region.",
+        "tip": "Every Rotarian should create a My Rotary account at my.rotary.org — it provides access to grant tools, training resources, the Member Database, and Rotary's official learning platform."
+      }
+    },
+    {
+      "term": "Rotary Peace Centers",
+      "definition": "Partnerships at eight universities around the world offering advanced degrees and professional certificates in peace and conflict resolution.",
+      "icon": "🕊️",
+      "insight": {
+        "overview": "The Rotary Peace Centers program is among Rotary's most visionary and prestigious initiatives. Since 2002, it has trained hundreds of peace and conflict resolution practitioners who now lead peacebuilding efforts in conflict zones, governments, NGOs, and international organisations worldwide.",
+        "keyFacts": [
+          "Eight universities host Rotary Peace Centers: Duke, University of Queensland, International Christian University (Tokyo), Uppsala, University of Bradford, Chulalongkorn, University of Cape Town, and Makerere University",
+          "Two fellowship types are offered: Master's Degree (two years, fully funded) and Professional Certificate (three months, fully funded)",
+          "Fellowships cover full tuition, room, board, and round-trip airfare for selected candidates",
+          "Over 1,700 Rotary Peace Fellows have graduated and serve in 130+ countries",
+          "The University of Cape Town and Makerere (Uganda) centers specifically serve the African context — directly relevant to District 9212",
+          "Applications are open to professionals with 3–5 years of experience in peace-related fields"
+        ],
+        "whyItMatters": "Rotary Peace Fellows are among the most impactful alumni Rotary produces. Many go on to lead UN peacekeeping missions, mediate civil conflicts, and shape national reconciliation policies. Sponsoring or nominating a candidate from the RCNS community is one of the club's highest-impact contributions.",
+        "districtConnection": "District 9212 clubs are encouraged to identify and nominate qualified candidates for Rotary Peace Fellowships. Given the region's context — Kenya, Ethiopia, South Sudan, and Eritrea — peace and conflict resolution expertise is directly applicable.",
+        "tip": "RCNS can support candidates' Rotary Peace Fellowship applications through club endorsement letters and connections to past District 9212 fellowship awardees who can provide mentorship during the application process."
+      }
+    },
+    {
+      "term": "Rotary Youth Exchange",
+      "definition": "A cultural exchange program for youth ages 15 to 19, promoting international understanding with exchanges lasting from one week to one year.",
+      "icon": "✈️",
+      "insight": {
+        "overview": "Rotary Youth Exchange is one of the world's oldest and most respected international student exchange programs. Since 1927, it has sent hundreds of thousands of young people across borders, creating lifelong ambassadors of international understanding.",
+        "keyFacts": [
+          "Over 8,000 students participate annually in exchanges spanning 100+ countries",
+          "Long-term exchanges (up to 12 months) place students with host families and enrol them in local schools",
+          "Short-term exchanges (1–6 weeks) focus on cultural immersion, language learning, and group activities",
+          "Host families provide accommodation and meals; sponsor clubs provide pocket money and support",
+          "Exchange students are required to present their experience at club meetings — giving Rotarians direct contact with the program's human impact",
+          "Inbound students from Europe, America, or Asia who stay in Kenya are a powerful cultural bridge for RCNS"
+        ],
+        "whyItMatters": "Youth Exchange alumni consistently report that their exchange year was the defining experience of their life. They return home with cross-cultural empathy, language skills, and global networks — and many become committed Rotarians or Rotaractors as adults.",
+        "districtConnection": "District 9212 participates in both inbound and outbound Youth Exchange. RCNS can host inbound students from partner districts globally and sponsor Kenyan youth for outbound exchanges.",
+        "tip": "Host family recruitment is the single biggest bottleneck for Youth Exchange programs. RCNS members who volunteer as host families become the program's most powerful advocates — and often say it was the most rewarding thing they've done in Rotary."
+      }
+    },
+    {
+      "term": "Rotary Youth Leadership Awards (RYLA)",
+      "definition": "Intense leadership training and recognition activities conducted by clubs or districts for youth and young adults ages 14 to 30.",
+      "icon": "🏆",
+      "insight": {
+        "overview": "RYLA is Rotary's flagship leadership development program — a high-intensity, experiential training experience that equips young people with the skills, confidence, and networks to lead in their communities and careers. Unlike Youth Exchange, RYLA focuses explicitly on leadership competency-building.",
+        "keyFacts": [
+          "RYLA programs vary in format — from weekend retreats to week-long residential camps",
+          "Core skills covered include public speaking, project management, team leadership, ethical decision-making, and community needs assessment",
+          "District 9212 hosts an annual RYLA event attended by youth from Kenya, Ethiopia, South Sudan, and Eritrea",
+          "RYLA alumni frequently go on to found Interact clubs, lead Rotaract chapters, or pursue careers in public service",
+          "Clubs sponsor participants by covering program fees, transport, and accommodation",
+          "Corporate sponsorship from club members' employers can fund multiple RYLA places per year"
+        ],
+        "whyItMatters": "RYLA is one of Rotary's highest-return youth investments. A RYLA alumnus who becomes an Interact president typically delivers 10x the service impact of a non-RYLA peer. The program's alumni network also becomes a talent pool for future Rotaract and Rotary membership.",
+        "districtConnection": "RCNS is encouraged to send 2–3 sponsored youth to the District 9212 RYLA each year. Clubs that invest in RYLA consistently report stronger Interact clubs and more engaged youth in their broader community programmes.",
+        "tip": "The strongest RYLA sponsorships include a post-program mentorship component — pairing each RYLA graduate with a Rotarian mentor for 6–12 months to help them apply their new skills in a real leadership role."
+      }
+    }
+  ]
+}

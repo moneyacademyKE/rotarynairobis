@@ -1,0 +1,74 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('RCNS About Page E2E Verification', () => {
+  test.beforeEach(async ({ page }) => {
+    // Navigate to the About page directly
+    await page.goto('/about/');
+    await page.waitForLoadState('domcontentloaded');
+  });
+
+  test('Page header should highlight the About pill as active', async ({ page }) => {
+    const activePill = page.locator('.pill-btn.active');
+    await expect(activePill).toContainText('About');
+  });
+
+  test('About page should render the main header, welcome message, and quote card', async ({ page }) => {
+    const mainTitle = page.locator('.main-title');
+    await expect(mainTitle).toContainText('Welcome to Rotary');
+
+    const quoteAuthor = page.locator('.quote-author');
+    await expect(quoteAuthor).toContainText('Kemal Attilâ');
+  });
+
+  test('Should render the Rotary Numbers section with cards', async ({ page }) => {
+    const numCards = page.locator('.number-card');
+    await expect(numCards).toHaveCount(7);
+
+    const firstVal = await numCards.nth(0).locator('.num-value').innerText();
+    expect(firstVal).toBe('1.2M');
+  });
+
+  test('Should render the Four-Way Test questions in correct order', async ({ page }) => {
+    const questions = page.locator('.four-way-question');
+    await expect(questions).toHaveCount(4);
+
+    await expect(questions.nth(0)).toContainText('TRUTH');
+    await expect(questions.nth(1)).toContainText('FAIR');
+    await expect(questions.nth(2)).toContainText('GOODWILL');
+    await expect(questions.nth(3)).toContainText('BENEFICIAL');
+  });
+
+  test('Should support interactive search inside the Rotary Glossary accordion', async ({ page }) => {
+    const searchField = page.locator('.search-field');
+    const glossaryCards = page.locator('.glossary-card');
+
+    // 1. Initial state: verify terms are loaded (e.g. at least 10 items)
+    const initialCount = await glossaryCards.count();
+    expect(initialCount).toBeGreaterThan(10);
+
+    // 2. Type "Interact" into search sequentially to allow lazy handler hydration
+    await searchField.focus();
+    await searchField.pressSequentially('Interact', { delay: 100 });
+
+    // 3. Verify only relevant matches are visible (auto-polls for count 1)
+    await expect(glossaryCards).toHaveCount(1);
+    await expect(glossaryCards.first().locator('.glossary-term')).toContainText('Interact');
+
+    // 4. Type a query that yields no results
+    await searchField.fill('');
+    await searchField.focus();
+    await searchField.pressSequentially('NonExistentTermXYZ', { delay: 50 });
+
+    // 5. Verify the empty state shows up (auto-polls)
+    await expect(glossaryCards).toHaveCount(0);
+    const emptyStateText = page.locator('.glossary-empty');
+    await expect(emptyStateText).toBeVisible();
+    await expect(emptyStateText).toContainText('No glossary terms match your search');
+
+    // 6. Clear search
+    await searchField.fill('');
+    
+    // 7. Verify all cards are visible again (auto-polls)
+    await expect(glossaryCards).toHaveCount(initialCount);
+  });
+});

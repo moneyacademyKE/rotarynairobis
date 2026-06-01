@@ -1,0 +1,103 @@
+{
+  "welcomeTitle": "Rotary Club of Nairobi South",
+  "charterBadge": "Chartered 1963",
+  "history": {
+    "charterText": "Rotary Club of Nairobi South was chartered in 1963 at which time only Europeans were Members. Our Club is the second oldest in Nairobi and third in Kenya. The first Club President was Graham Clarke who later on went to become District Governor.",
+    "notableMembersText": "Other notable members of the club were Pius Menezes (the first non-European member 1959) and Abdul Lakha. Mr. B. M. Gichanga was the first African member followed by Don Menya. Our long standing members were late Kundan Doshi, and Rustam Hira, who was the first Assistant District Governor for Nairobi.",
+    "districtsText": "Rotary Club of Nairobi South are members of Rotary International, we are in District 9212 which comprises, Kenya, Ethiopia, South Sudan and Eritrea. Our club is now over 60 years and still going strong. We celebrated our Golden Jubilee in June 2013. The event was graced by none other than our First Lady H.E. Margaret Kenyatta.",
+    "successText": "The success of our club programs and sustainability can be attributed to our twenty-some members who are from varied backgrounds and professions for their selfless contributions of time, finance, leadership, fellowship and management."
+  },
+  "awardsTitle": "Awards & District Recognition",
+  "awards": [
+    {
+      "title": "Best Rotary Foundation Giving Club",
+      "period": "2016/2017",
+      "description": "Won the coveted giving award during the 91st District Conference in Addis Ababa, Ethiopia."
+    },
+    {
+      "title": "PR Award",
+      "period": "2016/2017",
+      "description": "Recognized for public relations and image excellence during the 91st District Conference."
+    },
+    {
+      "title": "2nd Best Club in Returns Submission",
+      "period": "2016/2017",
+      "description": "Awarded for outstanding efficiency and prompt returns reporting at the district level."
+    },
+    {
+      "title": "Recognition for Public Image",
+      "period": "2017/2018",
+      "description": "Received recognition for Public Image excellence during the 94th District Conference in Kisumu."
+    }
+  ],
+  "newGenerationsTitle": "New Generation Programmes",
+  "newGenerations": {
+    "babyClubsText": "Rotary Club of Nairobi South successfully Chartered The Rotary Club of Kirinyaga (2013-2014). We also mentor our ‘baby club’ Rotaract Club of Kenyatta University and our Interact Clubs of State House Girls School and Upper Hill Primary & Secondary School.",
+    "programsText": "Rotary Club of Nairobi South has for several years been managing New Generation programmes that target youth in High school and Universities designed to develop them into responsible and productive Citizens of our society.",
+    "rotaractText": "Our Club has an active Rotaract Club at Kenyatta University which currently boasts of over a hundred members. Their activities involve organizing regular career talks for fellow students and involvement in community service such as tree planting that support global environment conservation. The students also raise funds and food donations for Christ Our Refuge Children’s Home in Kahawa West (an orphan children's home which they have adopted) and helped them install a water tank through their members' fundraising efforts.",
+    "interactText": "Our club has been sponsoring thirty (30) needy and deserving students in Upper Hill Secondary school and State House Girls High School. Our programme has been praised by the schools' administration for assisting needy students go through the High School education Programme smoothly. Our Interact Clubs have been involved in Clean Up activities in their schools' compounds, including planting of trees and provision of Dust Bins. The Interact Club members have also adopted Philomena Children’s Home in Kayole Slums."
+  },
+  "membersTitle": "Club Members & Officers",
+  "members": [
+    {
+      "name": "Rtn Insight King'ori",
+      "role": "President"
+    },
+    {
+      "name": "Rtn Fortune Nyakoe",
+      "role": "President Elect"
+    },
+    {
+      "name": "Rtn Fredrick Tongi",
+      "role": "Vice President"
+    },
+    {
+      "name": "Rtn Faith Agnetta",
+      "role": "IPP"
+    },
+    {
+      "name": "Rtn Jared Musima",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Manmohan Dogra",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn James Mwaura",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Francis Asiema",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Dr. Rasik Kantaria",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Prem Gidmool",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Catherine Ngengi",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Vincent Mambo",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Christine Nyandat",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Rena Gore",
+      "role": "Active Member"
+    },
+    {
+      "name": "Rtn Benjamin Musau",
+      "role": "Active Member"
+    }
+  ]
+}

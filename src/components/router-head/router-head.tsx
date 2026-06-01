@@ -10,11 +10,21 @@ export const RouterHead = component$(() => {
 
   return (
     <>
-      <title>{head.title}</title>
+      <title>{head.title || "Rotary Club of Nairobi South"}</title>
 
       <link rel="canonical" href={loc.url.href} />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="icon" type="image/png" href="/favicon.png" />
+
+      {/* Global Open Graph & Twitter Card SEO previews */}
+      <meta property="og:title" content={head.title || "Rotary Club of Nairobi South"} />
+      <meta property="og:description" content="Explore activities, events, birthdays, and recaps from the Rotary Club of Nairobi South." />
+      <meta property="og:image" content={`${loc.url.origin}/images/seo-preview.png`} />
+      <meta property="og:type" content="website" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={head.title || "Rotary Club of Nairobi South"} />
+      <meta name="twitter:description" content="Explore activities, events, birthdays, and recaps from the Rotary Club of Nairobi South." />
+      <meta name="twitter:image" content={`${loc.url.origin}/images/seo-preview.png`} />
 
       {head.meta.map((m) => (
         <meta key={m.key} {...m} />

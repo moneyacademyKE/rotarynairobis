@@ -299,7 +299,7 @@ const STYLES = `
           height: 40px;
           border-radius: 50%;
           background-color: var(--border-subtle);
-          background-image: url('/images/logo.png');
+          background-image: url('/favicon.png');
           background-size: cover;
           flex-shrink: 0;
         }

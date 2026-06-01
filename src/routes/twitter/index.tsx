@@ -134,7 +134,7 @@ export default component$(() => {
                     }}
                   >
                     <div class="event-item-header">
-                      <span class="event-account">@{post.account || 'rcns'}</span>
+                      <span class="event-account">@{(post.account?.toLowerCase() === 'rcns' || !post.account) ? 'rotarynairobis' : post.account}</span>
                       <span class="event-badge upcoming">Upcoming</span>
                     </div>
                     <div class="event-meta-extracted">
@@ -201,7 +201,7 @@ export default component$(() => {
                     }}
                   >
                     <div class="event-item-header">
-                      <span class="event-account">@{post.account || 'rcns'}</span>
+                      <span class="event-account">@{(post.account?.toLowerCase() === 'rcns' || !post.account) ? 'rotarynairobis' : post.account}</span>
                       <span class="event-badge previous">Past Event</span>
                     </div>
                     <div class="event-meta-extracted">

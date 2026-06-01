@@ -74,6 +74,9 @@ export const usePlatformTheme = routeLoader$(({ url }) => {
   if (path.includes('/birthdays')) return 'birthdays';
   if (path.includes('/recaps')) return 'recaps';
   if (path.includes('/search')) return 'search';
+  if (path.includes('/about')) return 'about';
+  if (path.includes('/rcns')) return 'rcns';
+  if (path.includes('/ri-history')) return 'ri-history';
   return 'twitter';
 });
 
@@ -140,13 +143,31 @@ export default component$(() => {
               href="/recaps/" 
               class={["pill-btn", loc.url.pathname.includes('/recaps') ? "active" : ""]}
             >
-              Recaps
+              More
             </a>
             <a 
               href="/search/" 
               class={["pill-btn", loc.url.pathname.includes('/search') ? "active" : ""]}
             >
               Search
+            </a>
+            <a 
+              href="/about/" 
+              class={["pill-btn", loc.url.pathname.includes('/about') ? "active" : ""]}
+            >
+              About
+            </a>
+            <a 
+              href="/rcns/" 
+              class={["pill-btn", loc.url.pathname.includes('/rcns') ? "active" : ""]}
+            >
+              RCNS
+            </a>
+            <a 
+              href="/ri-history/" 
+              class={["pill-btn", loc.url.pathname.includes('/ri-history') ? "active" : ""]}
+            >
+              RI History
             </a>
           </div>
         </div>

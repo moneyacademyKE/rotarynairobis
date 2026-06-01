@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'line',
   use: {
-    baseURL: 'https://rotarynairobis.iamkingori.workers.dev',
+    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'https://rotarynairobis.iamkingori.workers.dev',
     trace: 'on-first-retry',
     headless: true,
   },
