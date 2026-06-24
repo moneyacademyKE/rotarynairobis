@@ -119,9 +119,28 @@ export const ReelFeed = component$<ReelFeedProps>((props) => {
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      cursor: pointer;
     }
-    
+
+    /* Full-screen native button wrapper for the reel item */
+    .reel-clickable-area {
+      appearance: none;
+      -webkit-appearance: none;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .reel-clickable-area:focus-visible {
+      outline: 3px solid var(--accent-primary);
+      outline-offset: -3px;
+    }
+
     .reel-background {
       position: absolute;
       top: 0;
@@ -142,7 +161,7 @@ export const ReelFeed = component$<ReelFeedProps>((props) => {
       transition: transform var(--transition-smooth);
     }
     
-    .reel-view:hover .reel-background img {
+    .reel-clickable-area:hover .reel-background img {
       transform: scale(1.02);
     }
     
@@ -162,7 +181,7 @@ export const ReelFeed = component$<ReelFeedProps>((props) => {
       align-items: center;
       gap: var(--space-md);
       z-index: 10;
-      transition: all var(--transition-smooth);
+      pointer-events: none;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
     
@@ -207,30 +226,20 @@ export const ReelFeed = component$<ReelFeedProps>((props) => {
       text-overflow: ellipsis;
     }
     
+    /* reel-action-btn is now a decorative span (aria-hidden) — visual affordance only */
     .reel-action-btn {
       background: var(--accent-primary);
       color: #000;
-      border: none;
       padding: 0.6rem 1.2rem;
       font-size: 0.85rem;
       font-weight: 600;
       border-radius: 8px;
-      cursor: pointer;
       white-space: nowrap;
-      transition: all var(--transition-fast);
       min-height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    
-    .reel-action-btn:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-    
-    .reel-action-btn:active {
-      transform: translateY(1px);
+      flex-shrink: 0;
     }
     
     @media (max-width: 768px) {
@@ -275,57 +284,41 @@ export const ReelFeed = component$<ReelFeedProps>((props) => {
           const category = props.category || "Event Poster";
 
           return (
-            <div 
-              key={post.id} 
-              class="snap-item reel-view"
-              role="button"
-              tabIndex={0}
-              onClick$={() => {
-                drawerState.isOpen = true;
-                drawerState.title = cleanedText ? cleanedText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : `${category} View`;
-                drawerState.category = category === 'Birthday' ? 'Birthday Celebration' : 'Event Poster';
-                drawerState.mediaSrc = post.photos.length > 0 ? `/photos/${post.photos[0]}` : '';
-                drawerState.mediaType = "image";
-                drawerState.content = cleanedText;
-              }}
-              onKeyDown$={(e: KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
+            <div key={post.id} class="snap-item reel-view">
+              <button
+                class="reel-clickable-area"
+                onClick$={() => {
                   drawerState.isOpen = true;
                   drawerState.title = cleanedText ? cleanedText.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : `${category} View`;
                   drawerState.category = category === 'Birthday' ? 'Birthday Celebration' : 'Event Poster';
                   drawerState.mediaSrc = post.photos.length > 0 ? `/photos/${post.photos[0]}` : '';
                   drawerState.mediaType = "image";
                   drawerState.content = cleanedText;
-                }
-              }}
-            >
-              <div class="reel-background">
-                {post.photos.length > 0 && (
-                  <img 
-                    src={`/photos/${post.photos[0]}`} 
-                    alt={title} 
-                    loading="lazy"
-                    width={720}
-                    height={1280}
-                  />
-                )}
-              </div>
-              <div class="reel-overlay">
-                <div class="reel-info">
-                  <div class="reel-meta">
-                    <span class="reel-author">@{post.account || 'rcns'}</span>
-                    <span class="reel-badge">{category}</span>
-                  </div>
-                  <p class="reel-caption">{cleanedText || 'Rotary Club of Nairobi South Activity'}</p>
+                }}
+                aria-label={`View details for ${title}`}
+              >
+                <div class="reel-background">
+                  {post.photos.length > 0 && (
+                    <img 
+                      src={`/photos/${post.photos[0]}`} 
+                      alt={title} 
+                      loading="lazy"
+                      width={720}
+                      height={1280}
+                    />
+                  )}
                 </div>
-                <button 
-                  class="reel-action-btn"
-                  aria-label={`View details for ${title}`}
-                >
-                  Read Post →
-                </button>
-              </div>
+                <div class="reel-overlay">
+                  <div class="reel-info">
+                    <div class="reel-meta">
+                      <span class="reel-author">@{post.account || 'rcns'}</span>
+                      <span class="reel-badge">{category}</span>
+                    </div>
+                    <p class="reel-caption">{cleanedText || 'Rotary Club of Nairobi South Activity'}</p>
+                  </div>
+                  <span class="reel-action-btn" aria-hidden="true">Read Post →</span>
+                </div>
+              </button>
             </div>
           );
         })

@@ -32,11 +32,14 @@ export default component$(() => {
   }));
   
   return (
-    <GalleryGrid
-      items={items}
-      emptyMessage="No Photos Loaded"
-      emptyIcon="📷"
-    />
+    <>
+      <h1 class="sr-only">Club Photos</h1>
+      <GalleryGrid
+        items={items}
+        emptyMessage="No Photos Loaded"
+        emptyIcon="📷"
+      />
+    </>
   );
 });
 

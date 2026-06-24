@@ -42,38 +42,43 @@ export default component$(() => {
         </div>
       </section>
 
-      {/* 2. Rotary by the Numbers Grid */}
+      {/* 2. Rotary by the Numbers — Editorial Stat Strip (not a hero metric grid) */}
       <section class="numbers-section">
         <h2 class="section-title">Rotary by the Numbers</h2>
-        <div class="numbers-grid">
-          <div class="number-card">
-            <span class="num-value">{data.numbers.membersCount}</span>
-            <span class="num-label">Rotarians Worldwide</span>
+        <div class="stat-strip">
+          {/* Primary hero stats — large, commanding */}
+          <div class="stat-primary">
+            <span class="stat-primary-value">{data.numbers.membersCount}</span>
+            <span class="stat-primary-label">Rotarians worldwide</span>
           </div>
-          <div class="number-card">
-            <span class="num-value">{data.numbers.clubsCount}</span>
-            <span class="num-label">Rotary Clubs</span>
+          <div class="stat-divider" aria-hidden="true" />
+          <div class="stat-primary">
+            <span class="stat-primary-value">{data.numbers.clubsCount}</span>
+            <span class="stat-primary-label">Clubs in 200+ countries</span>
           </div>
-          <div class="number-card">
-            <span class="num-value">{data.numbers.interactCount}</span>
-            <span class="num-label">Interact Clubs</span>
-          </div>
-          <div class="number-card">
-            <span class="num-value">{data.numbers.rotaractCount}</span>
-            <span class="num-label">Rotaract Clubs</span>
-          </div>
-          <div class="number-card">
-            <span class="num-value">{data.numbers.rccCount}</span>
-            <span class="num-label">Rotary Community Corps</span>
-          </div>
-          <div class="number-card">
-            <span class="num-value">{data.numbers.districtsCount}</span>
-            <span class="num-label">Districts</span>
-          </div>
-          <div class="number-card">
-            <span class="num-value">{data.numbers.zonesCount}</span>
-            <span class="num-label">Zones</span>
-          </div>
+          {/* Secondary stats — compact inline row */}
+          <dl class="stat-secondary-row">
+            <div class="stat-secondary-item">
+              <dt class="stat-secondary-label">Interact Clubs</dt>
+              <dd class="stat-secondary-value">{data.numbers.interactCount}</dd>
+            </div>
+            <div class="stat-secondary-item">
+              <dt class="stat-secondary-label">Rotaract Clubs</dt>
+              <dd class="stat-secondary-value">{data.numbers.rotaractCount}</dd>
+            </div>
+            <div class="stat-secondary-item">
+              <dt class="stat-secondary-label">Community Corps</dt>
+              <dd class="stat-secondary-value">{data.numbers.rccCount}</dd>
+            </div>
+            <div class="stat-secondary-item">
+              <dt class="stat-secondary-label">Districts</dt>
+              <dd class="stat-secondary-value">{data.numbers.districtsCount}</dd>
+            </div>
+            <div class="stat-secondary-item">
+              <dt class="stat-secondary-label">Zones</dt>
+              <dd class="stat-secondary-value">{data.numbers.zonesCount}</dd>
+            </div>
+          </dl>
         </div>
       </section>
 
@@ -119,7 +124,7 @@ export default component$(() => {
 
                       {/* Key Facts */}
                       <div class="drawer-section">
-                        <h4 class="drawer-section-title">📋 Key Facts</h4>
+                        <h4 class="drawer-section-title"><span aria-hidden="true">📋</span> Key Facts</h4>
                         <ul class="drawer-facts-list">
                           {item.insight.keyFacts.map((fact, fi) => (
                             <li key={fi} class="drawer-fact-item">{fact}</li>
@@ -129,19 +134,19 @@ export default component$(() => {
 
                       {/* Why It Matters */}
                       <div class="drawer-section drawer-section--highlight">
-                        <h4 class="drawer-section-title">💡 Why It Matters</h4>
+                        <h4 class="drawer-section-title"><span aria-hidden="true">💡</span> Why It Matters</h4>
                         <p class="drawer-body">{item.insight.whyItMatters}</p>
                       </div>
 
                       {/* District Connection */}
                       <div class="drawer-section">
-                        <h4 class="drawer-section-title">🌍 District Connection</h4>
+                        <h4 class="drawer-section-title"><span aria-hidden="true">🌍</span> District Connection</h4>
                         <p class="drawer-body">{item.insight.districtConnection}</p>
                       </div>
 
                       {/* Pro Tip */}
                       <div class="drawer-section drawer-section--tip">
-                        <h4 class="drawer-section-title">⭐ Pro Tip</h4>
+                        <h4 class="drawer-section-title"><span aria-hidden="true">⭐</span> Pro Tip</h4>
                         <p class="drawer-body">{item.insight.tip}</p>
                       </div>
                     </div>
@@ -214,7 +219,7 @@ export default component$(() => {
 
                         {/* Key Facts */}
                         <div class="drawer-section">
-                          <h4 class="drawer-section-title">📋 Key Facts</h4>
+                          <h4 class="drawer-section-title"><span aria-hidden="true">📋</span> Key Facts</h4>
                           <ul class="drawer-facts-list">
                             {ave.insight.keyFacts.map((fact, fi) => (
                               <li key={fi} class="drawer-fact-item">{fact}</li>
@@ -224,19 +229,19 @@ export default component$(() => {
 
                         {/* Why It Matters */}
                         <div class="drawer-section drawer-section--highlight">
-                          <h4 class="drawer-section-title">💡 Why It Matters</h4>
+                          <h4 class="drawer-section-title"><span aria-hidden="true">💡</span> Why It Matters</h4>
                           <p class="drawer-body">{ave.insight.whyItMatters}</p>
                         </div>
 
                         {/* District Connection */}
                         <div class="drawer-section">
-                          <h4 class="drawer-section-title">🌍 District Connection</h4>
+                          <h4 class="drawer-section-title"><span aria-hidden="true">🌍</span> District Connection</h4>
                           <p class="drawer-body">{ave.insight.districtConnection}</p>
                         </div>
 
                         {/* Pro Tip */}
                         <div class="drawer-section drawer-section--tip">
-                          <h4 class="drawer-section-title">⭐ Pro Tip</h4>
+                          <h4 class="drawer-section-title"><span aria-hidden="true">⭐</span> Pro Tip</h4>
                           <p class="drawer-body">{ave.insight.tip}</p>
                         </div>
                       </div>
@@ -295,7 +300,7 @@ export default component$(() => {
 
                       {/* Key Facts */}
                       <div class="drawer-section">
-                        <h4 class="drawer-section-title">📋 Key Facts</h4>
+                        <h4 class="drawer-section-title"><span aria-hidden="true">📋</span> Key Facts</h4>
                         <ul class="drawer-facts-list">
                           {focus.insight.keyFacts.map((fact, fi) => (
                             <li key={fi} class="drawer-fact-item">{fact}</li>
@@ -305,19 +310,19 @@ export default component$(() => {
 
                       {/* Why It Matters */}
                       <div class="drawer-section drawer-section--highlight">
-                        <h4 class="drawer-section-title">💡 Why It Matters</h4>
+                        <h4 class="drawer-section-title"><span aria-hidden="true">💡</span> Why It Matters</h4>
                         <p class="drawer-body">{focus.insight.whyItMatters}</p>
                       </div>
 
                       {/* District Connection */}
                       <div class="drawer-section">
-                        <h4 class="drawer-section-title">🌍 District 9212 Connection</h4>
+                        <h4 class="drawer-section-title"><span aria-hidden="true">🌍</span> District 9212 Connection</h4>
                         <p class="drawer-body">{focus.insight.districtConnection}</p>
                       </div>
 
                       {/* Pro Tip */}
                       <div class="drawer-section drawer-section--tip">
-                        <h4 class="drawer-section-title">⭐ Pro Tip</h4>
+                        <h4 class="drawer-section-title"><span aria-hidden="true">⭐</span> Pro Tip</h4>
                         <p class="drawer-body">{focus.insight.tip}</p>
                       </div>
                     </div>
@@ -397,7 +402,7 @@ export default component$(() => {
                         {/* Real-world Example */}
                         {comm.insight.example && (
                           <div class="drawer-section drawer-section--example">
-                            <h4 class="drawer-section-title">💡 Real-world Example</h4>
+                            <h4 class="drawer-section-title"><span aria-hidden="true">💡</span> Real-world Example</h4>
                             <p class="drawer-body">{comm.insight.example}</p>
                           </div>
                         )}
@@ -472,7 +477,7 @@ export default component$(() => {
                 )}
 
                 <div class="drawer-section drawer-section--highlight">
-                  <h4 class="drawer-section-title">🌍 RCNS Assignment Details</h4>
+                  <h4 class="drawer-section-title"><span aria-hidden="true">🌍</span> RCNS Assignment Details</h4>
                   <p class="drawer-body">{data.districtTransition.rcnsAssignment}</p>
                 </div>
               </div>
@@ -598,7 +603,7 @@ export default component$(() => {
 
                         {/* Key Facts */}
                         <div class="drawer-section">
-                          <h4 class="drawer-section-title">📋 Key Facts</h4>
+                          <h4 class="drawer-section-title"><span aria-hidden="true">📋</span> Key Facts</h4>
                           <ul class="drawer-facts-list">
                             {item.insight.keyFacts.map((fact, fi) => (
                               <li key={fi} class="drawer-fact-item">{fact}</li>
@@ -608,19 +613,19 @@ export default component$(() => {
 
                         {/* Why It Matters */}
                         <div class="drawer-section drawer-section--highlight">
-                          <h4 class="drawer-section-title">💡 Why It Matters</h4>
+                          <h4 class="drawer-section-title"><span aria-hidden="true">💡</span> Why It Matters</h4>
                           <p class="drawer-body">{item.insight.whyItMatters}</p>
                         </div>
 
                         {/* District Connection */}
                         <div class="drawer-section">
-                          <h4 class="drawer-section-title">🌍 District 9212 Connection</h4>
+                          <h4 class="drawer-section-title"><span aria-hidden="true">🌍</span> District 9212 Connection</h4>
                           <p class="drawer-body">{item.insight.districtConnection}</p>
                         </div>
 
                         {/* Pro Tip */}
                         <div class="drawer-section drawer-section--tip">
-                          <h4 class="drawer-section-title">⭐ Pro Tip</h4>
+                          <h4 class="drawer-section-title"><span aria-hidden="true">⭐</span> Pro Tip</h4>
                           <p class="drawer-body">{item.insight.tip}</p>
                         </div>
                       </div>
@@ -713,7 +718,7 @@ const STYLES = `
   text-transform: uppercase;
 }
 
-/* Numbers section */
+/* Numbers section — editorial stat strip (not a hero metric grid) */
 .numbers-section {
   display: flex;
   flex-direction: column;
@@ -729,58 +734,82 @@ const STYLES = `
   padding-bottom: var(--space-xs);
 }
 
-.numbers-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-sm);
+/* Asymmetric stat strip: two commanding primaries + compact secondary row */
+.stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
 }
 
-@media (min-width: 640px) {
-  .numbers-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .numbers-grid {
-    grid-template-columns: repeat(7, 1fr);
-  }
-}
-
-.number-card {
-  background-color: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: var(--space-sm);
+.stat-primary {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  gap: 2px;
+  flex-shrink: 0;
 }
 
-.number-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-primary);
-  box-shadow: 0 4px 12px var(--accent-glow);
-}
-
-.num-value {
+.stat-primary-value {
   font-family: var(--font-serif);
-  font-size: var(--font-size-xl);
+  font-size: clamp(2.8rem, 5vw + 1.5rem, 5.5rem);
   color: var(--accent-primary);
-  font-weight: 500;
-  line-height: 1;
-  margin-bottom: 4px;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
 }
 
-.num-label {
-  font-size: 11px;
+.stat-primary-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 6px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 5rem;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.stat-secondary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--border-subtle);
+  padding-left: var(--space-md);
+  flex: 1;
+  min-width: 220px;
+}
+
+.stat-secondary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 80px;
+}
+
+.stat-secondary-value {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  font-weight: 400;
+  line-height: 1;
+  margin: 0;
+}
+
+.stat-secondary-label {
+  font-size: 10px;
   color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 /* Centralized headers */
@@ -839,9 +868,9 @@ const STYLES = `
 }
 
 .four-way-card:hover {
-  transform: translateY(-4px) scale(1.01);
+  transform: translateY(-4px);
   border-color: var(--accent-primary);
-  box-shadow: 0 12px 30px rgba(0, 103, 200, 0.4);
+  box-shadow: var(--shadow-gallery-hover);
 }
 
 .four-way-card--open {

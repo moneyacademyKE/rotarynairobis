@@ -28,10 +28,13 @@ export default component$(() => {
   }));
   
   return (
-    <GalleryGrid 
-      items={items} 
-      emptyMessage="No event recaps found yet" 
-      emptyIcon="🎞️" 
-    />
+    <>
+      <h1 class="sr-only">Event Recaps</h1>
+      <GalleryGrid 
+        items={items} 
+        emptyMessage="No event recaps found yet" 
+        emptyIcon="🎞️" 
+      />
+    </>
   );
 });

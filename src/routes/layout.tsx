@@ -104,6 +104,9 @@ export default component$(() => {
         }
       }}
     >
+      {/* Skip to main content — first focusable element for keyboard users */}
+      <a href="#main-content" class="skip-link sr-only">Skip to main content</a>
+
       <div class="sticky-header">
         <header class="app-header">
           <div class="header-brand-row">
@@ -114,7 +117,7 @@ export default component$(() => {
         </header>
 
         <div class="controls-wrapper">
-          <div class="category-pills">
+          <nav aria-label="Main navigation" class="category-pills">
             <a 
               href="/twitter/" 
               class={["pill-btn", loc.url.pathname.includes('/twitter') ? "active" : ""]}
@@ -169,11 +172,11 @@ export default component$(() => {
             >
               RI History
             </a>
-          </div>
+          </nav>
         </div>
       </div>
 
-      <main class="main-content" inert={drawerState.isOpen ? true : undefined}>
+      <main id="main-content" class="main-content" inert={drawerState.isOpen ? true : undefined}>
         <Slot />
       </main>
 
@@ -184,11 +187,17 @@ export default component$(() => {
       />
 
       {/* Slide-out Drawer Panel */}
-      <div class={["drawer-panel", drawerState.isOpen ? "open" : ""]}>
+      <div 
+        class={["drawer-panel", drawerState.isOpen ? "open" : ""]}
+        role="dialog"
+        aria-modal={drawerState.isOpen ? "true" : "false"}
+        aria-labelledby="drawer-title"
+        aria-hidden={!drawerState.isOpen}
+      >
         <div class="drawer-header">
           <div class="drawer-header-info">
             <span class="drawer-category">{drawerState.category}</span>
-            <h2 class="drawer-title">{drawerState.title}</h2>
+            <h2 id="drawer-title" class="drawer-title">{drawerState.title}</h2>
           </div>
           <button 
             class="close-btn" 

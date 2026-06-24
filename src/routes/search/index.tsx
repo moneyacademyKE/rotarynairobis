@@ -30,8 +30,9 @@ export default component$(() => {
   return (
     <div class="search-container">
       <header class="search-header">
+        {/* Visually hidden page title for screen readers and SEO */}
         <h1 class="heading">Search Database</h1>
-        <p class="search-subtitle">Verify club history, historical event details, and photo archives.</p>
+        <p class="search-subtitle">Verify club history, event details, and photo archives.</p>
         
         <form method="get" action="/search/" class="search-form">
           <div class="input-wrapper">
@@ -93,11 +94,9 @@ export default component$(() => {
                 : `Search Fact #${post.id}`;
 
               return (
-                <div 
+                <button
                   key={post.id} 
                   class="search-item"
-                  role="button"
-                  tabIndex={0}
                   onClick$={() => {
                     drawerState.isOpen = true;
                     drawerState.title = title;
@@ -105,17 +104,6 @@ export default component$(() => {
                     drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
                     drawerState.mediaType = "image";
                     drawerState.content = cleanedText;
-                  }}
-                  onKeyDown$={(e: KeyboardEvent) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      drawerState.isOpen = true;
-                      drawerState.title = title;
-                      drawerState.category = "Search Result";
-                      drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
-                      drawerState.mediaType = "image";
-                      drawerState.content = cleanedText;
-                    }
                   }}
                 >
                   <div class="avatar search-avatar"></div>
@@ -152,10 +140,10 @@ export default component$(() => {
                     </div>
                     <div class="search-item-footer">
                       <span class="read-more-text">Inspect ledger entry</span>
-                      <span class="read-more-arrow">→</span>
+                      <span class="read-more-arrow" aria-hidden="true">→</span>
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -206,6 +194,30 @@ const STYLES = `
           border-color: var(--border-focus);
           box-shadow: 0 0 0 2px var(--accent-glow);
         }
+        .search-item {
+          appearance: none;
+          -webkit-appearance: none;
+          display: flex;
+          gap: var(--space-sm);
+          padding: var(--space-md);
+          border: 1px solid var(--border-subtle);
+          border-radius: 16px;
+          cursor: pointer;
+          transition: border-color var(--transition-fast), background-color var(--transition-fast);
+          background-color: var(--bg-panel);
+          width: 100%;
+          text-align: left;
+          font-family: var(--font-sans);
+          color: var(--text-color);
+          animation: search-item-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+        .search-item:hover {
+          border-color: var(--border-focus);
+        }
+        .search-item:focus-visible {
+          outline: 2px solid var(--accent-primary);
+          outline-offset: 2px;
+        }
         .search-icon {
           color: var(--text-muted);
           margin-right: var(--space-sm);
@@ -219,6 +231,7 @@ const STYLES = `
           padding: 14px 0;
           font-size: 1rem;
           font-family: var(--font-sans);
+          /* outline managed by .input-wrapper:focus-within */
           outline: none;
         }
         .search-input::placeholder {

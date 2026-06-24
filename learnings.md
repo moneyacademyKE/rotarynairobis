@@ -174,3 +174,18 @@
 - **Micro-interactions for Media Content**: Applying subtle scaling transitions (`transform: scale(1.02)`) on hover combined with wrapper overflows (`overflow: hidden`) adds high-quality tactile feedback, contributing to a premium user experience.
 - **Administrative Realignment Integrity**: Aligning data ledgers and test expectations to match real-world changes (such as the District 9212 split into District 9215 and 9216) ensures that codebase, tests, and actual administrative boundaries remain unified, avoiding silent test drifts.
 
+## Robust Event Ingestion Caption Parsing
+- **Contraction Collisions in Quote Matching**: Using generic quotes (`'`) as topic quotation matchers without boundary bounds matches apostrophes inside contraction words (like `isn't` or `you're`), yielding corrupted topic descriptions like `'t just an event; it'`. Using bounded quote patterns `/(?:^|\s|["'“‘])['"“‘]([^'"”’\n]{5,100})['"”’]/` avoids this by ensuring quote delimiters are independent text tokens.
+- **Relative Keyword Override Prevention**: Relative keywords (like `today` or `tomorrow`) inside user captions will override absolute calendar dates if checked first in the parsing order. Moving absolute date matching regexes to the top of the date resolver function guarantees that explicit dates are prioritized over generic CTA keywords.
+- **Support for Period Separators in Time Strings**: Human-authored captions regularly use periods as time separators (e.g., `4.00pm` instead of `4:00 PM`). Adding period checks to the time-matching regex prevents incorrect default timezone matching (`00:00 PM`) and keeps rendering correct.
+- **Decoupled Render-Time Formatting**: Prioritizing human-authored post text captions over AI visual OCR outputs for formatting ensures that details not fully visible in the flyer (such as ticketing or RSVP details present in the text) are preserved in the card rendering while maintaining a pure visual fallback logic.
+
+## Declarative Projection Mapping for Rebranding
+- **Unified Name Projection Mapping**: When resolving rebranding changes (such as mapping "Lang'ata" to "Nairobi-Lang'ata"), implementing a declarative projection map at the boundary preserves the historical integrity of raw database ingestion facts. This separates the data from the control flow and ensures consistency across all parser routines and matching conditions.
+
+## AI Prompt Optimization & Edge Bypass (De-scaffolding)
+- **Prompt-Driven Output Alignment**: Encoding the exact structural templates, enums, date/time formats, and lookups inside the LLM prompt allows the AI model to generate fully normalized sentences at ingestion time. This minimizes complex parsing heuristics inside the application code.
+- **Bypass boundaries for Edge Performance**: Executing regex checks to intercept and return already-formatted snippets directly cuts out edge execution costs and avoids regex corruption on correct strings, while retaining legacy rules as safe fallbacks.
+
+
+

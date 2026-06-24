@@ -26,7 +26,16 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
   }
 
   try {
-    // 1. Fetch the last 50 image posts
+    // Optional limit from request body (default 50, cap 200)
+    let limit = 50;
+    try {
+      const body = await request.clone().json() as { limit?: number };
+      if (typeof body.limit === 'number' && body.limit > 0) {
+        limit = Math.min(body.limit, 200);
+      }
+    } catch { /* no body or non-JSON — use default */ }
+
+    // 1. Fetch the last N image posts
     const { results } = await env.DB.prepare(`
       SELECT DISTINCT p.id, m.file_name
       FROM posts p
@@ -34,7 +43,7 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
       JOIN media m ON m.file_name = je.value
       WHERE m.type != 'FAILED'
       ORDER BY p.created_at DESC, p.id DESC
-      LIMIT 50
+      LIMIT ${limit}
     `).all();
 
     // 2. Loop and dispatch each payload to the Cloudflare Queue binding

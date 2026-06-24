@@ -132,6 +132,11 @@ describe("Twitter Event Text Parsing & Formatting", () => {
       const venue = extractVenue("Join us online via Zoom meeting ID 123");
       expect(venue).toBe("Zoom (Virtual)");
     });
+
+    it("should ignore generic 'our' extractions and return null", () => {
+      const venue = extractVenue("Join us for the installation at our fellowship venue.");
+      expect(venue).toBeNull();
+    });
   });
 
   describe("Coverage Hardening for Twitter Parser", () => {
@@ -254,20 +259,81 @@ describe("Twitter Event Text Parsing & Formatting", () => {
     it("should extract Lang'ata from Instagram header and ignore Upper Hill venue in text when account is rcns/null", () => {
       const text = "'rotarycluboflangata' on Instagram\n\nWeekly fellowship gathering.\nVenue: Bonds Garden, Upper Hill\nDate: 22nd May 2026";
       const formatted = reformatEventText(text, "rcns", "2026-05-19T12:00:00.000Z");
-      expect(formatted).toContain("The Rotary Club of Lang'ata");
+      expect(formatted).toContain("The Rotary Club of Nairobi-Lang'ata");
       expect(formatted).not.toContain("Nairobi Upper Hill");
     });
 
-    it("should map account name 'rotarycluboflangata' to 'Lang'ata'", () => {
+    it("should map account name 'rotarycluboflangata' to 'Nairobi-Lang'ata'", () => {
       const text = "Weekly fellowship gathering.";
       const formatted = reformatEventText(text, "rotarycluboflangata", "2026-05-19T12:00:00.000Z");
-      expect(formatted).toContain("The Rotary Club of Lang'ata");
+      expect(formatted).toContain("The Rotary Club of Nairobi-Lang'ata");
     });
 
     it("should extract Madaraka from Instagram header when account is rcns/null", () => {
       const text = "'rotary_madaraka' on Instagram\n\nWeekly fellowship gathering.";
       const formatted = reformatEventText(text, "rcns", "2026-05-19T12:00:00.000Z");
       expect(formatted).toContain("The Rotary Club of Nairobi Madaraka");
+    });
+
+    it("should resolve Kilimani Alfajiri from header text when account is null", () => {
+      const text = "'rckilimanialfajiri' on Instagram\n\nWeekly fellowship gathering.";
+      const formatted = reformatEventText(text, "rcns", "2026-05-19T12:00:00.000Z");
+      expect(formatted).toContain("The Rotary Club of Kilimani Alfajiri");
+    });
+
+    it("should parse times containing periods correctly (e.g. 4.00pm)", () => {
+      const text = "fellowship gathering on Thursday 16 April 2026 from 4.00pm at Bonds Garden";
+      const formatted = reformatEventText(text, "rcns", "2026-04-15T12:00:00.000Z");
+      expect(formatted).toContain("from 4:00 PM");
+    });
+
+    it("should not greedily match word contractions like 'isn't' or 'we'd' as topic quotes", () => {
+      const text = "This isn't just an event; it's a celebration! Join us on Thursday 16 April 2026 at Bonds Garden from 6:00 PM.";
+      const formatted = reformatEventText(text, "rcns", "2026-04-15T12:00:00.000Z");
+      expect(formatted).not.toContain("isn't");
+      expect(formatted).not.toContain("event");
+      expect(formatted).toContain("invites you to a fellowship gathering");
+    });
+
+    it("should format installation events as invites with correct a/an articles", () => {
+      const text = "'rcupperhill' on Instagram\n\nJoin us for the joint installation of our board on 11th July 2026 at 12th Floor, Anderson Center from 4.00pm.";
+      const formatted = reformatEventText(text, "rcns", "2026-06-24T12:00:00Z");
+      expect(formatted).toContain("invites you to a Joint Installation & Dinner Ceremony at 12th Floor, Anderson Center from 4:00 PM on Saturday, July 11, 2026");
+    });
+
+    it("should fall back to extracting venue, date, and time from snippet if missing in caption text", () => {
+      const text = "'rcnairobieast' on Instagram\n\nThe stage is being set for our Installation Ceremony! See you then.";
+      const snippet = "The Rotary Club of Nairobi East will be hosting the 'Installation Ceremony' event at Simba Corp Waiyaki Way from 6:00 PM on Saturday, July 4, 2026.";
+      const formatted = reformatEventText(text, "rcns", "2026-06-24T12:00:00Z", snippet);
+      
+      expect(formatted).toContain("The Rotary Club of Nairobi East");
+      expect(formatted).toContain("invites you to an Installation Ceremony");
+      expect(formatted).toContain("at Simba Corp Waiyaki Way");
+      expect(formatted).toContain("from 6:00 PM");
+      expect(formatted).toContain("on Saturday, July 4, 2026");
+    });
+
+    it("should format digit-prefixed installation topics from snippet without article prefix", () => {
+      const text = "'rcnairobieast' on Instagram\n\nThe stage is being set! See you then.";
+      const snippet = "The Rotary Club of Nairobi East will be hosting the '2026/27 Installation Dinner of the Board of Directors' event at Simba Corp Waiyaki Way from 6:00 PM on Saturday, July 4, 2026.";
+      const formatted = reformatEventText(text, "rcns", "2026-06-24T12:00:00Z", snippet);
+      
+      expect(formatted).toBe("The Rotary Club of Nairobi East invites you to 2026/27 Installation Dinner of the Board of Directors at Simba Corp Waiyaki Way from 6:00 PM on Saturday, July 4, 2026.");
+    });
+
+    it("should format 'Installation of President...' from snippet using 'the' article prefix", () => {
+      const text = "'rotarycluboflangata' on Instagram\n\nAn Evening of Music. Fellowship. Purpose.\n\nJoin us for a memorable evening...";
+      const snippet = "The Rotary Club of Nairobi-Lang'ata will be hosting the 'Installation of President Maina Njonjo & the 2026/2027 Board of Directors' event at Bonds Garden, Upper Hill from 6:00 PM on Friday, June 26, 2026.";
+      const formatted = reformatEventText(text, "rcns", "2026-06-24T12:00:00Z", snippet);
+      
+      expect(formatted).toBe("The Rotary Club of Nairobi-Lang'ata invites you to the Installation of President Maina Njonjo & the 2026/2027 Board of Directors at Bonds Garden, Upper Hill from 6:00 PM on Friday, June 26, 2026.");
+    });
+
+    it("should bypass parser scaffolding and return snippet directly if it is already pre-formatted", () => {
+      const text = "See you there!";
+      const snippet = "The Rotary Club of Nairobi-Lang'ata invites you to the Installation of President Maina Njonjo & the 2026/2027 Board of Directors at Bonds Garden, Upper Hill from 6:00 PM on Friday, June 26, 2026.";
+      const formatted = reformatEventText(text, "rcns", "2026-06-24T12:00:00Z", snippet);
+      expect(formatted).toBe(snippet);
     });
   });
 });

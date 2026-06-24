@@ -28,10 +28,13 @@ export default component$(() => {
   }));
   
   return (
-    <GalleryGrid 
-      items={items} 
-      emptyMessage="No birthday celebrations found" 
-      emptyIcon="🎂" 
-    />
+    <>
+      <h1 class="sr-only">Birthday Celebrations</h1>
+      <GalleryGrid 
+        items={items} 
+        emptyMessage="No birthday celebrations found" 
+        emptyIcon="🎂" 
+      />
+    </>
   );
 });

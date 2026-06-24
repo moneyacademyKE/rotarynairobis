@@ -57,10 +57,13 @@ export default component$(() => {
   ];
 
   return (
-    <GalleryGrid 
-      items={sorted} 
-      emptyMessage="No event posters found" 
-      emptyIcon="📅" 
-    />
+    <>
+      <h1 class="sr-only">Event Posters</h1>
+      <GalleryGrid 
+        items={sorted} 
+        emptyMessage="No event posters found" 
+        emptyIcon="📅" 
+      />
+    </>
   );
 });

@@ -427,7 +427,7 @@
 
 **Solution**:
 1.  **De-complect Source from Content**: Match and parse the platform header prefix (e.g., `'rotarycluboflangata' on Instagram`) *before* running any body keyword checks. Use the extracted username to resolve the actual host club.
-2.  **Explicit Mapping dictionary**: Map clean platform usernames (like `langata` -> `Lang'ata` and `madaraka` -> `Nairobi Madaraka`) explicitly.
+2.  **Explicit Mapping dictionary**: Map clean platform usernames (like `langata` -> `Nairobi-Lang'ata` and `madaraka` -> `Nairobi Madaraka`) explicitly.
 3.  **Venue Exclusion Boundaries**: Prior to executing fallback substring checks on generic accounts, extract the venue location. If any club keyword (e.g., "Upper Hill") is present only inside the resolved venue name and is not explicitly formatted as a club handle or name (e.g., `rcupperhill`), skip attributing the post to that club, preventing location name leakage.
 
 **Benefits**:
@@ -514,4 +514,28 @@
 - **Zero CLS score**: Eliminates Cumulative Layout Shift completely.
 - **Premium Visual Fidelity**: Fluid layout adapts gracefully across varying device screen sizes.
 - **Micro-animations**: Enhances user engagement with soft, hardware-accelerated transitions.
+
+## Pattern: The Contraction-Safe Bounded Quotation Parser
+**Problem**: Extracting quoted fields (such as event topics or titles) from human-authored text using simple quote delimiters (`'`) is highly prone to "contraction collisions." English contractions (like `isn't`, `you're`, `we'd`) use apostrophes that match simple quote regexes, causing the parser to capture large blocks of text between unrelated words as the topic (e.g., `'t just an event; it'`).
+
+**Solution**:
+1. **Bounded Quotation Boundaries**: Construct a regular expression `/(?:^|\s|["'“‘])['"“‘]([^'"”’\n]{5,100})['"”’](?:\s|$|[.,!?"'”’])/` that requires the quote character to be preceded and followed by a space, line boundary, or punctuation, rather than a word character.
+2. **First-Segment Fallback**: If no valid quoted topic is found, fallback to candidate segments derived by splitting the text on sentence boundaries, filtering out common call-to-action keywords.
+
+**Benefits**:
+- **Zero Dependencies**: Achieve robust topic mapping using standard regex syntax without needing complex natural language libraries.
+
+## Pattern: AI-Driven Structural Snippets & Parser Bypass (De-scaffolding)
+**Problem**: Hardcoding text parsing, regex extraction, and conditional formatting rules inside serverless edge routes introduces high code complexity, maintenance overhead, and is prone to formatting bugs.
+
+**Solution**:
+1. **Instruction-Level Formatting**: Fine-tune the AI ingestion prompt (`classification-prompt.ts`) to structurally enforce the exact visual card layout templates, date/time standards, club name lookups, and venue normalizations at generation time.
+2. **Deterministic Bypass Boundary**: Update the route parser loader (`reformatEventText`) to execute a regex pre-format check. If the ingestion-generated `snippet` already matches the target event structures (`invites you to` or speaker hosting format), bypass the parsing heuristics completely and return the clean snippet directly.
+3. **Hybrid Guardrails**: Keep the legacy regex parser as a passive guardrail/fallback to safely handle older records or unformatted updates.
+
+**Benefits**:
+- **Simplicity**: Code remains clean, dry, and un-complected by formatting edge cases.
+- **Accuracy**: Direct visual details from flyers are preserved with 100% fidelity without regex corruption.
+- **Resilience**: Maintains backward compatibility while scaling seamlessly for future inputs.
+
 

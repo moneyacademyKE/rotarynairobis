@@ -1,76 +1,56 @@
-# Implementation Plan - About Page Interactive Upgrades & District 9215 Team Photo styling
+# Image Processing & Event Description Generation Accuracy Plan
 
-This plan details the design and implementation for styling the leadership photo within the **District Transition** section of the About page, assigning the Rotary Club of Nairobi South (RCNS) correctly to **District 9215** (which is effective July 1, 2026), and correcting all tests.
-
----
+Resolve issues with incorrect time parsing (e.g., `00:00 PM` instead of `4:00 PM`), false-positive topic extraction from word contractions (e.g., `'t just an event; it'`), and missing club attribution (e.g., defaulting to `"Nairobi South"` instead of `"Kilimani Alfajiri"`).
 
 ## Rich Hickey Gap Analysis
 
-### 1. Feature Set Difference
+To achieve maximum simplicity and factual purity, we analyze the options for extracting structured metadata from social media post facts.
 
-| Feature | Current State | Target State | Gap / Difference |
+### 1. Feature Set Comparison
+
+| Feature | Current Fragile Parser (Regex) | Refined Robust Parser | Model-Only (`m.snippet`) | Combined Pipeline (Recommended) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Time Format Normalization** | Fails on `4.00pm` (gives `00:00 PM`) | Extracts `4.00pm` as `4:00 PM` | Extracts `4:00 PM` (accurate) | **Refined Regex + Model validation** |
+| **Topic Extract from Quotes** | Greedily matches apostrophes (`isn't` -> `'t...it'`) | Requires quote to be bounded by space/boundary | N/A (uses visual layout) | **Bounded Regex + Model snippet fallback** |
+| **Club Name Resolution** | Missing Kilimani, Lang'ata fallback bugs | Full lookup mapping (incl. Kilimani Alfajiri) | Extracts from logo/visual text | **Comprehensive mapping + Model fallback** |
+| **Reference Anchor (Dates)** | Overridden by CTAs ("today") | Reordered: absolute dates match first | Infers from visual countdown only | **Reordered parser (absolute first) + Model fallback** |
+
+### 2. Complexity vs. Utility
+
+| Strategy | Complexity | Utility | Trade-offs / Risks |
 | :--- | :--- | :--- | :--- |
-| **District Transition Photo styling** | Markup for showing the photo exists, but CSS classes `.transition-photo-wrapper` and `.transition-team-photo` are unstyled | Sleek, modern, layout-shift-free transition photo layout with rounded corners, subtle shadow, and responsive containment | Missing CSS rules inside the `STYLES` constant in `src/routes/about/index.tsx`. |
-| **RCNS District Assignment Verification** | Unit tests and E2E tests expect `District 9216` for RCNS assignment | Unit tests and E2E tests expect `District 9215` for RCNS assignment, aligning with the user request | Tests mismatch the updated rotary-basics.json database ledger. |
+| **Model-Only (`m.snippet`)** | Low (de-complects parsing logic) | High (very accurate visual check) | Fails on posters that have countdowns like "17 days to go" without absolute calendar dates. |
+| **Refined Parser-Only** | Medium (requires deterministic regex) | High (deterministic for written text) | Highly dependent on clean text caption syntax. |
+| **Combined Pipeline (Recommended)** | Medium-High (unifies text + visual facts) | **Maximum** (highest accuracy & resilience) | Must specify clean precedence rules: use refined caption parser if clean event fields are found; fallback to `m.snippet` if parsing is ambiguous. |
 
-### 2. Feature Explanation
+### 3. Actionable Recommendation
 
-*   **Responsive Layout-Shift-Free Team Photo:** Add styles utilizing modern CSS features like `aspect-ratio` to allocate space before the photo load to prevent Cumulative Layout Shift (CLS). Include subtle transitions, smooth borders, and container queries or clean responsive layouts.
-*   **TDD Test Synchronization:** Fix the failing test assertions in `about.test.ts` and `about-page.spec.ts` to expect "District 9215" instead of "District 9216" for the RCNS assignment.
-
-### 3. Benefits & Trade-offs
-
-*   **Benefits:**
-    *   *High Performance UX:* Prevent layout shift during lazy load of the 414KB leadership picture.
-    *   *Accurate Documentation:* Represents the actual geographic and administrative division.
-    *   *Passing Test Coverage:* Align tests with the data model.
-*   **Trade-offs:**
-    *   *None.* Aligning the tests to the correct district assignment fixes a known test failure.
-
-### 4. Complexity vs. Utility Analysis
-
-| Feature Component | Complexity | Utility | Recommendation |
-| :--- | :--- | :--- | :--- |
-| **Transition photo wrapper styles** | Low | High | Implement: Essential to make the picture look premium. |
-| **Test alignment to District 9215** | Low | High | Implement: Fixes test suite regression and maintains accurate requirements. |
-
----
-
-## User Review Required
-
-> [!IMPORTANT]
-> The team photo is sourced from `/images/district-9215-team.jpg` and will be lazily loaded to preserve bandwith on mobile devices.
->
-> Rotary Club of Nairobi South is assigned to **District 9215** instead of District 9216 based on the redistricting details, and the test suite has been updated to reflect this.
+We recommend the **Combined Pipeline** with **Refined Parser rules**:
+1. **Reorder Date Parsing:** Parse absolute calendar dates (`July 4th`) before relative keywords (`today`) to stop CTA words from overriding real event dates.
+2. **Constrain Quote Matching:** Modify the topic extraction regex to require the quote mark to be preceded by a space/boundary and not sandwiched by word characters (e.g., `n't`, `re'd`).
+3. **Enhance Club Attribution:** Add Kilimani Alfajiri and other missing clubs to the fallback scan mapping.
+4. **Fix Time Regex:** Expand the time regex to match periods as separators (e.g., `4.00pm` -> `4:00 PM`).
 
 ---
 
 ## Proposed Changes
 
-### UI & Styling
+We will modify the core parsing utility library and verify it against our test suite.
 
-#### [MODIFY] [index.tsx (about)](file:///Users/moe/Desktop/rcns/src/routes/about/index.tsx)
-*   Add styles for `.transition-photo-section`, `.transition-photo-wrapper`, and `.transition-team-photo`.
-*   Ensure the wrapper uses a glassmorphic border, high-quality border-radius (e.g. `12px`), and max-width.
-*   Ensure the image uses `aspect-ratio` to eliminate CLS and `object-fit: cover` with proper responsive sizing.
+### Core Utilities
 
-### Testing & Verification
+#### [MODIFY] [twitter-parser.ts](file:///Users/moe/Desktop/rcns/src/lib/twitter-parser.ts)
 
-#### [MODIFY] [about.test.ts](file:///Users/moe/Desktop/rcns/src/routes/about/about.test.ts)
-*   Update line 49 assertion to expect "District 9215".
-
-#### [MODIFY] [about-page.spec.ts](file:///Users/moe/Desktop/rcns/tests/about-page.spec.ts)
-*   Update line 192 assertion to expect "District 9215".
-
----
+*   **Time Regex update:** Replace `/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM|am|pm)\b/i` with `/\b(\d{1,2})(?:[.:](\d{2}))?\s*(AM|PM|am|pm)\b/i`.
+*   **Topic Quotes Regex update:** Replace `/['"“‘]([^'"”’\n]{5,100})['"”’]/` with `/(?:^|\s|["'“‘])['"“‘]([^'"”’\n]{5,100})['"”’](?:\s|$|[.,!?"'”’])/` or a non-greedy word boundary contraction check.
+*   **Date Parser reordering:** Move numeric, month-first, and day-first absolute regex parsers above relative weekdays and relative keyword checks.
+*   **Club Fallbacks:** Add `kilimani` / `kilimanialfajiri` mapping to return `Kilimani Alfajiri`.
 
 ## Verification Plan
 
 ### Automated Tests
-*   Run Vitest: `bun run test` (Ensuring all unit tests pass)
-*   Verify type safety: `bun run build.types`
-*   Verify Playwright tests pass: `npx playwright test tests/about-page.spec.ts`
+*   Run the parser test suite to verify no regressions and add new cases representing the problematic files:
+    `bun test src/routes/twitter/twitter-parser.test.ts`
 
 ### Manual Verification
-*   Run dev server: `bun run dev`
-*   Inspect the About page district transition section drawer, expand it, and verify the leadership photo is styled beautifully with responsive width.
+*   Execute a dry run of the test cases using a scratch script on the database/post text.

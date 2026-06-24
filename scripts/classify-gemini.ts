@@ -2,30 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import pLimit from 'p-limit';
+import { CLASSIFICATION_PROMPT, GENERATION_CONFIG } from '../src/lib/classification-prompt';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
+const model = genAI.getGenerativeModel({
+  model: "gemini-3.1-flash-lite-preview",
+  generationConfig: GENERATION_CONFIG,
+});
 
 const PHOTOS_DIR = path.join(process.cwd(), 'public/photos');
 const MANIFEST_PATH = path.join(process.cwd(), 'src/data/media-classification.json');
-
-const PROMPT = `You are an elite AI visual classifier and metadata extractor for the Rotary Club of Nairobi South.
-Analyze the provided image and classify it into one of four exclusive categories:
-
-1. EVENT_POSTER: An upcoming event announcement flyer, calendar, or registration invite. Typically has a title, date, time, venue, or speaker.
-2. BIRTHDAY: A graphic specifically celebrating a member's birthday or anniversary, explicitly mentioning "Birthday" or "Happy Birthday".
-3. EVENT_RECAP: A retrospective graphic summarizing a past meeting, project, or event (e.g., photo collage, "Thank You", "Moments", "Highlights" banners). Not an upcoming invitation.
-4. PHOTO: Raw, unedited, or non-designed photographic captures of people, fellowship meetings, projects, or actual activities. No heavy designed graphics overlay.
-
-Extraction Rule for "snippet":
-- If the image contains text, extract the main heading, date, speaker, or celebration message (max 120 chars).
-- If it is a PHOTO with no readable overlay text, describe the visual scene concisely (e.g., "Members planting trees", "Club assembly group photo") (max 120 chars).
-
-You MUST return a strict, minified JSON object with no markdown block formatting:
-{
-  "type": "EVENT_POSTER" | "BIRTHDAY" | "EVENT_RECAP" | "PHOTO",
-  "snippet": "concise text or description"
-}`;
 
 function fileToBase64(filePath: string): string {
   return fs.readFileSync(filePath).toString('base64');
@@ -37,7 +23,7 @@ async function classifyImage(fileName: string, retryCount = 0) {
 
   try {
     const result = await model.generateContent([
-      PROMPT,
+      CLASSIFICATION_PROMPT,
       {
         inlineData: {
           data: base64Data,
@@ -48,8 +34,7 @@ async function classifyImage(fileName: string, retryCount = 0) {
 
     const response = await result.response;
     const text = response.text();
-    const cleanText = text.replace(/```json|```/g, '').trim();
-    return JSON.parse(cleanText);
+    return JSON.parse(text);
   } catch (error: any) {
     if ((error.status === 503 || error.status === 429) && retryCount < 3) {
       console.log(`Retrying ${fileName} due to ${error.status}... (Attempt ${retryCount + 1})`);

@@ -1,11 +1,8 @@
-# Tasks: About Page District Transition Styling & Test Fixes
-
-- `[x]` Modify unit test expectations in `src/routes/about/about.test.ts` to expect "District 9215"
-- `[x]` Add CSS styles in `src/routes/about/index.tsx` for the leadership team photo layout
-- `[x]` Modify Playwright E2E test expectations in `tests/about-page.spec.ts` to expect "District 9215"
-- `[x]` Run unit tests with `bun run test` to verify green TDD status
-- `[x]` Run type check / build to verify no compilation errors
-- `[x]` Run E2E tests with Playwright to verify full suite passes
-- `[x]` Update learnings.md and patterns.md
-- `[x]` Update walkthrough.md summarizing changes
-- `[x]` Commit and push changes to GitHub
+- `[x]` Update time parsing regex in `twitter-parser.ts` to support periods (e.g., `4.00pm`).
+- `[x]` Strengthen topic quote matching regex to exclude contractions (e.g., `isn't`, `you're`).
+- `[x]` Reorder parsing checks in `parseEventDate` so absolute formats match before relative keywords (`today`).
+- `[x]` Add `kilimani` and `kilimanialfajiri` to the club fallbacks.
+- `[x]` Run Vitest to check for regressions.
+- `[x]` Write unit tests for new cases (Kilimani, contraction text, `4.00pm` time).
+- `[ ]` Deploy updated code to Cloudflare worker and Pages.
+- `[ ]` Trigger re-classification of the affected images to verify.

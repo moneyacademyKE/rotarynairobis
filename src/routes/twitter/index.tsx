@@ -80,6 +80,9 @@ export default component$(() => {
 
   return (
     <div class="events-page-container">
+      {/* Visually hidden page title for screen readers and SEO */}
+      <h1 class="sr-only">Club Events — Home</h1>
+
       {posts.value.length === 0 ? (
         <div class="empty-state">
           <div class="empty-title">No Events Loaded</div>
@@ -102,17 +105,15 @@ export default component$(() => {
                 const targetText = post.text || post.snippet || "";
                 const eventDate = parseEventDate(targetText, post.created_at || undefined);
                 const displayDate = formatExtractedDate(eventDate);
-                const formattedContent = reformatEventText(targetText, post.account || "", post.created_at || undefined);
+                const formattedContent = reformatEventText(targetText, post.account || "", post.created_at || undefined, post.snippet || undefined);
                 const cleanedTarget = cleanPostText(targetText);
                 const title = cleanedTarget ? cleanedTarget.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Announcement";
                 const venue = extractVenue(targetText);
                 
                 return (
-                  <div 
+                  <button
                     key={post.id} 
                     class="event-text-item"
-                    role="button"
-                    tabIndex={0}
                     onClick$={() => {
                       drawerState.isOpen = true;
                       drawerState.title = title;
@@ -121,17 +122,6 @@ export default component$(() => {
                       drawerState.mediaType = "image";
                       drawerState.content = formattedContent;
                     }}
-                    onKeyDown$={(e: KeyboardEvent) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        drawerState.isOpen = true;
-                        drawerState.title = title;
-                        drawerState.category = "Upcoming Event";
-                        drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
-                        drawerState.mediaType = "image";
-                        drawerState.content = formattedContent;
-                      }
-                    }}
                   >
                     <div class="event-item-header">
                       <span class="event-account">@{(post.account?.toLowerCase() === 'rcns' || !post.account) ? 'rotarynairobis' : post.account}</span>
@@ -139,16 +129,16 @@ export default component$(() => {
                     </div>
                     <div class="event-meta-extracted">
                       {displayDate && <div class="event-date-extracted">{displayDate}</div>}
-                      {venue && <div class="event-venue-extracted">📍 {venue}</div>}
+                      {venue && <div class="event-venue-extracted"><span aria-hidden="true">📍</span> {venue}</div>}
                     </div>
                     <div class="event-item-body">
                       {formattedContent}
                     </div>
                     <div class="event-item-footer">
                       <span class="read-more-text">Read details</span>
-                      <span class="read-more-arrow">→</span>
+                      <span class="read-more-arrow" aria-hidden="true">→</span>
                     </div>
-                  </div>
+                  </button>
                 );
               })
             )}
@@ -169,17 +159,15 @@ export default component$(() => {
                 const targetText = post.text || post.snippet || "";
                 const eventDate = parseEventDate(targetText, post.created_at || undefined);
                 const displayDate = formatExtractedDate(eventDate);
-                const formattedContent = reformatEventText(targetText, post.account || "", post.created_at || undefined);
+                const formattedContent = reformatEventText(targetText, post.account || "", post.created_at || undefined, post.snippet || undefined);
                 const cleanedTarget = cleanPostText(targetText);
                 const title = cleanedTarget ? cleanedTarget.split('\n')[0].replace(/#\w+/g, '').trim().slice(0, 60) : "Event Recap";
                 const venue = extractVenue(targetText);
                 
                 return (
-                  <div 
+                  <button
                     key={post.id} 
                     class="event-text-item"
-                    role="button"
-                    tabIndex={0}
                     onClick$={() => {
                       drawerState.isOpen = true;
                       drawerState.title = title;
@@ -188,17 +176,6 @@ export default component$(() => {
                       drawerState.mediaType = "image";
                       drawerState.content = formattedContent;
                     }}
-                    onKeyDown$={(e: KeyboardEvent) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        drawerState.isOpen = true;
-                        drawerState.title = title;
-                        drawerState.category = "Past Event";
-                        drawerState.mediaSrc = post.photos && post.photos.length > 0 ? `/photos/${post.photos[0]}` : "";
-                        drawerState.mediaType = "image";
-                        drawerState.content = formattedContent;
-                      }
-                    }}
                   >
                     <div class="event-item-header">
                       <span class="event-account">@{(post.account?.toLowerCase() === 'rcns' || !post.account) ? 'rotarynairobis' : post.account}</span>
@@ -206,16 +183,16 @@ export default component$(() => {
                     </div>
                     <div class="event-meta-extracted">
                       {displayDate && <div class="event-date-extracted">{displayDate}</div>}
-                      {venue && <div class="event-venue-extracted">📍 {venue}</div>}
+                      {venue && <div class="event-venue-extracted"><span aria-hidden="true">📍</span> {venue}</div>}
                     </div>
                     <div class="event-item-body">
                       {formattedContent}
                     </div>
                     <div class="event-item-footer">
                       <span class="read-more-text">Read details</span>
-                      <span class="read-more-arrow">→</span>
+                      <span class="read-more-arrow" aria-hidden="true">→</span>
                     </div>
-                  </div>
+                  </button>
                 );
               })
             )}
@@ -271,21 +248,32 @@ const STYLES = `
           border-radius: 9999px;
           border: 1px solid var(--border-subtle);
         }
+        /* Native button reset — event cards are <button> elements */
         .event-text-item {
+          appearance: none;
+          -webkit-appearance: none;
           background-color: var(--bg-panel);
           border: 1px solid var(--border-subtle);
           border-radius: 16px;
           padding: 1.5rem;
-          transition: all var(--transition-fast);
+          transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
           cursor: pointer;
           display: flex;
           flex-direction: column;
           gap: 1rem;
+          width: 100%;
+          text-align: left;
+          font-family: var(--font-sans);
+          color: var(--text-color);
         }
         .event-text-item:hover {
           border-color: var(--border-focus);
           transform: translateY(-2px);
           box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        .event-text-item:focus-visible {
+          outline: 2px solid var(--accent-primary);
+          outline-offset: 2px;
         }
         .event-item-header {
           display: flex;

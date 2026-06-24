@@ -37,6 +37,15 @@
   --accent-primary: oklch(76% 0.11 70); /* Warm Copper Gold */
   --accent-hover: oklch(81% 0.12 70);
   --accent-glow: oklch(76% 0.11 70 / 0.15);
+  --font-display: var(--font-serif); /* Alias for display/date typography */
+
+  /* Semantic Overlay & Shadow Tokens */
+  --overlay-backdrop: oklch(5% 0.01 220 / 0.72);
+  --overlay-gradient-deep: linear-gradient(to top, oklch(12% 0.04 230 / 0.95) 0%, oklch(20% 0.06 220 / 0.4) 60%, transparent 100%);
+  --shadow-drawer: -10px 0 40px oklch(2% 0 0 / 0.6);
+  --shadow-gallery-hover: 0 12px 30px oklch(50% 0.18 240 / 0.3);
+  --tag-pill-bg: oklch(100% 0 0 / 0.08);
+  --tag-pill-border: oklch(100% 0 0 / 0.14);
 
   /* Easing curves */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -76,7 +85,8 @@
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-color);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Ccircle cx='20' cy='30' r='1' fill='%23ffffff' opacity='0.35'%2F%3E%3Ccircle cx='75' cy='15' r='1' fill='%2338bdf8' opacity='0.4'%2F%3E%3Ccircle cx='150' cy='55' r='1.5' fill='%23ffffff' opacity='0.5'%2F%3E%3Ccircle cx='230' cy='20' r='1' fill='%23ffffff' opacity='0.2'%2F%3E%3Ccircle cx='310' cy='65' r='1.2' fill='%237dd3fc' opacity='0.35'%2F%3E%3Ccircle cx='380' cy='40' r='1' fill='%23ffffff' opacity='0.4'%2F%3E%3Ccircle cx='45' cy='120' r='1' fill='%23ffffff' opacity='0.35'%2F%3E%3Ccircle cx='110' cy='160' r='1.5' fill='%2338bdf8' opacity='0.45'%2F%3E%3Ccircle cx='190' cy='110' r='1' fill='%23ffffff' opacity='0.25'%2F%3E%3Ccircle cx='280' cy='150' r='1.2' fill='%23ffffff' opacity='0.5'%2F%3E%3Ccircle cx='340' cy='130' r='1' fill='%237dd3fc' opacity='0.4'%2F%3E%3Ccircle cx='30' cy='250' r='1.2' fill='%23ffffff' opacity='0.5'%2F%3E%3Ccircle cx='95' cy='220' r='1' fill='%23ffffff' opacity='0.2'%2F%3E%3Ccircle cx='160' cy='280' r='1' fill='%2338bdf8' opacity='0.3'%2F%3E%3Ccircle cx='240' cy='230' r='1.5' fill='%23ffffff' opacity='0.4'%2F%3E%3Ccircle cx='315' cy='275' r='1' fill='%23ffffff' opacity='0.25'%2F%3E%3Ccircle cx='370' cy='210' r='1.3' fill='%237dd3fc' opacity='0.45'%2F%3E%3Ccircle cx='60' cy='340' r='1' fill='%2338bdf8' opacity='0.35'%2F%3E%3Ccircle cx='130' cy='380' r='1.2' fill='%23ffffff' opacity='0.45'%2F%3E%3Ccircle cx='210' cy='330' r='1' fill='%23ffffff' opacity='0.2'%2F%3E%3Ccircle cx='270' cy='360' r='1.5' fill='%23ffffff' opacity='0.5'%2F%3E%3Ccircle cx='350' cy='320' r='1' fill='%237dd3fc' opacity='0.3'%2F%3E%3Ccircle cx='390' cy='370' r='1' fill='%23ffffff' opacity='0.4'%2F%3E%3Cpath d='M120 70 L122 76 L128 78 L122 80 L120 86 L118 80 L112 78 L118 76 Z' fill='%23ffffff' opacity='0.5'%2F%3E%3Cpath d='M330 220 L331 224 L335 225 L331 226 L330 230 L329 226 L325 225 L329 224 Z' fill='%237dd3fc' opacity='0.45'%2F%3E%3Cpath d='M180 300 L181 303 L184 304 L181 305 L180 308 L179 305 L176 304 L179 303 Z' fill='%23ffffff' opacity='0.4'%2F%3E%3C/svg%3E");
+  /* Starfield uses brand gold instead of AI-slop cyan */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Ccircle cx='20' cy='30' r='1' fill='%23ffffff' opacity='0.25'%2F%3E%3Ccircle cx='75' cy='15' r='1' fill='%23c8943a' opacity='0.3'%2F%3E%3Ccircle cx='150' cy='55' r='1.5' fill='%23ffffff' opacity='0.35'%2F%3E%3Ccircle cx='230' cy='20' r='1' fill='%23ffffff' opacity='0.15'%2F%3E%3Ccircle cx='310' cy='65' r='1.2' fill='%23c8943a' opacity='0.25'%2F%3E%3Ccircle cx='380' cy='40' r='1' fill='%23ffffff' opacity='0.3'%2F%3E%3Ccircle cx='45' cy='120' r='1' fill='%23ffffff' opacity='0.25'%2F%3E%3Ccircle cx='110' cy='160' r='1.5' fill='%23c8943a' opacity='0.3'%2F%3E%3Ccircle cx='190' cy='110' r='1' fill='%23ffffff' opacity='0.18'%2F%3E%3Ccircle cx='280' cy='150' r='1.2' fill='%23ffffff' opacity='0.35'%2F%3E%3Ccircle cx='340' cy='130' r='1' fill='%23c8943a' opacity='0.28'%2F%3E%3Ccircle cx='30' cy='250' r='1.2' fill='%23ffffff' opacity='0.35'%2F%3E%3Ccircle cx='95' cy='220' r='1' fill='%23ffffff' opacity='0.15'%2F%3E%3Ccircle cx='160' cy='280' r='1' fill='%23c8943a' opacity='0.22'%2F%3E%3Ccircle cx='240' cy='230' r='1.5' fill='%23ffffff' opacity='0.28'%2F%3E%3Ccircle cx='315' cy='275' r='1' fill='%23ffffff' opacity='0.18'%2F%3E%3Ccircle cx='370' cy='210' r='1.3' fill='%23c8943a' opacity='0.32'%2F%3E%3Ccircle cx='60' cy='340' r='1' fill='%23c8943a' opacity='0.25'%2F%3E%3Ccircle cx='130' cy='380' r='1.2' fill='%23ffffff' opacity='0.32'%2F%3E%3Ccircle cx='210' cy='330' r='1' fill='%23ffffff' opacity='0.15'%2F%3E%3Ccircle cx='270' cy='360' r='1.5' fill='%23ffffff' opacity='0.35'%2F%3E%3Ccircle cx='350' cy='320' r='1' fill='%23c8943a' opacity='0.22'%2F%3E%3Ccircle cx='390' cy='370' r='1' fill='%23ffffff' opacity='0.28'%2F%3E%3Cpath d='M120 70 L122 76 L128 78 L122 80 L120 86 L118 80 L112 78 L118 76 Z' fill='%23c8943a' opacity='0.35'%2F%3E%3Cpath d='M330 220 L331 224 L335 225 L331 226 L330 230 L329 226 L325 225 L329 224 Z' fill='%23c8943a' opacity='0.32'%2F%3E%3Cpath d='M180 300 L181 303 L184 304 L181 305 L180 308 L179 305 L176 304 L179 303 Z' fill='%23ffffff' opacity='0.28'%2F%3E%3C/svg%3E");
   background-repeat: repeat;
   background-attachment: fixed;
   color: var(--text-color);
@@ -128,6 +138,10 @@ ul {
   -webkit-overflow-scrolling: touch;
   background-color: var(--bg-color);
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snap-container { scroll-behavior: auto; }
 }
 
 .snap-container::-webkit-scrollbar {
@@ -216,6 +230,21 @@ ul {
   animation: heart 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* ==========================================
+   Global Reduced-Motion Safety Net
+   Handles ALL animations not explicitly guarded.
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Utils */
 .sr-only {
   position: absolute;
@@ -227,6 +256,28 @@ ul {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Skip link: hidden by default, revealed when keyboard-focused */
+.skip-link:focus-visible {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  width: auto;
+  height: auto;
+  padding: 0.6rem 1.2rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  border-width: 0;
+  z-index: 9999;
+  background-color: var(--bg-obsidian);
+  color: var(--accent-primary);
+  border: 2px solid var(--accent-primary);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
 }
 
 /* ==========================================
@@ -426,13 +477,17 @@ ul {
   font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  outline: none;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   font-family: var(--font-sans);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .btn-primary {
@@ -463,7 +518,7 @@ ul {
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: var(--overlay-backdrop);
   backdrop-filter: blur(8px);
   z-index: 900;
   opacity: 0;
@@ -484,8 +539,10 @@ ul {
   width: 100%;
   max-width: 600px;
   background-color: var(--bg-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-left: 1px solid var(--border-subtle);
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--shadow-drawer);
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -538,12 +595,17 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .close-btn:hover {
   background-color: var(--border-subtle);
   color: var(--text-primary);
+}
+
+.close-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .drawer-body {
@@ -702,7 +764,7 @@ ul {
   border-radius: 9999px;
   font-size: var(--font-size-sm);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
   text-decoration: none;
   font-weight: 500;
   font-family: var(--font-sans);
@@ -711,6 +773,11 @@ ul {
 .pill-btn:hover {
   color: var(--text-primary);
   border-color: var(--text-muted);
+}
+
+.pill-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .pill-btn.active {
@@ -741,22 +808,21 @@ ul {
 
 .gallery-container .prompt-card:hover,
 .instagram-profile .prompt-card:hover {
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-4px);
   border-color: var(--accent-primary);
-  box-shadow: 0 12px 30px rgba(0, 103, 200, 0.4);
+  box-shadow: var(--shadow-gallery-hover);
 }
 
 .card-hover-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10, 30, 70, 0.95) 0%, rgba(23, 69, 143, 0.4) 60%, transparent 100%);
+  background: var(--overlay-gradient-deep);
   opacity: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   padding: var(--space-sm);
-  transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
-  backdrop-filter: blur(0px);
+  transition: opacity 0.3s ease;
   pointer-events: auto; /* Allow hover scroll wheel interactions */
   overflow-y: auto;
   scrollbar-width: none;
@@ -816,18 +882,17 @@ ul {
 .overlay-tags .tag-pill {
   font-size: 10px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--tag-pill-bg);
   color: var(--text-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--tag-pill-border);
   padding: 1px 5px;
   border-radius: 3px;
 }
 
-/* Glassmorphism panels and cards */
-.prompt-card, .search-item, .drawer-panel {
+/* Drawer panel gets glassmorphism (functional — overlays scrolling content) */
+/* Cards do NOT get backdrop-filter — it creates 50+ compositing layers in grids */
+.drawer-panel {
   background-color: var(--bg-panel);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-subtle);
 }
 
