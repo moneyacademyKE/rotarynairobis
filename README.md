@@ -48,7 +48,27 @@ bun run build && bun run build.server
 bun run deploy
 ```
 
+## 📖 Playbook: AI Ingestion & Reprocessing Operations
+
+### 1. Ingestion Prompt Tuning
+The system uses the Gemini model to classify images and generate snippets according to precise visual formatting templates. The configuration and system instructions are managed in [classification-prompt.ts](file:///Users/moe/Desktop/rcns/src/lib/classification-prompt.ts).
+If any template, club name mapping, or venue normalization changes:
+1. Update `CLASSIFICATION_PROMPT` in `classification-prompt.ts`.
+2. Run unit tests (`bun test`) to ensure zero regressions.
+3. Deploy the changes (`bun run deploy`) to update the queue consumer worker.
+
+### 2. Cloudflare In-Cloud Reprocessing
+To reprocess existing images and regenerate database records using the updated prompt directly on Cloudflare:
+```shell
+bun run scripts/reprocess-last.ts --count <N>
+```
+This enqueues the last `N` media items directly to the Cloudflare Queue. The active queue consumer worker will classify each image and update the D1 database.
+
+### 3. Edge Parser Bypass
+To prevent redundant execution and potential regex corruption on the edge, any snippet matching the standard structural templates (e.g. `invites you to` or speaker host formats) completely bypasses the regex parser heuristics inside [twitter-parser.ts](file:///Users/moe/Desktop/rcns/src/lib/twitter-parser.ts) and is rendered directly to the page.
+
 ## 📂 Patterns & Learnings
 For a deep dive into the architectural decisions and "Simple" design patterns used in this repository, see:
-- [Patterns Documentation](file:///Users/moe/Desktop/com/patterns.md)
-- [Edge Learnings](file:///Users/moe/Desktop/com/learnings.md)
+- [Patterns Documentation](file:///Users/moe/Desktop/rcns/patterns.md)
+- [Edge Learnings](file:///Users/moe/Desktop/rcns/learnings.md)
+
