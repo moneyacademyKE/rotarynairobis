@@ -76,4 +76,9 @@ CREATE INDEX IF NOT EXISTS idx_media_facts_type ON media_facts(type);
 CREATE INDEX IF NOT EXISTS idx_posts_facts_account ON posts_facts(account);
 CREATE INDEX IF NOT EXISTS idx_telegram_raw_update_id ON telegram_raw_facts(update_id);
 
+-- Timestamp-sync seeks: /api/sync?since= filters on created_at. Without these
+-- indexes every timestamp-based poll degrades to a full table scan.
+CREATE INDEX IF NOT EXISTS idx_posts_facts_created ON posts_facts(created_at);
+CREATE INDEX IF NOT EXISTS idx_media_facts_created ON media_facts(created_at);
+
 
