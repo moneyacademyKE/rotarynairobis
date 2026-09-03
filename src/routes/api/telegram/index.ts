@@ -48,12 +48,24 @@ export const onGet: RequestHandler = async ({ request, platform, json }) => {
       : `Failed to update webhook: ${setInfo.description}`;
   }
 
+  // Diagnostics count is KV-cached (5 min TTL): every uncached hit scans the
+  // whole raw-facts table, and this endpoint is unauthenticated — monitors
+  // and passers-by alike can hammer it.
+  let databaseFactsCount: number | null = null;
+  const cachedCount = await env.CACHE?.get("telegram_raw_facts_count");
+  if (cachedCount !== null && cachedCount !== undefined) {
+    databaseFactsCount = Number(cachedCount);
+  } else {
+    databaseFactsCount = await env.DB.prepare("SELECT COUNT(*) as count FROM telegram_raw_facts").first("count");
+    await env.CACHE?.put("telegram_raw_facts_count", String(databaseFactsCount), { expirationTtl: 300 });
+  }
+
   json(200, {
     status: "Healthy",
     target_webhook_url: targetWebhookUrl,
     telegram_webhook_info: info.result,
     heal_status: healStatus,
-    database_facts_count: await env.DB.prepare("SELECT COUNT(*) as count FROM telegram_raw_facts").first("count")
+    database_facts_count: databaseFactsCount
   });
 };
 
@@ -139,13 +151,20 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
 
     if (message.reply_to_message && text) {
       const parentMessageId = message.reply_to_message.message_id;
-      const parentPost = await env.DB.prepare(
-        "SELECT photos_json FROM posts WHERE id = ?"
-      ).bind(parentMessageId).first() as { photos_json?: string } | null;
-      
-      if (parentPost) {
-        targetPostId = parentMessageId;
-        finalPhotosJson = parentPost.photos_json || "[]";
+      try {
+        // The posts view is absent in some deployed schema generations; a
+        // failed lookup must not 500 the webhook (Telegram would retry and
+        // re-ingest the same update forever).
+        const parentPost = await env.DB.prepare(
+          "SELECT photos_json FROM posts WHERE id = ?"
+        ).bind(parentMessageId).first() as { photos_json?: string } | null;
+
+        if (parentPost) {
+          targetPostId = parentMessageId;
+          finalPhotosJson = parentPost.photos_json || "[]";
+        }
+      } catch {
+        // Fall through: the fact is still stored under its own message_id.
       }
     }
 
