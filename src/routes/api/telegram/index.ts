@@ -156,10 +156,14 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
         // failed lookup must not 500 the webhook (Telegram would retry and
         // re-ingest the same update forever).
         const parentPost = await env.DB.prepare(
-          "SELECT photos_json FROM posts WHERE id = ?"
-        ).bind(parentMessageId).first() as { photos_json?: string } | null;
+          "SELECT text, photos_json FROM posts WHERE id = ?"
+        ).bind(parentMessageId).first() as { text?: string | null; photos_json?: string } | null;
 
-        if (parentPost) {
+        // Merge ONLY into a photo-only parent. A reply to a post that already
+        // has text is its own record — overwriting the parent would destroy
+        // the original caption (the posts view resolves latest-fact-wins).
+        const parentHasText = typeof parentPost?.text === "string" && parentPost.text.trim() !== "";
+        if (parentPost && !parentHasText) {
           targetPostId = parentMessageId;
           finalPhotosJson = parentPost.photos_json || "[]";
         }

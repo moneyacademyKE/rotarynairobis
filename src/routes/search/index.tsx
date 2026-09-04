@@ -1,21 +1,27 @@
 import { component$, useContext, useStylesScoped$ } from "@builder.io/qwik";
 import { routeLoader$, useLocation, useNavigate } from "@builder.io/qwik-city";
 import { executeSearch } from "~/lib/search-service";
+import { cachedQuery } from "~/lib/db-cache";
 import { DrawerContext } from "~/routes/layout";
 import { cleanPostText } from "~/routes/twitter";
 
 export const useSearchResults = routeLoader$(async ({ url, platform }) => {
-  const db = platform.env.DB;
   const term = url.searchParams.get("q") || "";
+  let rawRows: any[] = [];
 
-  // Get all facts from D1 to perform client-side edge search via Orama
-  const { results } = await db.prepare(`
-    SELECT p.* 
-    FROM posts p
-    ORDER BY p.created_at DESC, p.id DESC
-  `).all();
+  // No term, no query: the empty-state UI needs zero rows and zero D1 reads.
+  // With a term, search runs over a KV-cached, bounded snapshot instead of
+  // rebuilding a full-table scan on every page view.
+  if (term.trim()) {
+    rawRows = await cachedQuery(platform.env, "search:snapshot", `
+      SELECT p.*
+      FROM posts p
+      ORDER BY p.created_at DESC, p.id DESC
+      LIMIT 500
+    `);
+  }
 
-  const searchResults = await executeSearch(results, term);
+  const searchResults = await executeSearch(rawRows, term);
   return { results: searchResults, term };
 });
 

@@ -116,8 +116,45 @@ describe("Telegram Webhook Ingestion (TDD Green)", () => {
     await onPost({ request, platform: mockPlatform, json: jsonMock } as any);
     
     expect(jsonMock).toHaveBeenCalledWith(200, expect.objectContaining({ status: "Success" }));
-    expect(mockDbPrepare).toHaveBeenCalledWith(expect.stringContaining("SELECT photos_json FROM posts WHERE id = ?"));
+    expect(mockDbPrepare).toHaveBeenCalledWith(expect.stringContaining("SELECT text, photos_json FROM posts WHERE id = ?"));
     expect(mockDbPrepare).toHaveBeenCalledWith(expect.stringContaining("posts_facts"));
+  });
+
+  it("should store a reply to a text-bearing parent as its own post (no overwrite)", async () => {
+    const jsonMock = vi.fn();
+    const bindCalls: Array<[string, any[]]> = [];
+    const localDb = {
+      prepare: vi.fn().mockImplementation((query: string) => ({
+        bind: vi.fn().mockImplementation((...args: any[]) => {
+          bindCalls.push([query, args]);
+          return {
+            run: vi.fn().mockResolvedValue({ success: true }),
+            first: vi.fn().mockResolvedValue({ text: "Parent already has a caption", photos_json: '["p.jpg"]' }),
+          };
+        }),
+      })),
+    };
+    const platform = { env: { ...mockPlatform.env, DB: localDb } };
+
+    const request = new Request("http://localhost/api/telegram", {
+      method: "POST",
+      body: JSON.stringify({
+        update_id: 2046,
+        channel_post: {
+          message_id: 3001,
+          reply_to_message: { message_id: 2045 },
+          text: "Nice shot!",
+        }
+      }),
+      headers: { "X-Telegram-Bot-Api-Secret-Token": "test_secret_token" }
+    });
+
+    await onPost({ request, platform, json: jsonMock } as any);
+
+    expect(jsonMock).toHaveBeenCalledWith(200, expect.objectContaining({ status: "Success" }));
+    const insert = bindCalls.find(([q]) => q.includes("posts_facts"));
+    expect(insert).toBeDefined();
+    expect(insert![1][0]).toBe(3001); // stored under its own message_id, NOT the parent's 2045
   });
 
   it("should fail gracefully if TELEGRAM_BOT_TOKEN is missing in environment", async () => {
