@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import pLimit from 'p-limit';
-import { CLASSIFICATION_PROMPT, GENERATION_CONFIG } from '../src/lib/classification-prompt';
+import { classifyImage as classifyWithClient, type ClassifyEnv } from '../src/lib/classify-client';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const model = genAI.getGenerativeModel({
-  model: "gemini-3.1-flash-lite-preview",
-  generationConfig: GENERATION_CONFIG,
-});
+const env: ClassifyEnv = {
+  INFERSHUB_API_KEY: process.env.INFERSHUB_API_KEY,
+  INFERSHUB_BASE_URL: process.env.INFERSHUB_BASE_URL,
+  CLASSIFY_MODEL_MAIN: process.env.CLASSIFY_MODEL_MAIN,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+};
 
 const PHOTOS_DIR = path.join(process.cwd(), 'public/photos');
 const MANIFEST_PATH = path.join(process.cwd(), 'src/data/media-classification.json');
@@ -22,18 +22,7 @@ async function classifyImage(fileName: string, retryCount = 0) {
   const base64Data = fileToBase64(filePath);
 
   try {
-    const result = await model.generateContent([
-      CLASSIFICATION_PROMPT,
-      {
-        inlineData: {
-          data: base64Data,
-          mimeType: "image/jpeg"
-        }
-      }
-    ]);
-
-    const response = await result.response;
-    const text = response.text();
+    const text = await classifyWithClient(base64Data, "image/jpeg", env);
     return JSON.parse(text);
   } catch (error: any) {
     if ((error.status === 503 || error.status === 429) && retryCount < 3) {
