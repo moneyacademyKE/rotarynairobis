@@ -41,7 +41,7 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
       FROM posts p
       JOIN json_each(p.photos_json) AS je
       JOIN media m ON m.file_name = je.value
-      WHERE m.type != 'FAILED'
+      WHERE (m.type IS NULL OR m.type != 'FAILED')
       ORDER BY p.created_at DESC, p.id DESC
       LIMIT ${limit}
     `).all();
