@@ -2,18 +2,19 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseD1PostRows } from "../../domain/specs";
 import { GalleryGrid } from "../../components/GalleryGrid";
+import { cachedQuery } from "../../lib/db-cache";
 
 export const useBirthdayData = routeLoader$(async ({ platform }) => {
-  const db = platform.env.DB;
-  const { results } = await db.prepare(`
-    SELECT DISTINCT p.*, m.file_name AS file_name 
+  const rows = await cachedQuery(platform.env, "gallery:birthdays", `
+    SELECT DISTINCT p.*, m.file_name AS file_name
     FROM posts p
     JOIN json_each(p.photos_json) AS je
     JOIN media m ON m.file_name = je.value
     WHERE m.type = 'BIRTHDAY'
     ORDER BY p.created_at DESC, p.id DESC
-  `).all();
-  return parseD1PostRows(results);
+    LIMIT 200
+  `);
+  return parseD1PostRows(rows);
 });
 
 export default component$(() => {
