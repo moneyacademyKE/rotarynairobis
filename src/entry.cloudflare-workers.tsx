@@ -3,11 +3,10 @@ import {
 } from "@builder.io/qwik-city/middleware/cloudflare-pages";
 import qwikCityPlan from "@qwik-city-plan";
 import render from "./entry.ssr";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { drizzle } from "drizzle-orm/d1";
 import { media } from "./data/schema";
 import { parseGeminiResponse } from "./lib/gemini-parser";
-import { CLASSIFICATION_PROMPT, GENERATION_CONFIG } from "./lib/classification-prompt";
+import { classifyImage } from "./lib/classify-client";
 
 // Consolidating QwikCityPlatform into src/routes/layout.tsx to avoid empty interface errors and achieve architectural single-truth.
 
@@ -38,11 +37,6 @@ const fetch = async (request: Request, env: QwikCityPlatform["env"], ctx: Execut
 
 
 export const queue = async (batch: any, env: any) => {
-  const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-3.1-flash-lite-preview",
-    generationConfig: GENERATION_CONFIG,
-  });
   const db = drizzle(env.DB);
 
   for (const message of batch.messages) {
@@ -60,11 +54,7 @@ export const queue = async (batch: any, env: any) => {
       }
       const base64String = btoa(chunks.join(''));
 
-      const result = await model.generateContent([
-        CLASSIFICATION_PROMPT,
-        { inlineData: { data: base64String, mimeType: "image/jpeg" } }
-      ]);
-      const rawText = result.response.text();
+      const rawText = await classifyImage(base64String, "image/jpeg", env);
       const parsed = parseGeminiResponse(rawText);
 
       // 1. Persist to Epochal D1 Ledger (Strict TypeScript Drizzle)
