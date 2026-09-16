@@ -7,6 +7,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { media } from "./data/schema";
 import { parseGeminiResponse } from "./lib/gemini-parser";
 import { classifyImage } from "./lib/classify-client";
+import { handleScheduled } from "./lib/publish";
 
 // Consolidating QwikCityPlatform into src/routes/layout.tsx to avoid empty interface errors and achieve architectural single-truth.
 
@@ -82,5 +83,8 @@ export const queue = async (batch: any, env: any) => {
 
 export default {
   fetch,
-  queue
+  queue,
+  // Cron trigger (wrangler.toml [triggers], 00:30 UTC daily): refresh all
+  // KV-served read models right after the D1 quota reset.
+  scheduled: (_event: unknown, env: any, _ctx: unknown) => handleScheduled(env)
 };

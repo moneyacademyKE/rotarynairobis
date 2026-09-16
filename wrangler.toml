@@ -16,6 +16,9 @@ id = "f92d9b7c7de04b4eaa0fba93f36c95bb"
 [placement]
 mode = "smart"
 
+[triggers]
+crons = ["30 0 * * *"]
+
 [[queues.producers]]
 binding = "CLASSIFY_QUEUE"
 queue = "rcns-classify-queue"
