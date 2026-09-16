@@ -3,21 +3,11 @@ import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseD1PostRows, type Post } from "../../domain/specs";
 import { DrawerContext } from "../layout";
 import { cachedQuery } from "../../lib/db-cache";
+import { SOURCES } from "../../lib/publish";
 
 export const usePosts = routeLoader$(async ({ platform }) => {
   // Clean 'Home' feed: Text-only upcoming rotary club events (EVENT_POSTER)
-  const results = await cachedQuery(platform.env, "gallery:events", `
-    SELECT DISTINCT p.*, m.snippet, m.type, m.file_name AS file_name
-    FROM posts p
-    JOIN json_each(p.photos_json) AS je
-    JOIN media m ON m.file_name = je.value
-    WHERE m.type = 'EVENT_POSTER'
-      AND p.text IS NOT NULL
-      AND p.text != ''
-      AND p.text NOT LIKE 'Legacy media archive%'
-    ORDER BY p.created_at DESC, p.id DESC
-    LIMIT 200
-  `);
+  const results = await cachedQuery(platform.env, "gallery:events", SOURCES["gallery:events"]);
 
   const parsed = parseD1PostRows(results);
   const seenTexts = new Set<string>();
