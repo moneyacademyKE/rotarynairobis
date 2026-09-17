@@ -2,6 +2,7 @@ import { component$, useContext, useStylesScoped$ } from "@builder.io/qwik";
 import { routeLoader$, useLocation, useNavigate } from "@builder.io/qwik-city";
 import { executeSearch } from "~/lib/search-service";
 import { cachedQuery } from "~/lib/db-cache";
+import { SOURCES } from "~/lib/publish";
 import { DrawerContext } from "~/routes/layout";
 import { cleanPostText } from "~/routes/twitter";
 
@@ -13,12 +14,7 @@ export const useSearchResults = routeLoader$(async ({ url, platform }) => {
   // With a term, search runs over a KV-cached, bounded snapshot instead of
   // rebuilding a full-table scan on every page view.
   if (term.trim()) {
-    rawRows = await cachedQuery(platform.env, "search:snapshot", `
-      SELECT p.*
-      FROM posts p
-      ORDER BY p.created_at DESC, p.id DESC
-      LIMIT 500
-    `);
+    rawRows = await cachedQuery(platform.env, "search:snapshot", SOURCES["search:snapshot"]);
   }
 
   const searchResults = await executeSearch(rawRows, term);

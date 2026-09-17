@@ -9,7 +9,9 @@ export async function cachedQuery(
   env: any,
   key: string,
   sql: string,
-  ttlSeconds = 3600
+  // 48h: the daily publisher refreshes keys on its clock; this TTL is only
+  // the degradation bound if publishing stops (two missed nights → read-through).
+  ttlSeconds = 172800
 ): Promise<any[]> {
   try {
     const hit = await env.CACHE?.get(key, "json");
