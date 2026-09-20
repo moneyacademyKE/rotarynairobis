@@ -1,7 +1,7 @@
 /**
  * Daily publish pipeline: D1 -> KV, on a clock.
  *
- * The site reads finished gallery/search JSON from KV; this module is the
+ * The site reads finished gallery JSON from KV; this module is the
  * only writer. Every cache key the site serves has its SQL defined exactly
  * once in SOURCES — the routes project from the same map, so publisher and
  * renderers can never drift apart.
@@ -68,12 +68,6 @@ export const SOURCES: Record<string, string> = {
       AND p.text NOT LIKE 'Legacy media archive%'
     ORDER BY p.created_at DESC, p.id DESC
     LIMIT 200
-  `,
-  "search:snapshot": `
-    SELECT p.*
-    FROM posts p
-    ORDER BY p.created_at DESC, p.id DESC
-    LIMIT 500
   `,
 };
 

@@ -53,7 +53,6 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@orama/orama": "^3.1.18",
     "drizzle-orm": "^0.45.2",
     "p-limit": "^7.3.0",
     "tesseract.js": "^7.0.0",
