@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { publishAll, handleScheduled, SOURCES, PUBLISH_TTL_SECONDS } from "./publish";
 
-function makeEnv({ failSql, failPut }: { failSql?: RegExp; failPut?: string } = {}) {
+function makeEnv({ failSql, failPut }: { failSql?: RegExp | string; failPut?: string } = {}) {
   const put = vi.fn().mockResolvedValue(undefined);
   if (failPut) {
     put.mockImplementation((key: string) =>
@@ -9,7 +9,7 @@ function makeEnv({ failSql, failPut }: { failSql?: RegExp; failPut?: string } = 
     );
   }
   const prepare = vi.fn().mockImplementation((sql: string) => {
-    if (failSql && failSql.test(sql)) {
+    if (failSql && (typeof failSql === "string" ? sql === failSql : failSql.test(sql))) {
       return { all: vi.fn().mockRejectedValue(new Error("d1 exploded")) };
     }
     return { all: vi.fn().mockResolvedValue({ results: [{ id: 1, sql }] }) };
@@ -42,13 +42,13 @@ describe("publishAll", () => {
   });
 
   it("isolates failures: one broken source does not abort the rest", async () => {
-    const ctx = makeEnv({ failSql: /search:snapshot|LIMIT 500/ });
+    const ctx = makeEnv({ failSql: SOURCES["gallery:events"] });
     const report = await publishAll(ctx.env);
 
-    expect(report.published).not.toContain("search:snapshot");
+    expect(report.published).not.toContain("gallery:events");
     expect(report.published).toHaveLength(Object.keys(SOURCES).length - 1);
     expect(report.failed).toEqual([
-      { key: "search:snapshot", error: "d1 exploded" },
+      { key: "gallery:events", error: "d1 exploded" },
     ]);
   });
 
@@ -71,14 +71,13 @@ describe("SOURCES contract", () => {
     }
   });
 
-  it("covers the search snapshot and the five galleries", () => {
+  it("covers the five galleries", () => {
     for (const key of [
       "gallery:tiktok",
       "gallery:instagram",
       "gallery:birthdays",
       "gallery:recaps",
       "gallery:events",
-      "search:snapshot",
     ]) {
       expect(SOURCES[key]).toBeTruthy();
     }

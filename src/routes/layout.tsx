@@ -73,7 +73,6 @@ export const usePlatformTheme = routeLoader$(({ url }) => {
   if (path.includes('/tiktok')) return 'tiktok';
   if (path.includes('/birthdays')) return 'birthdays';
   if (path.includes('/recaps')) return 'recaps';
-  if (path.includes('/search')) return 'search';
   if (path.includes('/about')) return 'about';
   if (path.includes('/rcns')) return 'rcns';
   if (path.includes('/ri-history')) return 'ri-history';
@@ -147,12 +146,6 @@ export default component$(() => {
               class={["pill-btn", loc.url.pathname.includes('/recaps') ? "active" : ""]}
             >
               More
-            </a>
-            <a 
-              href="/search/" 
-              class={["pill-btn", loc.url.pathname.includes('/search') ? "active" : ""]}
-            >
-              Search
             </a>
             <a 
               href="/about/" 
