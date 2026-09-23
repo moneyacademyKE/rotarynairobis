@@ -83,8 +83,8 @@ describe("About Page Spec Boundaries & Data Integrity", () => {
 
   it("should parse Foundation and Polio statistics accurately", () => {
     const parsed = parseAboutPageData(rawData);
-    expect(parsed.foundationFacts.totalContributed).toBe("$2.4 Billion");
-    expect(parsed.polioEradication.casesDroppedPercentage).toBe("99%");
+    expect(parsed.foundationFacts.totalContributed).toBe("$7.2 Billion");
+    expect(parsed.polioEradication.casesDroppedPercentage).toBe("99.9%");
     expect(parsed.polioEradication.partners).toContain("World Health Organization (WHO)");
   });
 

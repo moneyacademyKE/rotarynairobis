@@ -1,0 +1,85 @@
+{
+  "pageTitle": "The Rotary Foundation",
+  "pageSubtitle": "\u201cFor the purpose of doing good in the world\u201d \u2014 Arch C. Klumph, 1917. What began with a single $26.50 gift from one club is now one of the world\u2019s top-rated charities.",
+  "stats": [
+    { "value": "$7.2B", "label": "Contributed since 1917", "detail": "Every dollar given since Kansas City\u2019s first $26.50" },
+    { "value": "$569.6M", "label": "Raised in 2024-25", "detail": "Goal was $500M \u2014 beaten by nearly $70M" },
+    { "value": "$2.05B", "label": "Endowment: net assets & commitments", "detail": "Passed the 2025-by-2025 goal of $2.025B" },
+    { "value": "17 yrs", "label": "Charity Navigator 4-star streak", "detail": "99/100 score \u2014 only ~1% of rated charities sustain 14+" },
+    { "value": "1,800+", "label": "Peace Fellows since 2002", "detail": "From 140+ countries, at eight Peace Centers" },
+    { "value": "99.9%", "label": "Polio cases eliminated", "detail": "From 350,000 cases a year in 1988 to 52 in 2025" }
+  ],
+  "origin": {
+    "title": "From $26.50 to $2 billion",
+    "intro": "At the 1917 Rotary convention in Atlanta, Arch C. Klumph \u2014 Rotary\u2019s sixth president \u2014 proposed that Rotary accept endowments \u201cfor the purpose of doing good in the world.\u201d A few months later, the Rotary Club of Kansas City, Missouri, gave $26.50. That was the seed of everything on this page.",
+    "timeline": [
+      { "year": "1917", "title": "The idea", "text": "Klumph proposes an endowment at the Atlanta convention; the Rotary Club of Kansas City donates $26.50 \u2014 the Foundation\u2019s first gift." },
+      { "year": "1928", "title": "A Foundation is born", "text": "The endowment passes $5,000, is renamed The Rotary Foundation, and gains a Board of Trustees \u2014 with Klumph as first chair (1928\u201335)." },
+      { "year": "1957", "title": "Paul Harris Fellow", "text": "Recognition for $1,000 of cumulative giving is established in Rotary\u2019s founder\u2019s name \u2014 today the movement\u2019s most recognized pin." },
+      { "year": "1985", "title": "PolioPlus", "text": "Rotary promises to immunize every child on Earth against polio \u2014 a public-health commitment without precedent from a volunteer organization." },
+      { "year": "1988", "title": "GPEI founded", "text": "Rotary joins WHO, UNICEF and the CDC to launch the Global Polio Eradication Initiative; the Gates Foundation and Gavi later join." },
+      { "year": "2002", "title": "Peace Centers", "text": "The Foundation begins training peacebuilders at university centers worldwide \u2014 1,800+ fellows from 140+ countries since." }
+    ]
+  },
+  "areasNote": {
+    "title": "Seven Areas of Focus",
+    "text": "Every Foundation grant serves at least one of seven causes: Peacebuilding & Conflict Prevention; Disease Prevention & Treatment; Water, Sanitation & Hygiene; Maternal & Child Health; Basic Education & Literacy; Community Economic Development; and Supporting the Environment (added 2020\u201321). Explore each in depth on our About page.",
+    "link": "/about/"
+  },
+  "mechanism": {
+    "title": "How the money flows",
+    "intro": "The Foundation\u2019s engine is SHARE \u2014 the system that turns club giving into local and global grants three years later, with investment earnings covering the overhead.",
+    "steps": [
+      { "step": "1", "title": "Rotarians give", "text": "Every Rotarian, Every Year (EREY) is the culture: in 2024\u201325, 39.9% of all Rotarians contributed (452,255 people, averaging $241 each) and 87.2% of the world\u2019s 35,633 clubs participated." },
+      { "step": "2", "title": "Annual Fund-SHARE", "text": "Contributions are credited to the donor\u2019s district and invested for three years. Earnings pay the Foundation\u2019s operating costs, so donations aren\u2019t consumed by administration." },
+      { "step": "3", "title": "The 50/50 split", "text": "After three years, each district\u2019s total splits in half: 50% becomes the World Fund (Trustees\u2019 worldwide priorities) and 50% becomes the District Designated Fund (DDF) \u2014 the district\u2019s money to direct." },
+      { "step": "4", "title": "DDF at work", "text": "Districts may use up to 50% of DDF as District Grants \u2014 block grants for quick, club-sized local projects. The rest funds global grants (matched 80% by the World Fund), PolioPlus (matched 50%), Peace Centers, disaster response, or other districts." },
+      { "step": "5", "title": "Money becomes projects", "text": "In 2024\u201325 the engine paid $331.6M in program awards and operations: 1,423 global grants ($81.0M), 468 district grants ($27.8M), 74 disaster response grants ($1.9M), one $2M Programs of Scale award, and $5.2M for Peace Centers and fellows." }
+    ],
+    "funds": [
+      { "name": "Annual Fund", "role": "The fuel", "fy": "$146.4M in 2024\u201325", "allTime": "$3.6B all-time", "note": "Invested conservatively (6.9% return in 2024\u201325); feeds SHARE." },
+      { "name": "Endowment Fund", "role": "The permanence", "fy": "$64.0M in 2024\u201325", "allTime": "$632.7M all-time", "note": "Principal is never spent \u2014 only earnings fund programs. 12.7% return in 2024\u201325." },
+      { "name": "PolioPlus Fund", "role": "The promise", "fy": "$132.8M in 2024\u201325", "allTime": "$2.4B all-time", "note": "Every dollar is matched 2:1 by the Gates Foundation, then flows to the GPEI." }
+    ],
+    "grantTypes": [
+      { "name": "District Grant", "size": "No minimum", "match": "Block grant from DDF", "text": "Fast, flexible, local: clubs decide and act within the year \u2014 school repairs, tree planting, health camps." },
+      { "name": "Global Grant", "size": "$30,000 minimum budget", "match": "80% match on DDF, 50% on cash (max $400K World Fund award)", "text": "Large international projects with sustainable, measurable outcomes \u2014 sponsored by clubs across borders, aligned to an area of focus." },
+      { "name": "Programs of Scale", "size": "$2,000,000", "match": "Competitive \u2014 one per year", "text": "Evidence-based 3\u20135 year programs ready to scale \u2014 from malaria elimination in Zambia to peacebuilding in Colombia." },
+      { "name": "Disaster Response Grant", "size": "Rapid release", "match": "Disaster Response Fund", "text": "74 grants released in 2024\u201325 ($1.9M) when emergencies strike \u2014 ready money when it matters most." }
+    ],
+    "shareExample": "Worked example: $100 given to Annual Fund-SHARE in 2022\u201323 becomes $50 of World Fund and $50 of DDF in 2025\u201326. If the district puts that DDF into a global grant, the World Fund adds its 80% match \u2014 the original $100 becomes roughly $190 of project money."
+  },
+  "recognition": {
+    "title": "The recognition ladder: PHF to AKS",
+    "intro": "The Foundation honors cumulative giving with a ladder every Rotarian knows \u2014 starting with the Paul Harris Fellow and crowning at the Arch Klumph Society.",
+    "phfRows": [
+      { "amount": "$1,000", "recognition": "Paul Harris Fellow \u2014 certificate and the iconic pin (est. 1957)" },
+      { "amount": "$2,000\u20132,999", "recognition": "PHF +1 \u2014 pin with one sapphire" },
+      { "amount": "$3,000\u20133,999", "recognition": "PHF +2 \u2014 two sapphires" },
+      { "amount": "$4,000\u20134,999", "recognition": "PHF +3 \u2014 three sapphires" },
+      { "amount": "$5,000\u20135,999", "recognition": "PHF +4 \u2014 four sapphires" },
+      { "amount": "$6,000\u20136,999", "recognition": "PHF +5 \u2014 five sapphires" },
+      { "amount": "$7,000\u20137,999", "recognition": "PHF +6 \u2014 one ruby" },
+      { "amount": "$8,000\u20138,999", "recognition": "PHF +7 \u2014 two rubies" },
+      { "amount": "$9,000\u20139,999", "recognition": "PHF +8 \u2014 three rubies" }
+    ],
+    "phfNote": "Foundation recognition points: every $1 to the Annual Fund or PolioPlus earns a point, and points can be transferred to honor someone else as a PHF. Endowment gifts don\u2019t earn points, and points don\u2019t count toward Major Donor \u2014 only personal giving does.",
+    "societies": [
+      { "name": "Paul Harris Society", "requirement": "$1,000+ every year", "note": "The recurring-giving pledge \u2014 an official TRF program since 2013\u201314." },
+      { "name": "Benefactor", "requirement": "$1,000+ to the Endowment", "note": "Outright, or by naming the Endowment Fund in your estate plans." },
+      { "name": "Bequest Society", "requirement": "$10,000+ planned gift", "note": "Crystal honors at $10K, $25K (named endowed fund), $50K and $100K; a $250K+ bequest earns posthumous Arch Klumph Society induction." },
+      { "name": "Major Donor", "requirement": "$10,000+ cumulative outright", "note": "Level 1 $10\u201324,999 \u00b7 Level 2 $25\u201349,999 \u00b7 Level 3 $50\u201399,999 \u00b7 Level 4 $100\u2013249,999." },
+      { "name": "Arch Klumph Society", "requirement": "$250,000+ lifetime", "note": "The highest tier \u2014 your portrait etched in the AKS Gallery at RI headquarters in Evanston." },
+      { "name": "Legacy Society", "requirement": "$1,000,000+ future commitment", "note": "Formed 2019 for those who promise the Foundation a place in their will." }
+    ],
+    "aksCircles": [
+      { "circle": "Trustees Circle", "range": "$250,000 \u2013 $499,999" },
+      { "circle": "Chair\u2019s Circle", "range": "$500,000 \u2013 $999,999" },
+      { "circle": "Foundation Circle", "range": "$1,000,000 \u2013 $2,499,999" },
+      { "circle": "Platinum Trustees Circle", "range": "$2,500,000 \u2013 $4,999,999" },
+      { "circle": "Platinum Chair\u2019s Circle", "range": "$5,000,000 \u2013 $9,999,999" },
+      { "circle": "Platinum Foundation Circle", "range": "$10,000,000 and above" }
+    ],
+    "aksNote": "AKS members who give an additional $250,000+ may designate a Circle of Honor member \u2014 passing the flame to a child, parent, sibling, or friend."
+  }
+}
