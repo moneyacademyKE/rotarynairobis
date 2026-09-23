@@ -154,6 +154,12 @@ export default component$(() => {
               About
             </a>
             <a 
+              href="/foundation/" 
+              class={["pill-btn", loc.url.pathname.includes('/foundation') ? "active" : ""]}
+            >
+              Foundation
+            </a>
+            <a 
               href="/rcns/" 
               class={["pill-btn", loc.url.pathname.includes('/rcns') ? "active" : ""]}
             >
