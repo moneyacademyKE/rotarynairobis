@@ -1,0 +1,131 @@
+{
+  "funders": {
+    "title": "Who funds the Foundation",
+    "globalIntro": "The Rotary Foundation\u2019s donor base is 76.1% individuals \u2014 478,629 people gave in 2024\u201325. The Bill & Melinda Gates Foundation is its giant partner on polio, governments fund the wider eradication effort, and clubs worldwide do the rest.",
+    "topCountries": [
+      { "rank": 1, "country": "United States", "total": "$197.4M", "perCapita": "$175" },
+      { "rank": 2, "country": "India", "total": "$38.3M", "perCapita": "$55" },
+      { "rank": 3, "country": "Korea", "total": "$19.8M", "perCapita": "$251" },
+      { "rank": 4, "country": "Taiwan", "total": "$17.8M", "perCapita": "$245" },
+      { "rank": 5, "country": "Japan", "total": "$16.9M", "perCapita": "$140" },
+      { "rank": 6, "country": "Canada", "total": "$8.4M", "perCapita": "$201" },
+      { "rank": 7, "country": "Germany", "total": "$7.3M", "perCapita": "$84" },
+      { "rank": 8, "country": "Italy", "total": "$5.7M", "perCapita": "$93" },
+      { "rank": 9, "country": "Brazil", "total": "$5.2M", "perCapita": "$86" },
+      { "rank": 10, "country": "Philippines", "total": "$5.1M", "perCapita": "$119" }
+    ],
+    "countriesNote": "Top 10 giving countries, all TRF funds, 2024\u201325 (per-capita = Annual Fund per Rotarian). The US figure includes a $100M PolioPlus gift from the Gates Foundation.",
+    "gates": {
+      "title": "The Gates Foundation",
+      "text": "Rotary\u2019s match partner since 2007: every dollar Rotary commits to polio is matched two-to-one. The June 2025 renewal is a joint commitment of up to $450M over three years (Rotary raises $50M a year, Gates adds two). Cumulatively the Gates Foundation has put $6.18B into the GPEI \u2014 its largest private donor \u2014 and governments have invested more than $21B since 1988, including Saudi Arabia\u2019s $500M pledge (2024), $1.2B newly pledged by Gates, $450M by Rotary, and $100M by Bloomberg Philanthropies at the 2025 Abu Dhabi pledging summit."
+    },
+    "donorBase": {
+      "title": "The real base: Rotarians themselves",
+      "text": "In 2024\u201325: 4 donors gave $1M+ ($12.2M), 51 gave $250K+, 1,604 gave $10K+, and 45,121 passed the $1,000 Paul Harris Fellow mark. 87.2% of all 35,633 clubs gave something \u2014 including 156 districts where every single club participated."
+    },
+    "districtTitle": "In our district \u2014 D9212\u2019s legacy, Kenya\u2019s giants",
+    "districtIntro": "The Rotary Foundation does not publish per-district donor ledgers, so this roll honors the names confirmed in public records.",
+    "districtNamed": [
+      { "name": "Geeta & Kaushik Manek", "detail": "Rotary Club of Muthaiga. Arch Klumph Society members, Major Donors, Benefactors and Bequest Society members. Geeta was the first female Governor of District 9200 (2013\u201314), served as a Trustee of The Rotary Foundation \u2014 chairing its Executive, Programs and Stewardship committees \u2014 and received Rotary\u2019s Service Above Self Award. Kaushik led District 9200 as Governor in 2008\u201309." },
+      { "name": "Dr. Manu Chandaria", "detail": "Rotary Club of Nairobi \u2014 Kenya\u2019s Carnegie Medal of Philanthropy laureate (2022). The visionary and financial backbone of the Kenya Rural Blindness Eradication Project, whose nine-year run of free eye camps restored sight to thousands (see achievements below)." }
+    ],
+    "districtAggregate": [
+      "District 9212\u2019s TRF giving: ~$290,000 in 2022\u201323 (against a $400K goal), with a $500,000 target for 2025\u201326 and a $1M+ three-year ambition.",
+      "District polio giving doubled: $36,885 (2023\u201324) \u2192 $72,857 (2024\u201325).",
+      "Kenya sits at the doorstep of the global top 30 \u2014 Nepal holds #30 at ~$450K. Meeting the 2025\u201326 target puts Kenyan giving inside that table.",
+      "Signature fundraisers: the End Polio Bikeathon (RC Lavington\u2019s award-winning ride), regional Foundation dinners (four in Kenya, one each in Ethiopia and South Sudan), and first-of-their-kind district art exhibitions in Kenya and Ethiopia \u2014 $115K+ raised from Darren Jones\u2019s \u201cImagine Ones Dream\u201d."
+    ]
+  },
+  "polio": {
+    "title": "PolioPlus: the promise",
+    "intro": "1985: Rotary pledges to immunize every child on Earth. 1988: Rotary co-founds the GPEI with WHO, UNICEF and the CDC (Gates and Gavi join later). Today the world is 99.9% of the way there \u2014 and every Gates-matched Rotary dollar pushes the last mile.",
+    "numbers": [
+      { "label": "Rotary\u2019s contribution to GPEI", "value": "$2.76B (1985\u20132024), $2.9B+ committed" },
+      { "label": "Children immunized", "value": "Nearly 3 billion" },
+      { "label": "People spared paralysis", "value": "More than 20 million" },
+      { "label": "Gates Foundation to GPEI", "value": "$6.18B \u2014 largest private donor" },
+      { "label": "Endemic countries", "value": "2 (Afghanistan, Pakistan) \u2014 down from 125" },
+      { "label": "Wild strains eradicated", "value": "Type 2 (2015) and Type 3 (2019)" }
+    ],
+    "caseBars": [
+      { "year": "1988", "cases": "350,000" },
+      { "year": "2024", "cases": "99" },
+      { "year": "2025", "cases": "52" }
+    ],
+    "caseNote": "Wild poliovirus cases per year, all countries. Africa was certified wild-polio-free in 2020. 2026 counts: 22 through August.",
+    "kenyaTitle": "Kenya & District 9212 in the polio story",
+    "kenya": [
+      "District 9212 partnered with Kenya\u2019s Ministry of Health, WHO, UNICEF and the Gates Foundation for five-county immunization campaigns \u2014 Migori, Kisumu, Homa Bay, Narok and Siaya \u2014 with the official launch hosted in Migori.",
+      "End Polio walks ran nationwide: Nairobi (University of Nairobi graduation square), Mombasa, Naivasha, Taveta, Mwatate, Voi, Nyeri, Thika and Suna \u2014 plus 100-day giving campaigns by RC Hurlingham (KSh 600K target) and RC Nairobi Kilimani Alfajiri\u2019s gold/silver/bronze daily tiers, and an African culture fashion show by RC Kitengela.",
+      "Immunization drives RCNS helped organize include the Kikopey campaign with RC Hurlingham, Ngong Road, Nairobi East, Milimani and Parklands \u2014 and the St. Catherine Primary School drive in Nairobi\u2019s South B.",
+      "Trustee Geeta Manek and Dr. David Githanga carried the district\u2019s polio message onto national television talk shows for World Polio Day."
+    ]
+  },
+  "achievementsGlobal": [
+    { "title": "Co-founding the polio endgame", "year": "1985\u20131988", "detail": "PolioPlus and the GPEI \u2014 Rotary\u2019s $2.76B helped immunize nearly 3 billion children and spare 20M+ from paralysis." },
+    { "title": "99.9% of wild polio eliminated", "year": "1988\u20132026", "detail": "350,000 annual cases in 125 countries reduced to 52 cases in 2 endemic countries in 2025." },
+    { "title": "Africa certified wild-polio-free", "year": "2020", "detail": "Four years with zero wild poliovirus across the African region \u2014 Kenya\u2019s immunization drives in the vanguard." },
+    { "title": "The Gates 2:1 match", "year": "2007\u2013present", "detail": "Every Rotary polio dollar is tripled; the 2025 renewal commits $450M jointly. Gates\u2019 total GPEI giving: $6.18B." },
+    { "title": "$7.2B contributed since 1917", "year": "all-time", "detail": "From Klumph\u2019s $26.50 seed to a $569.6M year in 2024\u201325 \u2014 beating the $500M goal by nearly $70M." },
+    { "title": "A $2.05B permanent endowment", "year": "2025", "detail": "The 2025-by-2025 campaign beat its $2.025B target; the Endowment returned 12.7% in 2024\u201325, funding programs forever." },
+    { "title": "17 straight 4-star ratings", "year": "2009\u20132025", "detail": "Charity Navigator\u2019s top rating held 17 consecutive years \u2014 a streak only ~1% of evaluated charities sustain." },
+    { "title": "Eight Rotary Peace Centers", "year": "2002\u20132026", "detail": "1,800+ fellows from 140+ countries; capacity rises to 170 fellowships a year with the new Symbiosis center (Pune, 2026). Africa\u2019s first: Makerere (2021)." },
+    { "title": "Programs of Scale \u2014 five $2M awards", "year": "2021\u20132025", "detail": "Malaria-free Zambia (1.2M people, 2,500 health workers) \u00b7 healthy families Nigeria \u00b7 cervical cancer Egypt (30K girls vaccinated, 4M reached) \u00b7 water & harvests India (60K farmers, +25\u201330% income) \u00b7 peace Colombia ($3M with the World Food Programme)." },
+    { "title": "The 2024\u201325 grant engine", "year": "2024\u201325", "detail": "1,423 global grants ($81.0M), 468 district grants ($27.8M), 74 disaster response grants ($1.9M) \u2014 $331.6M of program awards and operations." },
+    { "title": "Disaster money at speed", "year": "2024\u201325", "detail": "74 rapid disaster response grants released in a single year from the Disaster Response Fund." },
+    { "title": "A giving culture without equal", "year": "2024\u201325", "detail": "478,629 individual donors \u2014 39.9% of all Rotarians, averaging $241 each; 87.2% of 35,633 clubs participated." },
+    { "title": "Scholarships and peace fellowships", "year": "2002\u2013present", "detail": "$5.2M invested in fellows and centers in 2024\u201325 alone; global grants also fund graduate scholarships and vocational training teams." },
+    { "title": "Digital-era fundraising", "year": "2024\u201325", "detail": "Donor engagement campaigns generated $41.7M (+8% YoY); Raise for Rotary peer events raised $2.7M from 18,500 donors in 140+ countries." },
+    { "title": "The environment becomes cause #7", "year": "2020\u201321", "detail": "Supporting the Environment joined the areas of focus \u2014 and our district chartered Africa\u2019s first environment-club (RC Lavington Eco) in response." }
+  ],
+  "achievementsDistrict": [
+    { "title": "17,000+ free eye surgeries", "year": "1986\u20131995", "detail": "The Kenya Rural Blindness Eradication Project: Dr. Manu Chandaria and RC Nairobi, backed by 50 clubs from Germany, the Netherlands and Belgium. Camps at Kapkatet and Kabarak \u2014 one performed 309 cataract surgeries with President Moi in attendance; the programme ran nine years." },
+    { "title": "RCNS\u2019s Jaipur Foot Project", "year": "1990", "detail": "Our club founded the prosthetics programme that became the Jaipur Foot Trust \u2014 restoring mobility to thousands of amputees." },
+    { "title": "RCNS\u2019s National Sanitary Pads Campaign", "year": "2006", "detail": "Launched with the Girl Child Network (President Megan White, Rtn. Naisiae Paloshe) \u2014 it grew into the national Sanitary Towels Campaign and a government programme keeping girls in school." },
+    { "title": "Polio campaigns across five counties", "year": "2023\u20132025", "detail": "With Kenya\u2019s Ministry of Health, WHO, UNICEF and the Gates Foundation \u2014 Migori, Kisumu, Homa Bay, Narok, Siaya. RCNS co-organized the Kikopey drive." },
+    { "title": "District polio giving doubled", "year": "2023\u20132025", "detail": "$36,885 in 2023\u201324 to $72,857 in 2024\u201325 \u2014 walk by walk, shilling by shilling." },
+    { "title": "Geeta Manek on the global board", "year": "2013\u2013present", "detail": "RC Muthaiga\u2019s Geeta Manek \u2014 first female Governor of D9200, Trustee of The Rotary Foundation, chair of its Executive, Programs and Stewardship committees \u2014 and with husband Kaushik, Arch Klumph Society members." },
+    { "title": "Rotary born in East Africa", "year": "1930", "detail": "RC Nairobi \u2014 chartered 11 March 1930 at the New Stanley Hotel by John Innes and Mayor Charles Udall \u2014 Africa\u2019s third-oldest club and the root of every East African club. Mombasa followed in 1944, Addis Ababa in 1955, Juba in 2010." },
+    { "title": "RCNS \u2014 63 years of service", "year": "1963\u2013present", "detail": "Chartered 1963 (second-oldest Nairobi club, third in Kenya); Golden Jubilee in June 2013 graced by First Lady Margaret Kenyatta." },
+    { "title": "Best TRF Giving Club in the district", "year": "2016\u201317", "detail": "RCNS won the coveted Foundation giving award at the 91st District Conference in Addis Ababa." },
+    { "title": "Africa\u2019s first eco-club", "year": "2019\u201320", "detail": "RC Lavington Eco \u2014 the continent\u2019s first environment-focused Rotary club \u2014 chartered under Wairimu Njage (RC Lavington), alongside the award-winning End Polio Bikeathon." },
+    { "title": "First-of-its-kind district art exhibitions", "year": "2022\u201323", "detail": "Kenya and Ethiopia hosted joint exhibitions around Darren Jones\u2019s \u201cImagine Ones Dream\u201d \u2014 $115K+ raised for under-five immunization and surveillance." },
+    { "title": "A district that outgrew itself", "year": "2013\u20132026", "detail": "D9212 spanned four countries and grew to 267 clubs and 3,727 Rotarians \u2014 90% of clubs voted to split, and 101 District Conferences closed the story at Naivasha in 2026." },
+    { "title": "The next chapter: D9215 & D9216", "year": "2026", "detail": "From 1 July 2026, D9215 (Western Kenya, Rift Valley, Western Nairobi + South Sudan) and D9216 (Ethiopia, Eritrea, Central & Eastern Kenya, Coast) carry the flag \u2014 RCNS serves in D9215." },
+    { "title": "RCNS builds the next generation", "year": "ongoing", "detail": "Our club chartered RC Kirinyaga, mentors Rotaract Kenyatta University (100+ members) and Interact clubs at State House Girls and Upper Hill \u2014 and sponsors 30 needy students through secondary school." },
+    { "title": "The giving march to $1M", "year": "2023\u20132028", "detail": "District TRF giving: ~$290K (2022\u201323) \u2192 $500K target (2025\u201326) \u2192 $1M+ ambition by 2028, at $100 per Rotarian per year." }
+  ],
+  "club": {
+    "title": "Our club & the Foundation",
+    "intro": "The Rotary Foundation page of the Rotary Club of Nairobi South \u2014 the club that chartered the Jaipur Foot Project, launched a national pads campaign, won the district\u2019s Foundation giving award, and now serves in District 9215.",
+    "items": [
+      "Chartered 1963 \u2014 second-oldest club in Nairobi, third in Kenya.",
+      "Best Rotary Foundation Giving Club, District 9212 (2016\u201317).",
+      "Founded the Jaipur Foot Project (1990) and the National Sanitary Pads Campaign (2006).",
+      "Co-organized district polio immunization drives at Kikopey and Nairobi South B.",
+      "Sponsors RC Kirinyaga, Rotaract Kenyatta University and two Interact clubs."
+    ]
+  },
+  "sources": {
+    "title": "Sources",
+    "intro": "Figures as published by each source; retrieved September 2026. Amounts in US dollars.",
+    "items": [
+      { "name": "TRF Annual Report on Operations 2024-25 (PDF)", "url": "https://www.rotary.org/en/annual-report" },
+      { "name": "TRF 2024-25 Fact Card (Giving)", "url": "https://www.rotary.org/en/about-rotary/our-foundation" },
+      { "name": "Donor Recognition \u2014 rotary.org", "url": "https://www.rotary.org/get-involved/donate/donor-recognition" },
+      { "name": "Arch Klumph Society \u2014 rotary.org", "url": "https://www.rotary.org/en/who-we-are/arch-klumph-society" },
+      { "name": "Rotary & Gates Foundation extend polio partnership (June 2025) \u2014 endpolio.org", "url": "https://www.endpolio.org/rotary-and-gates-foundation-extend-partnership-to-end-polio" },
+      { "name": "GPEI historical contributions 1985-2024 \u2014 polioeradication.org", "url": "https://polioeradication.org/financing/" },
+      { "name": "GPEI Donors & Financing", "url": "https://polioeradication.org/donors-financing/" },
+      { "name": "Peace Fellowships \u2014 rotary.org", "url": "https://www.rotary.org/get-involved/our-programs/peace-fellowships" },
+      { "name": "Symbiosis Peace Center inauguration (Feb 2026) \u2014 rotary.org", "url": "https://www.rotary.org/articles/2026/02/rotary-international-launches-new-peace-center-in-india" },
+      { "name": "District 9212 \u2014 homepage, strategy & redistricting stories", "url": "https://rotary9212.org/" },
+      { "name": "D9212 timeline: eye surgeries & polio walks", "url": "https://timeline.rotary9212.org/" },
+      { "name": "Rotary Club of Nairobi \u2014 founded 1930", "url": "https://rotarynairobi.org/about/" },
+      { "name": "Jaipur Foot Project \u2014 founded by RCNS 1990", "url": "https://jaipurfootproject.org/" },
+      { "name": "Kenya sanitary pads campaign origins \u2014 ZanaAfrica", "url": "https://zanaa.org/managing-menstruation/policy-advocacy/national-committee/" },
+      { "name": "Charity Navigator \u2014 TRF rating", "url": "https://www.charitynavigator.org/ein/363245072" },
+      { "name": "Geeta Manek profile \u2014 The Task Force for Global Health", "url": "https://www.taskforce.org/employees/geeta-manek/" }
+    ]
+  }
+}
