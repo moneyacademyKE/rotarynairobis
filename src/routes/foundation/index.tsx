@@ -6,6 +6,8 @@ import impactData from "../../data/foundation-impact.json";
 import ShareFlowDiagram from "../../components/FoundationShareFlow";
 import RecognitionLadder from "../../components/FoundationRecognitionLadder";
 import PolioImpactChart from "../../components/FoundationPolioChart";
+import FoundationGivingRecords from "../../components/FoundationGivingRecords";
+import FoundationPoints from "../../components/FoundationPoints";
 import { pageStyles } from "./styles";
 
 export const useFoundation = routeLoader$(() => parseFoundationPageData(rawData));
@@ -152,6 +154,13 @@ export default component$(() => {
         <p class="fd-note">{data.recognition.aksNote}</p>
       </section>
 
+      {/* 6.5 Recognition points */}
+      <section class="fd-section">
+        <h2 class="fd-section-title">{data.points.title}</h2>
+        <p class="fd-section-intro">{data.points.intro}</p>
+        <FoundationPoints points={data.points} />
+      </section>
+
       {/* 7. Polio */}
       <section class="fd-section">
         <h2 class="fd-section-title">{impact.polio.title}</h2>
@@ -211,6 +220,7 @@ export default component$(() => {
             </div>
           ))}
         </div>
+        <FoundationGivingRecords funders={impact.funders} />
         <ul class="fd-agg-list">
           {impact.funders.districtAggregate.map((a, i) => <li key={i}>{a}</li>)}
         </ul>
