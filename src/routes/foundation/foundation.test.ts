@@ -75,4 +75,39 @@ describe("Foundation Page Spec Boundaries & Data Integrity", () => {
     expect(impact.polio.caseBars[2].cases).toBe("52");
     expect(impact.polio.numbers.map((n) => n.value).join(" ")).toContain("$2.76B");
   });
+
+  it("should carry the district's 13-year, final-year and heritage giving records from the farewell deck", () => {
+    const impact = parseFoundationImpactData(impactData);
+    expect(impact.funders.districtClubs.rows).toHaveLength(5);
+    expect(impact.funders.districtClubs.rows[0].club).toContain("Muthaiga North");
+    expect(impact.funders.districtClubs.rows[0].total).toBe("$293,243.31");
+    const rcns = impact.funders.districtClubs.rows.find((r) => r.own);
+    expect(rcns?.rank).toBe(4);
+    expect(rcns?.total).toBe("$225,893.73");
+    expect(impact.funders.lastDance.rows).toHaveLength(20);
+    expect(impact.funders.lastDance.rows[0].club).toBe("Muthaiga");
+    expect(impact.funders.lastDance.rows[19].club).toContain("Addis Ababa-West");
+    expect(impact.funders.heritage.clubs).toHaveLength(14);
+    expect(impact.funders.heritage.clubs[0].chartered).toBe("1930");
+    const own = impact.funders.heritage.clubs.find((c) => c.own);
+    expect(own?.rank).toBe(6);
+    expect(own?.chartered).toBe("1963");
+    expect(impact.funders.legacyStory.text).toContain("1979");
+    expect(impact.funders.legacyStory.text).toContain("Chandaria");
+  });
+
+  it("should pin the points contract: $1 per $1, gated transfers, PHF minting, never Major Donor", () => {
+    const parsed = parseFoundationPageData(rawData);
+    const points = parsed.points;
+    expect(points.earning.find((e) => e.label === "Endowment Fund")?.text).toContain("0 points");
+    expect(points.transferRules.join(" ")).toContain("at least 100 points");
+    expect(points.transferRules.join(" ")).toContain("Only the club president");
+    expect(points.transferRules.join(" ")).toContain("Only the district governor");
+    expect(points.transferRules.join(" ")).toContain("not be transferred from a person to a club or district");
+    const mint = points.strategy.items[0];
+    expect(mint).toContain("1,000 points");
+    expect(mint).toContain("$500");
+    expect(points.recognitionAmount).toContain("never count toward Major Donor");
+    expect(points.clubRecognition.items.length).toBeGreaterThanOrEqual(5);
+  });
 });

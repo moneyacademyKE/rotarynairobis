@@ -82,6 +82,34 @@ export const RecognitionSchema = z.object({
   aksNote: z.string(),
 });
 
+export const PointsEarningSchema = z.object({
+  label: z.string(),
+  text: z.string(),
+});
+
+export const ClubRecognitionItemSchema = z.object({
+  name: z.string(),
+  requirement: z.string(),
+  note: z.string(),
+});
+
+export const PointsSchema = z.object({
+  title: z.string(),
+  intro: z.string(),
+  earning: z.array(PointsEarningSchema),
+  ownership: z.string(),
+  transferRules: z.array(z.string()),
+  strategy: z.object({
+    title: z.string(),
+    items: z.array(z.string()),
+  }),
+  recognitionAmount: z.string(),
+  clubRecognition: z.object({
+    title: z.string(),
+    items: z.array(ClubRecognitionItemSchema),
+  }),
+});
+
 export const FoundationPageDataSchema = z.object({
   pageTitle: z.string(),
   pageSubtitle: z.string(),
@@ -90,6 +118,7 @@ export const FoundationPageDataSchema = z.object({
   areasNote: AreasNoteSchema,
   mechanism: MechanismSchema,
   recognition: RecognitionSchema,
+  points: PointsSchema,
 });
 
 export type FoundationPageData = z.infer<typeof FoundationPageDataSchema>;
@@ -112,6 +141,41 @@ export const NamedDonorSchema = z.object({
   detail: z.string(),
 });
 
+export const GivingClubRowSchema = z.object({
+  rank: z.number(),
+  club: z.string(),
+  total: z.string().optional(),
+  amount: z.string().optional(),
+  chartered: z.string().optional(),
+  own: z.boolean().optional(),
+});
+
+export const DistrictClubsSchema = z.object({
+  title: z.string(),
+  intro: z.string(),
+  note: z.string(),
+  rows: z.array(GivingClubRowSchema).length(5),
+});
+
+export const LastDanceSchema = z.object({
+  title: z.string(),
+  intro: z.string(),
+  note: z.string(),
+  rows: z.array(GivingClubRowSchema).length(20),
+});
+
+export const HeritageSchema = z.object({
+  title: z.string(),
+  intro: z.string(),
+  note: z.string(),
+  clubs: z.array(GivingClubRowSchema).length(14),
+});
+
+export const LegacyStorySchema = z.object({
+  title: z.string(),
+  text: z.string(),
+});
+
 export const FundersSchema = z.object({
   title: z.string(),
   globalIntro: z.string(),
@@ -122,6 +186,10 @@ export const FundersSchema = z.object({
   districtTitle: z.string(),
   districtIntro: z.string(),
   districtNamed: z.array(NamedDonorSchema),
+  districtClubs: DistrictClubsSchema,
+  lastDance: LastDanceSchema,
+  heritage: HeritageSchema,
+  legacyStory: LegacyStorySchema,
   districtAggregate: z.array(z.string()),
 });
 

@@ -24,11 +24,75 @@
       "text": "In 2024\u201325: 4 donors gave $1M+ ($12.2M), 51 gave $250K+, 1,604 gave $10K+, and 45,121 passed the $1,000 Paul Harris Fellow mark. 87.2% of all 35,633 clubs gave something \u2014 including 156 districts where every single club participated."
     },
     "districtTitle": "In our district \u2014 D9212\u2019s legacy, Kenya\u2019s giants",
-    "districtIntro": "The Rotary Foundation does not publish per-district donor ledgers, so this roll honors the names confirmed in public records.",
+    "districtIntro": "The Rotary Foundation does not publish per-district donor ledgers \u2014 but the district\u2019s own farewell conference decks do. The tables below come from the giving records presented at the D9212 send-off, alongside the names confirmed in public records.",
     "districtNamed": [
       { "name": "Geeta & Kaushik Manek", "detail": "Rotary Club of Muthaiga. Arch Klumph Society members, Major Donors, Benefactors and Bequest Society members. Geeta was the first female Governor of District 9200 (2013\u201314), served as a Trustee of The Rotary Foundation \u2014 chairing its Executive, Programs and Stewardship committees \u2014 and received Rotary\u2019s Service Above Self Award. Kaushik led District 9200 as Governor in 2008\u201309." },
       { "name": "Dr. Manu Chandaria", "detail": "Rotary Club of Nairobi \u2014 Kenya\u2019s Carnegie Medal of Philanthropy laureate (2022). The visionary and financial backbone of the Kenya Rural Blindness Eradication Project, whose nine-year run of free eye camps restored sight to thousands (see achievements below)." }
     ],
+    "districtClubs": {
+      "title": "Top five giving clubs \u2014 the full thirteen years",
+      "intro": "Cumulative TRF giving across District 9212\u2019s thirteen-year life, as honored at the district\u2019s farewell.",
+      "note": "All five are Nairobi-area clubs \u2014 and our own club sits fourth all-time at nearly a quarter of a million dollars.",
+      "rows": [
+        { "rank": 1, "club": "Nairobi Muthaiga North", "total": "$293,243.31" },
+        { "rank": 2, "club": "Nairobi Utumishi", "total": "$258,636.00" },
+        { "rank": 3, "club": "Nairobi Lang\u2019ata", "total": "$247,377.21" },
+        { "rank": 4, "club": "Nairobi South", "total": "$225,893.73", "own": true },
+        { "rank": 5, "club": "Karen Nairobi", "total": "$152,807.73" }
+      ]
+    },
+    "lastDance": {
+      "title": "2025/26 giving leaderboard \u2014 \u201cthe last dance\u201d",
+      "intro": "The final Rotary year of District 9212, as presented at the farewell: the top twenty giving clubs.",
+      "note": "Muthaiga led the last dance, and all four all-time top clubs stayed in the year\u2019s top four \u2014 with Kitengela, whose African-culture fashion show raised polio money, finishing fifth.",
+      "rows": [
+        { "rank": 1, "club": "Muthaiga", "amount": "$17,096" },
+        { "rank": 2, "club": "Nairobi Muthaiga North", "amount": "$12,993" },
+        { "rank": 3, "club": "Nairobi-Lang\u2019ata", "amount": "$12,940" },
+        { "rank": 4, "club": "Nairobi-Utumishi", "amount": "$8,935" },
+        { "rank": 5, "club": "Kitengela", "amount": "$8,637" },
+        { "rank": 6, "club": "Karen-Nairobi", "amount": "$8,583" },
+        { "rank": 7, "club": "Lavington Jioni", "amount": "$8,408" },
+        { "rank": 8, "club": "Nairobi Thika Road", "amount": "$6,873" },
+        { "rank": 9, "club": "Hurlingham-Nairobi", "amount": "$6,217" },
+        { "rank": 10, "club": "Nairobi Upper Hill", "amount": "$5,360" },
+        { "rank": 11, "club": "Nairobi Kilimani Alfajiri", "amount": "$5,072" },
+        { "rank": 12, "club": "Ngong Road", "amount": "$4,953" },
+        { "rank": 13, "club": "Kikuyu", "amount": "$4,697" },
+        { "rank": 14, "club": "Embakasi", "amount": "$4,431" },
+        { "rank": 15, "club": "Naivasha", "amount": "$3,897" },
+        { "rank": 16, "club": "Nairobi Parklands", "amount": "$3,533" },
+        { "rank": 17, "club": "Nairobi Madaraka", "amount": "$3,137" },
+        { "rank": 18, "club": "Lavington Nairobi", "amount": "$2,898" },
+        { "rank": 19, "club": "Nairobi-East", "amount": "$2,880" },
+        { "rank": 20, "club": "Addis Ababa-West", "amount": "$2,710" }
+      ]
+    },
+    "heritage": {
+      "title": "Heritage clubs \u2014 our enduring roots",
+      "intro": "The fourteen oldest clubs of the district, in order of charter \u2014 the roots every D9212 club grew from.",
+      "note": "Our club is the sixth-oldest in the lineage \u2014 chartered in 1963, the same year as Kisumu.",
+      "clubs": [
+        { "rank": 1, "club": "Rotary Club of Nairobi", "chartered": "1930" },
+        { "rank": 2, "club": "Rotary Club of Mombasa", "chartered": "1944" },
+        { "rank": 3, "club": "Rotary Club of Nakuru", "chartered": "1952" },
+        { "rank": 4, "club": "Rotary Club of Addis Ababa", "chartered": "1955" },
+        { "rank": 5, "club": "Rotary Club of Kisumu", "chartered": "1963" },
+        { "rank": 6, "club": "Rotary Club of Nairobi South", "chartered": "1963", "own": true },
+        { "rank": 7, "club": "Rotary Club of Nairobi North", "chartered": "1969" },
+        { "rank": 8, "club": "Rotary Club of Kilindini Mombasa", "chartered": "1973" },
+        { "rank": 9, "club": "Rotary Club of Nairobi Utumishi", "chartered": "1982" },
+        { "rank": 10, "club": "Rotary Club of Bahari Mombasa", "chartered": "1984" },
+        { "rank": 11, "club": "Rotary Club of Diani", "chartered": "1986" },
+        { "rank": 12, "club": "Rotary Club of Mombasa Central", "chartered": "1986" },
+        { "rank": 13, "club": "Rotary Club of Milimani", "chartered": "1988" },
+        { "rank": 14, "club": "Rotary Club of Hurlingham Nairobi", "chartered": "1989" }
+      ]
+    },
+    "legacyStory": {
+      "title": "The Sunshine Rally \u2014 one man\u2019s compassion, thousands of smiles",
+      "text": "In 1979, Dr. Manu Chandaria \u2014 renowned industrialist, philanthropist and past president of the Rotary Club of Nairobi \u2014 began the Rotary Sunshine Rally: a joyful day in the sun for children living with disabilities, built on laughter, dignity, love and belonging, at a time when conversations around inclusion were still limited. In 1980\u201381, during the UN International Year for the Handicapped and Rotary\u2019s 75th anniversary, clubs across Nairobi, Kiambu, Thika and Machakos officially adopted it. What began as a local act of kindness is today one of Kenya\u2019s most enduring humanitarian legacies."
+    },
     "districtAggregate": [
       "District 9212\u2019s TRF giving: ~$290,000 in 2022\u201323 (against a $400K goal), with a $500,000 target for 2025\u201326 and a $1M+ three-year ambition.",
       "District polio giving doubled: $36,885 (2023\u201324) \u2192 $72,857 (2024\u201325).",
@@ -80,6 +144,7 @@
   ],
   "achievementsDistrict": [
     { "title": "17,000+ free eye surgeries", "year": "1986\u20131995", "detail": "The Kenya Rural Blindness Eradication Project: Dr. Manu Chandaria and RC Nairobi, backed by 50 clubs from Germany, the Netherlands and Belgium. Camps at Kapkatet and Kabarak \u2014 one performed 309 cataract surgeries with President Moi in attendance; the programme ran nine years." },
+    { "title": "The Sunshine Rally begins", "year": "1979", "detail": "Dr. Manu Chandaria\u2019s day in the sun for children living with disabilities \u2014 adopted across Nairobi, Kiambu, Thika and Machakos in 1980\u201381 and still one of Kenya\u2019s most enduring humanitarian legacies." },
     { "title": "RCNS\u2019s Jaipur Foot Project", "year": "1990", "detail": "Our club founded the prosthetics programme that became the Jaipur Foot Trust \u2014 restoring mobility to thousands of amputees." },
     { "title": "RCNS\u2019s National Sanitary Pads Campaign", "year": "2006", "detail": "Launched with the Girl Child Network (President Megan White, Rtn. Naisiae Paloshe) \u2014 it grew into the national Sanitary Towels Campaign and a government programme keeping girls in school." },
     { "title": "Polio campaigns across five counties", "year": "2023\u20132025", "detail": "With Kenya\u2019s Ministry of Health, WHO, UNICEF and the Gates Foundation \u2014 Migori, Kisumu, Homa Bay, Narok, Siaya. RCNS co-organized the Kikopey drive." },
@@ -92,8 +157,7 @@
     { "title": "First-of-its-kind district art exhibitions", "year": "2022\u201323", "detail": "Kenya and Ethiopia hosted joint exhibitions around Darren Jones\u2019s \u201cImagine Ones Dream\u201d \u2014 $115K+ raised for under-five immunization and surveillance." },
     { "title": "A district that outgrew itself", "year": "2013\u20132026", "detail": "D9212 spanned four countries and grew to 267 clubs and 3,727 Rotarians \u2014 90% of clubs voted to split, and 101 District Conferences closed the story at Naivasha in 2026." },
     { "title": "The next chapter: D9215 & D9216", "year": "2026", "detail": "From 1 July 2026, D9215 (Western Kenya, Rift Valley, Western Nairobi + South Sudan) and D9216 (Ethiopia, Eritrea, Central & Eastern Kenya, Coast) carry the flag \u2014 RCNS serves in D9215." },
-    { "title": "RCNS builds the next generation", "year": "ongoing", "detail": "Our club chartered RC Kirinyaga, mentors Rotaract Kenyatta University (100+ members) and Interact clubs at State House Girls and Upper Hill \u2014 and sponsors 30 needy students through secondary school." },
-    { "title": "The giving march to $1M", "year": "2023\u20132028", "detail": "District TRF giving: ~$290K (2022\u201323) \u2192 $500K target (2025\u201326) \u2192 $1M+ ambition by 2028, at $100 per Rotarian per year." }
+    { "title": "RCNS builds the next generation", "year": "ongoing", "detail": "Our club chartered RC Kirinyaga, mentors Rotaract Kenyatta University (100+ members) and Interact clubs at State House Girls and Upper Hill \u2014 and sponsors 30 needy students through secondary school." }
   ],
   "club": {
     "title": "Our club & the Foundation",
@@ -101,6 +165,7 @@
     "items": [
       "Chartered 1963 \u2014 second-oldest club in Nairobi, third in Kenya.",
       "Best Rotary Foundation Giving Club, District 9212 (2016\u201317).",
+      "Fourth-highest TRF giving club in the district\u2019s thirteen-year history \u2014 $225,893.73.",
       "Founded the Jaipur Foot Project (1990) and the National Sanitary Pads Campaign (2006).",
       "Co-organized district polio immunization drives at Kikopey and Nairobi South B.",
       "Sponsors RC Kirinyaga, Rotaract Kenyatta University and two Interact clubs."
@@ -114,6 +179,8 @@
       { "name": "TRF 2024-25 Fact Card (Giving)", "url": "https://www.rotary.org/en/about-rotary/our-foundation" },
       { "name": "Donor Recognition \u2014 rotary.org", "url": "https://www.rotary.org/get-involved/donate/donor-recognition" },
       { "name": "Arch Klumph Society \u2014 rotary.org", "url": "https://www.rotary.org/en/who-we-are/arch-klumph-society" },
+      { "name": "Understanding Foundation Recognition Points \u2014 District 5580", "url": "https://rotary5580.org/stories/understanding-foundation-recognition-points" },
+      { "name": "Foundation Recognition Points fact sheet \u2014 District 5010 (PDF)", "url": "https://www.rotarydistrict5010.org/foundation-recognition-points-fact-sheet-en.pdf" },
       { "name": "Rotary & Gates Foundation extend polio partnership (June 2025) \u2014 endpolio.org", "url": "https://www.endpolio.org/rotary-and-gates-foundation-extend-partnership-to-end-polio" },
       { "name": "GPEI historical contributions 1985-2024 \u2014 polioeradication.org", "url": "https://polioeradication.org/financing/" },
       { "name": "GPEI Donors & Financing", "url": "https://polioeradication.org/donors-financing/" },
@@ -121,6 +188,7 @@
       { "name": "Symbiosis Peace Center inauguration (Feb 2026) \u2014 rotary.org", "url": "https://www.rotary.org/articles/2026/02/rotary-international-launches-new-peace-center-in-india" },
       { "name": "District 9212 \u2014 homepage, strategy & redistricting stories", "url": "https://rotary9212.org/" },
       { "name": "D9212 timeline: eye surgeries & polio walks", "url": "https://timeline.rotary9212.org/" },
+      { "name": "D9212 farewell conference giving-records deck (club tables, leaderboard, heritage clubs, Sunshine Rally) \u2014 slides shared by the owner", "url": "https://rotary9212.org/" },
       { "name": "Rotary Club of Nairobi \u2014 founded 1930", "url": "https://rotarynairobi.org/about/" },
       { "name": "Jaipur Foot Project \u2014 founded by RCNS 1990", "url": "https://jaipurfootproject.org/" },
       { "name": "Kenya sanitary pads campaign origins \u2014 ZanaAfrica", "url": "https://zanaa.org/managing-menstruation/policy-advocacy/national-committee/" },
