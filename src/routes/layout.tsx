@@ -50,7 +50,9 @@ declare global {
       CACHE: KVNamespace;
       CLASSIFY_QUEUE: Queue<any>;
       GEMINI_API_KEY: string;
-      PHOTOS: R2Bucket;
+      TELEGRAM_BOT_TOKEN: string;
+      // Optional while R2 is suspended: photo bridge falls back to Telegram.
+      PHOTOS?: R2Bucket;
       ASSETS: any;
     };
   }
