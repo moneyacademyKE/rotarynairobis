@@ -229,7 +229,7 @@ export default component$(() => {
       {/* 9. Global achievements */}
       <section class="fd-section">
         <h2 class="fd-section-title">Top 15 achievements — worldwide</h2>
-        <p class="fd-section-intro">From a $26.50 seed to the brink of eradicating a human disease.</p>
+        <p class="fd-section-intro">From a single seed gift to the brink of eradicating a human disease.</p>
         <div class="fd-ach-list">
           {impact.achievementsGlobal.map((a, i) => (
             <div key={a.title} class="fd-ach-item">
@@ -247,7 +247,7 @@ export default component$(() => {
       {/* 10. District achievements */}
       <section class="fd-section">
         <h2 class="fd-section-title">Top 15 achievements — District 9212 &amp; Kenya</h2>
-        <p class="fd-section-intro">Thirteen years, four countries, 267 clubs — and a club from Nairobi South in the story from the start.</p>
+        <p class="fd-section-intro">Thirteen years, four countries — and a club from Nairobi South in the story from the start.</p>
         <div class="fd-ach-list">
           {impact.achievementsDistrict.map((a, i) => (
             <div key={a.title} class="fd-ach-item">
