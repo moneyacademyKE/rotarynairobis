@@ -34,6 +34,7 @@ export interface PhotoEnv {
   CACHE: {
     get(key: string): Promise<string | null>;
     put(key: string, value: string, opts?: { expirationTtl?: number }): Promise<void>;
+    delete?(key: string): Promise<void>;
   };
   TELEGRAM_BOT_TOKEN?: string;
 }
@@ -98,12 +99,22 @@ async function resolveFilePath(uid: string, env: PhotoEnv): Promise<string | nul
   const fileId = await resolveFileId(uid, env);
   if (!fileId) return null;
 
-  const file = await getFile(env.TELEGRAM_BOT_TOKEN, fileId);
-  if (!file.file_path) return null;
-  await env.CACHE.put(`tg:path:${uid}`, file.file_path, {
-    expirationTtl: PATH_TTL_SECONDS,
-  });
-  return file.file_path;
+  try {
+    const file = await getFile(env.TELEGRAM_BOT_TOKEN, fileId);
+    if (!file.file_path) return null;
+    await env.CACHE.put(`tg:path:${uid}`, file.file_path, {
+      expirationTtl: PATH_TTL_SECONDS,
+    });
+    return file.file_path;
+  } catch (e) {
+    // A cached file_id may have gone stale: evict both layers so the next
+    // request re-resolves from D1 instead of 502ing forever.
+    if (env.CACHE.delete) {
+      await env.CACHE.delete(`tg:path:${uid}`).catch(() => {});
+      await env.CACHE.delete(`tg:id:${uid}`).catch(() => {});
+    }
+    throw e;
+  }
 }
 
 export async function servePhoto(
