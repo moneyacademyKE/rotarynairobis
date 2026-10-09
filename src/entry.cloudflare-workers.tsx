@@ -8,6 +8,7 @@ import { media } from "./data/schema";
 import { parseGeminiResponse } from "./lib/gemini-parser";
 import { classifyImage } from "./lib/classify-client";
 import { handleScheduled } from "./lib/publish";
+import { servePhoto } from "./lib/photo-source";
 
 // Consolidating QwikCityPlatform into src/routes/layout.tsx to avoid empty interface errors and achieve architectural single-truth.
 
@@ -16,21 +17,11 @@ const qwikCityFetch = createQwikCity({ render, qwikCityPlan });
 const fetch = async (request: Request, env: QwikCityPlatform["env"], ctx: ExecutionContext) => {
   const url = new URL(request.url);
   
-  // Media Proxy Bridge: Serve photos from R2 bucket
+  // Media Proxy Bridge: R2 when bound, Telegram file CDN as fallback
+  // (see src/lib/photo-source.ts — R2 account suspension must not 500 photos
+  // or block deploys ever again).
   if (url.pathname.startsWith('/photos/')) {
-    const fileName = url.pathname.replace('/photos/', '');
-    const object = await env.PHOTOS.get(fileName);
-    
-    if (object) {
-      const headers = new Headers();
-      object.writeHttpMetadata(headers);
-      headers.set('etag', object.httpEtag);
-      headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-      
-      return new Response(object.body, { headers });
-    }
-    
-    return new Response('Media Not Found', { status: 404 });
+    return servePhoto(url.pathname.replace('/photos/', ''), env as any);
   }
 
   return qwikCityFetch(request, env as any, ctx);

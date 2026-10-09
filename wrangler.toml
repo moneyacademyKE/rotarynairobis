@@ -27,6 +27,10 @@ queue = "rcns-classify-queue"
 queue = "rcns-classify-queue"
 max_batch_size = 5
 max_batch_timeout = 5
-[[r2_buckets]]
-binding = "PHOTOS"
-bucket_name = "nai-media"
+# R2 binding removed while the account's R2 is suspended (err 10042):
+# wrangler refuses to deploy any binding against a suspended R2, and the
+# runtime bridge (src/lib/photo-source.ts) serves photos from Telegram's
+# file CDN until R2 is re-enabled. Restore this block after re-enabling.
+# [[r2_buckets]]
+# binding = "PHOTOS"
+# bucket_name = "nai-media"

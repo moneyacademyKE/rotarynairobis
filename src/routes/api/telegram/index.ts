@@ -122,24 +122,29 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
       const file = await getFile(env.TELEGRAM_BOT_TOKEN, largestPhoto.file_id);
       
       if (file.file_path) {
-        const downloadUrl = getDownloadUrl(env.TELEGRAM_BOT_TOKEN, file.file_path);
         const fileName = `telegram_${file.file_unique_id}.jpg`;
-        
-        const res = await fetch(downloadUrl);
-        if (res.ok) {
-          const blob = await res.blob();
-          await env.PHOTOS.put(fileName, blob, {
-            customMetadata: { origin: "telegram", update_id: updateId.toString() }
-          });
-          
-          photosJson = JSON.stringify([fileName]);
 
-          // Push to AI Classification Queue (Gemini will set the category/tab)
-          await env.CLASSIFY_QUEUE.send({
-            fileName,
-            imageUrl: `${new URL(request.url).origin}/photos/${fileName}`
-          });
+        // R2 put is optional: while the binding is absent (R2 suspension),
+        // the /photos/ bridge serves the same bytes from Telegram's CDN,
+        // so ingestion and classification continue uninterrupted.
+        if (env.PHOTOS) {
+          const downloadUrl = getDownloadUrl(env.TELEGRAM_BOT_TOKEN, file.file_path);
+          const res = await fetch(downloadUrl);
+          if (res.ok) {
+            const blob = await res.blob();
+            await env.PHOTOS.put(fileName, blob, {
+              customMetadata: { origin: "telegram", update_id: updateId.toString() }
+            });
+          }
         }
+
+        photosJson = JSON.stringify([fileName]);
+
+        // Push to AI Classification Queue (Gemini will set the category/tab)
+        await env.CLASSIFY_QUEUE.send({
+          fileName,
+          imageUrl: `${new URL(request.url).origin}/photos/${fileName}`
+        });
       }
     }
 
