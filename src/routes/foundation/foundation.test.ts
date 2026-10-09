@@ -8,7 +8,7 @@ describe("Foundation Page Spec Boundaries & Data Integrity", () => {
     const parsed = parseFoundationPageData(rawData);
     expect(parsed).toBeDefined();
     expect(parsed.pageTitle).toBe("The Rotary Foundation");
-    expect(parsed.pageSubtitle).toContain("26.50");
+    expect(parsed.pageSubtitle).toContain("Klumph");
   });
 
   it("should carry six at-a-glance stats and a six-entry origin timeline", () => {
@@ -94,6 +94,19 @@ describe("Foundation Page Spec Boundaries & Data Integrity", () => {
     expect(own?.chartered).toBe("1963");
     expect(impact.funders.legacyStory.text).toContain("1979");
     expect(impact.funders.legacyStory.text).toContain("Chandaria");
+  });
+
+  it("should tell each headline fact exactly once across the whole page", () => {
+    const all =
+      JSON.stringify(parseFoundationPageData(rawData)) +
+      JSON.stringify(parseFoundationImpactData(impactData));
+    const count = (needle: string) => all.split(needle).length - 1;
+    expect(count("$26.50")).toBe(1);
+    expect(count("6.18B")).toBe(1);
+    expect(count("225,893.73")).toBe(1);
+    expect(count("36,885")).toBe(1);
+    expect(count("Imagine Ones Dream")).toBe(1);
+    expect(count("87.2%")).toBe(1);
   });
 
   it("should pin the points contract: $1 per $1, gated transfers, PHF minting, never Major Donor", () => {
