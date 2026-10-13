@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { SOURCES } from "~/lib/publish";
+import { GALLERY_KEYS } from "~/lib/gallery";
 
 function makeRequest(auth?: string) {
   return new Request("http://localhost/api/publish", {
@@ -45,7 +45,7 @@ describe("Manual Publish Endpoint", () => {
       expect.objectContaining({ status: "ok" })
     );
     const body = jsonMock.mock.calls[0][1];
-    expect(body.published).toHaveLength(Object.keys(SOURCES).length);
+    expect(body.published).toHaveLength(GALLERY_KEYS.length);
   });
 
   it("reports partial when a source fails but others publish", async () => {
@@ -66,7 +66,7 @@ describe("Manual Publish Endpoint", () => {
       expect.objectContaining({ status: "partial" })
     );
     const body = jsonMock.mock.calls[0][1];
-    expect(body.failed).toHaveLength(Object.keys(SOURCES).length);
+    expect(body.failed).toHaveLength(GALLERY_KEYS.length);
     expect(body.published).toHaveLength(0);
   });
 });

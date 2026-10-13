@@ -3,11 +3,10 @@ import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseD1PostRows } from "../../domain/specs";
 import { GalleryGrid } from "../../components/GalleryGrid";
 import { parseEventDate } from "../../lib/twitter-parser";
-import { cachedQuery } from "../../lib/db-cache";
-import { SOURCES } from "../../lib/publish";
+import { getGallery } from "../../lib/gallery";
 
 export const useTikTokData = routeLoader$(async ({ platform }) => {
-  const rows = await cachedQuery(platform.env, "gallery:tiktok", SOURCES["gallery:tiktok"]);
+  const rows = await getGallery(platform.env, "gallery:tiktok");
   return parseD1PostRows(rows);
 });
 

@@ -7,7 +7,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { media } from "./data/schema";
 import { parseGeminiResponse } from "./lib/gemini-parser";
 import { classifyImage } from "./lib/classify-client";
-import { handleScheduled } from "./lib/publish";
+import { handleScheduled } from "./lib/gallery";
 import { servePhoto } from "./lib/photo-source";
 
 // Consolidating QwikCityPlatform into src/routes/layout.tsx to avoid empty interface errors and achieve architectural single-truth.

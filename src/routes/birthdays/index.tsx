@@ -2,11 +2,10 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseD1PostRows } from "../../domain/specs";
 import { GalleryGrid } from "../../components/GalleryGrid";
-import { cachedQuery } from "../../lib/db-cache";
-import { SOURCES } from "../../lib/publish";
+import { getGallery } from "../../lib/gallery";
 
 export const useBirthdayData = routeLoader$(async ({ platform }) => {
-  const rows = await cachedQuery(platform.env, "gallery:birthdays", SOURCES["gallery:birthdays"]);
+  const rows = await getGallery(platform.env, "gallery:birthdays");
   return parseD1PostRows(rows);
 });
 
