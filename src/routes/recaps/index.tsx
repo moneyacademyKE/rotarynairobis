@@ -2,11 +2,10 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseD1PostRows } from "../../domain/specs";
 import { GalleryGrid } from "../../components/GalleryGrid";
-import { cachedQuery } from "../../lib/db-cache";
-import { SOURCES } from "../../lib/publish";
+import { getGallery } from "../../lib/gallery";
 
 export const useRecapData = routeLoader$(async ({ platform }) => {
-  const rows = await cachedQuery(platform.env, "gallery:recaps", SOURCES["gallery:recaps"]);
+  const rows = await getGallery(platform.env, "gallery:recaps");
   return parseD1PostRows(rows);
 });
 

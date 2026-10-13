@@ -2,12 +2,11 @@ import { component$, useContext, useStylesScoped$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseD1PostRows, type Post } from "../../domain/specs";
 import { DrawerContext } from "../layout";
-import { cachedQuery } from "../../lib/db-cache";
-import { SOURCES } from "../../lib/publish";
+import { getGallery } from "../../lib/gallery";
 
 export const usePosts = routeLoader$(async ({ platform }) => {
   // Clean 'Home' feed: Text-only upcoming rotary club events (EVENT_POSTER)
-  const results = await cachedQuery(platform.env, "gallery:events", SOURCES["gallery:events"]);
+  const results = await getGallery(platform.env, "gallery:events");
 
   const parsed = parseD1PostRows(results);
   const seenTexts = new Set<string>();

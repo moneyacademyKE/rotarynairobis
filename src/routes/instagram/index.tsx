@@ -2,12 +2,11 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseInstagramRows } from "../../domain/specs";
 import { GalleryGrid } from "../../components/GalleryGrid";
-import { cachedQuery } from "../../lib/db-cache";
-import { SOURCES } from "../../lib/publish";
+import { getGallery } from "../../lib/gallery";
 
 export const useInstagramData = routeLoader$(async ({ platform }) => {
   // Visual media classified strictly as PHOTO (excluding posters, recaps, birthdays to prevent cross-tab duplication)
-  const results = await cachedQuery(platform.env, "gallery:instagram", SOURCES["gallery:instagram"]);
+  const results = await getGallery(platform.env, "gallery:instagram");
   
   const allPhotos = parseInstagramRows(results);
     

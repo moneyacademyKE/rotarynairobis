@@ -1,5 +1,5 @@
 import type { RequestHandler } from "@builder.io/qwik-city";
-import { publishAll } from "~/lib/publish";
+import { publishAll } from "~/lib/gallery";
 
 /**
  * Manual publish escape hatch: rewrites all KV read models from D1 on demand.
