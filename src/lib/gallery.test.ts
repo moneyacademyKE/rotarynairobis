@@ -85,13 +85,14 @@ describe("buildGallery", () => {
   });
 });
 
-function makeEnv({ posts = [], media = [], kvGet = null, failPrepare = false }: { posts?: any[]; media?: any[]; kvGet?: any; failPrepare?: boolean } = {}) {
+function makeEnv({ posts = [], media = [], kvGet = null, failPrepare = false, watermark = 0 }: { posts?: any[]; media?: any[]; kvGet?: any; failPrepare?: boolean; watermark?: number } = {}) {
   const put = vi.fn().mockResolvedValue(undefined);
   const get = vi.fn().mockResolvedValue(kvGet);
   const prepare = vi.fn().mockImplementation((sql: string) => ({
     all: failPrepare
       ? vi.fn().mockRejectedValue(new Error("d1 down"))
       : vi.fn().mockResolvedValue({ results: sql.includes("posts_facts") ? posts : media }),
+    first: vi.fn().mockResolvedValue(watermark),
   }));
   return { env: { DB: { prepare }, CACHE: { get, put } }, prepare, put, get };
 }
@@ -113,13 +114,41 @@ describe("getGallery", () => {
 });
 
 describe("publishAll", () => {
-  it("queries D1 exactly twice — not once per gallery", async () => {
+  it("queries D1 with two table scans — not once per gallery", async () => {
     const { env, prepare, put } = makeEnv({ posts: [post(1)], media: [media("f1a.jpg", 1, "EVENT_POSTER")] });
     const report = await publishAll(env);
-    expect(prepare).toHaveBeenCalledTimes(2);
+    const scans = prepare.mock.calls.filter((call: any[]) => String(call[0]).includes("SELECT *"));
+    expect(scans).toHaveLength(2);
     expect(put).toHaveBeenCalledTimes(GALLERY_KEYS.length);
     expect(report.published).toEqual([...GALLERY_KEYS]);
     expect(report.failed).toEqual([]);
+  });
+
+  it("skips when the watermark matches the stored cursor — no scans, no writes", async () => {
+    const { env, prepare, put } = makeEnv({ watermark: 42, kvGet: "42" });
+    const report = await publishAll(env);
+    expect(report.skipped).toBe(true);
+    expect(report.published).toEqual([]);
+    const scans = prepare.mock.calls.filter((call: any[]) => String(call[0]).includes("SELECT *"));
+    expect(scans).toHaveLength(0);
+    expect(put).not.toHaveBeenCalled();
+  });
+
+  it("publishes and advances the cursor when the watermark moved", async () => {
+    const { env, put } = makeEnv({ posts: [post(1)], media: [media("f1a.jpg", 1, "EVENT_POSTER")], watermark: 42, kvGet: "41" });
+    const report = await publishAll(env);
+    expect(report.skipped).toBeUndefined();
+    expect(report.published).toEqual([...GALLERY_KEYS]);
+    expect(put).toHaveBeenCalledWith("publish:last-tx", "42");
+  });
+
+  it("force bypasses the skip even when the watermark matches", async () => {
+    const { env, put } = makeEnv({ posts: [post(1)], media: [media("f1a.jpg", 1, "EVENT_POSTER")], watermark: 42, kvGet: "42" });
+    const report = await publishAll(env, { force: true });
+    expect(report.skipped).toBeUndefined();
+    expect(report.published).toEqual([...GALLERY_KEYS]);
+    // Force mode never probes the watermark, so it cannot advance the cursor.
+    expect(put.mock.calls.some((call: any[]) => call[0] === "publish:last-tx")).toBe(false);
   });
 
   it("when the fact load fails, every key reports the same failure", async () => {

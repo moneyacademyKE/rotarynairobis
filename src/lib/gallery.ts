@@ -159,21 +159,53 @@ export interface PublishReport {
   published: string[];
   failed: { key: string; error: string }[];
   rowsWritten: number;
+  /** true when MAX(tx_id) matched the stored cursor — nothing changed. */
+  skipped?: boolean;
   at: string;
 }
 
-/** Two D1 scans total, then all five galleries from memory. Never throws. */
-export async function publishAll(env: any): Promise<PublishReport> {
+const CURSOR_KEY = "publish:last-tx";
+
+/** Change watermark: MAX(tx_id) over both fact tables. Two indexed reads. */
+async function currentWatermark(env: any): Promise<number> {
+  const [p, m] = await Promise.all([
+    env.DB.prepare("SELECT MAX(tx_id) AS t FROM posts_facts").first("t"),
+    env.DB.prepare("SELECT MAX(tx_id) AS t FROM media_facts").first("t"),
+  ]);
+  return Math.max(Number(p ?? 0), Number(m ?? 0));
+}
+
+/**
+ * Two D1 scans total, then all five galleries from memory. Never throws.
+ * Skips entirely when the watermark hasn't moved since the last successful
+ * publish: quiet nights cost 2 rows, not 7K. The manual /api/publish escape
+ * hatch passes force: true to bypass the skip.
+ */
+export async function publishAll(env: any, opts: { force?: boolean } = {}): Promise<PublishReport> {
   const published: string[] = [];
   const failed: PublishReport["failed"] = [];
   let rowsWritten = 0;
+  const at = new Date().toISOString();
+
+  let watermark: number | null = null;
+  if (!opts.force) {
+    try {
+      watermark = await currentWatermark(env);
+      const last = await env.CACHE?.get(CURSOR_KEY);
+      if (watermark > 0 && last !== null && Number(last) === watermark) {
+        return { published, failed, rowsWritten, skipped: true, at };
+      }
+    } catch {
+      watermark = null; // watermark probe failed — publish anyway
+    }
+  }
 
   let facts: { posts: FactRow[]; media: Map<unknown, FactRow> };
   try {
     facts = await loadFacts(env);
   } catch (e: any) {
     const error = e?.message || String(e);
-    return { published, failed: GALLERY_KEYS.map((key) => ({ key, error })), rowsWritten: 0, at: new Date().toISOString() };
+    return { published, failed: GALLERY_KEYS.map((key) => ({ key, error })), rowsWritten: 0, at };
   }
 
   for (const key of GALLERY_KEYS) {
@@ -187,7 +219,13 @@ export async function publishAll(env: any): Promise<PublishReport> {
     }
   }
 
-  return { published, failed, rowsWritten, at: new Date().toISOString() };
+  // Advance the cursor only on a fully clean publish: a partial failure must
+  // not cause tomorrow's skip to leave a broken key stale.
+  if (watermark !== null && watermark > 0 && failed.length === 0) {
+    await env.CACHE?.put(CURSOR_KEY, String(watermark)).catch(() => {});
+  }
+
+  return { published, failed, rowsWritten, at };
 }
 
 /** Entry point for the cron trigger. Publishes and logs the receipt. */
