@@ -21,7 +21,8 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
   }
 
   try {
-    const report = await publishAll(env);
+    // Manual publish is an operator's "publish now" — bypass the watermark skip.
+    const report = await publishAll(env, { force: true });
     json(200, {
       status: report.failed.length === 0 ? "ok" : "partial",
       ...report,

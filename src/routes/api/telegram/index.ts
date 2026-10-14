@@ -48,7 +48,7 @@ export const onGet: RequestHandler = async ({ request, platform, json }) => {
       : `Failed to update webhook: ${setInfo.description}`;
   }
 
-  // Diagnostics count is KV-cached (5 min TTL): every uncached hit scans the
+  // Diagnostics count is KV-cached (1h TTL): every uncached hit scans the
   // whole raw-facts table, and this endpoint is unauthenticated — monitors
   // and passers-by alike can hammer it.
   let databaseFactsCount: number | null = null;
@@ -57,7 +57,7 @@ export const onGet: RequestHandler = async ({ request, platform, json }) => {
     databaseFactsCount = Number(cachedCount);
   } else {
     databaseFactsCount = await env.DB.prepare("SELECT COUNT(*) as count FROM telegram_raw_facts").first("count");
-    await env.CACHE?.put("telegram_raw_facts_count", String(databaseFactsCount), { expirationTtl: 300 });
+    await env.CACHE?.put("telegram_raw_facts_count", String(databaseFactsCount), { expirationTtl: 3600 });
   }
 
   json(200, {
@@ -123,6 +123,12 @@ export const onPost: RequestHandler = async ({ request, platform, json }) => {
       
       if (file.file_path) {
         const fileName = `telegram_${file.file_unique_id}.jpg`;
+
+        // Warm the /photos/ bridge at ingest: we already hold both halves of
+        // the mapping (file_unique_id, file_id), so the first request for this
+        // photo never pays the D1 raw_json LIKE scan. Same key shape the
+        // bridge uses; failures here are harmless (bridge falls back to D1).
+        await env.CACHE?.put(`tg:id:${file.file_unique_id}`, largestPhoto.file_id, { expirationTtl: 7 * 24 * 3600 }).catch(() => {});
 
         // R2 put is optional: while the binding is absent (R2 suspension),
         // the /photos/ bridge serves the same bytes from Telegram's CDN,

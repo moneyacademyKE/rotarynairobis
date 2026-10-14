@@ -81,4 +81,10 @@ CREATE INDEX IF NOT EXISTS idx_telegram_raw_update_id ON telegram_raw_facts(upda
 CREATE INDEX IF NOT EXISTS idx_posts_facts_created ON posts_facts(created_at);
 CREATE INDEX IF NOT EXISTS idx_media_facts_created ON media_facts(created_at);
 
+-- Sync endpoint polls: WHERE created_at > ? ORDER BY tx_id LIMIT 500.
+-- Single-column created_at indexes force a full sort before the LIMIT bites;
+-- the composite makes incremental polls read only what changed.
+CREATE INDEX IF NOT EXISTS idx_posts_facts_created_tx ON posts_facts(created_at, tx_id);
+CREATE INDEX IF NOT EXISTS idx_media_facts_created_tx ON media_facts(created_at, tx_id);
+
 
