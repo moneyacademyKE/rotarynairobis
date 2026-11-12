@@ -25,6 +25,8 @@
     "serve": "wrangler dev server/entry.cloudflare-workers.js",
     "start": "vite --open --mode ssr",
     "test": "vitest run",
+    "test:local": "bun test local/",
+    "local:run": "bun local/run.ts",
     "test.watch": "vitest",
     "qwik": "qwik"
   },
