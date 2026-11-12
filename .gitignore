@@ -49,3 +49,6 @@ functions/**/*.js
 /_excluded_photos
 /test.db
 /eng.traineddata
+
+# Secrets
+.dev.vars
