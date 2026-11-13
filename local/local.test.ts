@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import { openStore, type SqliteStore, type FactRow } from "./sqlite-store";
 import { mirror, needsSync } from "./mirror";
 import { buildGalleries } from "./build";
+import { tick } from "./tick";
 import type { D1Remote } from "./d1-remote";
 
 let dir: string;
@@ -106,6 +107,18 @@ describe("buildGalleries (integration with the worker's own builder)", () => {
     expect(insta).toEqual([
       expect.objectContaining({ id: 11, photo_src: "telegram_b.jpg" }),
     ]);
+  });
+});
+
+describe("tick", () => {
+  it("quiet tick (no token, no keys, no jobs): poll skipped, build skipped, zero writes", async () => {
+    const out = join(dir, "generated");
+    const report = await tick(join(dir, "test.sqlite"), out);
+    expect(report.poll.skipped).toBe(true);
+    expect(report.poll.polled).toBe(0);
+    expect(report.build.skipped).toBe(true);
+    expect(report.build.published).toEqual([]);
+    expect(report.build.rowsWritten).toBe(0);
   });
 });
 

@@ -34,6 +34,8 @@ export interface PollerDeps {
   getFile: (token: string, fileId: string) => Promise<TelegramFile>;
   downloadPhoto: (token: string, filePath: string, destPath: string) => Promise<void>;
   kvPut: (key: string, value: string, ttlSeconds: number) => Promise<void>;
+  /** Optional: when present, a webhook conflict is self-healed by deleting it. */
+  deleteWebhook?: (token: string) => Promise<{ ok: boolean }>;
 }
 
 export interface IngestResult {
@@ -129,7 +131,18 @@ export async function pollOnce(
     (store.db.prepare("SELECT MAX(update_id) AS m FROM telegram_raw_facts").get() as { m: number | null }).m ?? 0,
   );
   const offset = Number(store.metaGet("tg:offset") ?? maxKnown + 1);
-  const res = await deps.fetchUpdates(token, offset);
+  let res = await deps.fetchUpdates(token, offset);
+  if (
+    !res.ok &&
+    /conflict|webhook is (active|already)/i.test(res.description ?? "") &&
+    deps.deleteWebhook
+  ) {
+    // Post-cutover guard: the CF worker's /api/telegram self-heal can re-arm
+    // the webhook (a stray GET re-registers it), which 409s every poll. The
+    // poller owns ingestion now — delete the webhook once and retry.
+    await deps.deleteWebhook(token).catch(() => {});
+    res = await deps.fetchUpdates(token, offset);
+  }
   if (!res.ok) throw new Error(`getUpdates failed: ${res.description ?? "unknown"}`);
   const updates = (res.result ?? []) as Array<Record<string, unknown>>;
 
@@ -183,6 +196,10 @@ export function realDeps(): PollerDeps {
       writeFileSync(dest, Buffer.from(await r.arrayBuffer()));
     },
     kvPut: (key, value, ttl) => kv.put(key, value, { expirationTtl: ttl }),
+    deleteWebhook: async (token) => {
+      const r = await fetch(`https://api.telegram.org/bot${token}/deleteWebhook?drop_pending_updates=false`);
+      return r.json() as any;
+    },
   };
 }
 

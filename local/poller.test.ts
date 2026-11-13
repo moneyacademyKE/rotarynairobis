@@ -169,6 +169,28 @@ test("pollOnce surfaces API failure", async () => {
   expect(pollOnce(store, "TOK", d, cacheDir)).rejects.toThrow("409");
 });
 
+test("pollOnce self-heals a re-armed webhook: deletes it, retries, ingests", async () => {
+  let calls = 0;
+  let webhookDeleted = 0;
+  const d = deps({
+    fetchUpdates: async () => {
+      calls++;
+      if (calls === 1) return { ok: false, description: "Conflict: terminated by other getUpdates request; webhook is active" };
+      return { ok: true, result: [post(6215, { text: "after heal" })] };
+    },
+    deleteWebhook: async () => {
+      webhookDeleted++;
+      return { ok: true };
+    },
+  });
+  const report = await pollOnce(store, "TOK", d, cacheDir);
+  expect(webhookDeleted).toBe(1);
+  expect(report.polled).toBe(1);
+  expect(report.newPosts).toBe(1);
+  expect(report.offset).toBe(7216);
+  expect(store.db.prepare("SELECT text FROM posts_facts WHERE id = 6215").get().text).toBe("after heal");
+});
+
 test("FileKV: put/get, json type, TTL expiry, delete", async () => {
   await kv.put("k1", "v1");
   expect(await kv.get("k1")).toBe("v1");

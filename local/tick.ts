@@ -20,7 +20,7 @@ export interface TickReport {
   at: string;
   poll: { skipped: boolean; error?: string; polled: number; newPosts: number; newPhotos: number };
   classify: { done: number; failed: number; skipped: number; error?: string };
-  build: { published: string[]; failed: { key: string; error: string }[]; rowsWritten: number };
+  build: { skipped?: boolean; published: string[]; failed: { key: string; error: string }[]; rowsWritten: number };
 }
 
 export async function tick(dbPath = DEFAULT_DB_PATH, outDir = DEFAULT_OUT_DIR): Promise<TickReport> {
@@ -53,7 +53,13 @@ export async function tick(dbPath = DEFAULT_DB_PATH, outDir = DEFAULT_OUT_DIR): 
       }
     }
 
-    const build = await buildGalleries(dbPath, outDir);
+    // Quiet tick: nothing polled, nothing classified → data unchanged →
+    // skip the rebuild. The 5-min cron becomes a single getUpdates call.
+    const quiet =
+      poll.polled === 0 && !poll.error && classify.done === 0 && classify.failed === 0 && !classify.error;
+    const build = quiet
+      ? { skipped: true as const, published: [] as string[], failed: [] as { key: string; error: string }[], rowsWritten: 0 }
+      : await buildGalleries(dbPath, outDir);
 
     return { at, poll, classify, build };
   } finally {
