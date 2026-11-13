@@ -86,19 +86,49 @@ Post-flip hardening (PR #21): `pollOnce` self-heals a re-armed webhook
 (409 → deleteWebhook → retry) — guards against the CF worker's
 `/api/telegram` self-heal re-registering it. Quiet ticks skip the rebuild.
 
-**State now:** D1 is the cold archive (nightly mirror will report
-`skipped: true` forever — that's the freeze proof). The CF site serves
-its last-published KV state; new content only appears locally until the
-public exposure choice is made (Cloudflare Tunnel from this Mac, or
-static hosting of the generated output, or push-to-KV hybrid).
+**State now:** D1 is the cold archive (nightly mirror reports
+`skipped: true` forever — that's the freeze proof). The CF worker serves
+its last-published KV state at `rotarynairobis.iamkingori.workers.dev`
+(dormant fallback). The public domain points at the local tunnel — see
+**Public serving** below.
 
 Runbook for a fresh machine / restart:
 
 ```sh
 # poller + classifier + builder (the cron does this every 5 min):
 cd ~/src/rotarynairobis && source ~/.opencrabs/projects/rotary-local/.env.sh && bun local/tick.ts
-# site: bun run build.local && bun run local:serve  (put under launchd when public)
+# site: launchd manages it now (see Public serving); manual: bun run build.local && bun run local:serve
 ```
+
+## Public serving: LIVE 2026-11-13 (Cloudflare Tunnel)
+
+`rotarynairobis.com` → CF edge → named tunnel **`rcns-local`**
+(`f41f65e9-565a-469b-90cf-4b184f5f2d41`) → `http://localhost:8788`.
+
+- **DNS**: zone `a4e5deb…`; root CNAME → `f41f65e9….cfargotunnel.com`,
+  proxied. The worker's custom-domain attachment on the root was deleted
+  (the workers.dev URL still serves the frozen fallback).
+  `club.`/`jaipur.` custom domains belong to *other* workers — untouched.
+- **Tunnel**: locally managed. Config
+  `~/.opencrabs/projects/rotary-local/tunnel/config.yml`, credentials
+  `tunnel/creds.json` (600 — connector secret; rotate by deleting +
+  recreating the tunnel if it ever leaks).
+- **launchd (survives reboot, KeepAlive)**: `com.rcns.server` →
+  `local/run-server.sh` (sources the 600-perm env file, execs bun);
+  `com.rcns.tunnel` → cloudflared. Logs:
+  `~/.opencrabs/projects/rotary-local/logs/{server,tunnel}*.log`.
+- **Ops**: `launchctl load -w ~/Library/LaunchAgents/com.rcns.{server,tunnel}.plist`
+  (`unload -w` to stop).
+- **Rollback to the CF worker**: delete the root CNAME, re-attach the
+  custom domain in the dashboard (Workers → rotarynairobis → Domains),
+  `bun run deploy`. Nothing else changed.
+- **Latency reality**: TTFB from this Mac ~1.2s (its route to the CF edge
+  is ~500ms RTT; the tunnel adds edge→Mac hops; local server is 24ms).
+  Static assets edge-cache after first hit (`CF-Cache-Status: HIT`).
+  Future knob: `Cache-Control: s-maxage` on HTML.
+- **Uptime dependency**: the site dies when this Mac sleeps or powers
+  off. Content freshness also needs the OpenCrabs `rcns-local-poll` cron
+  (*/5). Photos keep serving regardless — the server holds the token.
 
 ## Verified (2026-11-12)
 
