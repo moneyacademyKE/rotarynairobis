@@ -70,32 +70,35 @@ bun run local:serve      # serve the site on :8788
 bun test local/          # the local test suite
 ```
 
-## Cutover runbook (everything is built; the flip needs one input)
+## Cutover: COMPLETED 2026-11-13 (17:00 UTC)
 
-The one missing secret is the **site bot token** — the bot that is admin of
-the `@rotarynairobis` channel and currently holds the live webhook. It is
-a worker secret (unreadable by design) and is NOT on this machine (hunted:
-session DB, keys.toml, .dev.vars, repo copies — none). Two ways to supply:
+The flip ran end-to-end on the owner's token:
 
-- **(a) existing bot**: @BotFather → the RCNS bot → copy its token into
-  `.env.sh` as `TELEGRAM_BOT_TOKEN`. Find the bot's name in the channel's
-  admin list.
-- **(b) fresh bot** (arguably cleaner): @BotFather `/newbot`, add it as
-  admin of the channel, put its token in `.env.sh`. The old bot's webhook
-  keeps writing to D1 as a dormant fallback until you remove it.
+1. Token verified via `getMe` → **@rotaryrcnsbot** (the channel-admin bot
+   named from the admin list). `getWebhookInfo`: live receiver, 0 pending.
+2. Final mirror (21 rows, today's delta) → local == D1 at cut time.
+3. `deleteWebhook` (pending kept) → **Cloudflare ingestion stopped**.
+4. `rcns-local-poll` cron ENABLED (*/5, trigger-gated: fires only on
+   new posts/photos/failures; quiet ticks are one getUpdates call).
+5. Local server verified live on :8788 incl. cold photo via bot token.
 
-Then the flip, in order:
+Post-flip hardening (PR #21): `pollOnce` self-heals a re-armed webhook
+(409 → deleteWebhook → retry) — guards against the CF worker's
+`/api/telegram` self-heal re-registering it. Quiet ticks skip the rebuild.
 
-1. `deleteWebhook` on the poller bot (only for (a); with (b) skip — two
-   bots can coexist, only one needs getUpdates).
-2. Enable the `rcns-local-poll` cron (created DISABLED, trigger-gated:
-   fires only when posts/photos/errors land, zero-token quiet ticks).
-3. `bun run local:serve` under a supervisor (launchd) — site live on :8788.
-4. Point the domain at it — two options: a Cloudflare Tunnel from this
-   Mac (free, needs cloudflared), or keep Cloudflare as static host with
-   the generated output (needs the static render + photo warm-all).
-5. D1 becomes the cold archive (nightly mirror then no-ops: local
-   outgrows remote, delta pulls zero rows).
+**State now:** D1 is the cold archive (nightly mirror will report
+`skipped: true` forever — that's the freeze proof). The CF site serves
+its last-published KV state; new content only appears locally until the
+public exposure choice is made (Cloudflare Tunnel from this Mac, or
+static hosting of the generated output, or push-to-KV hybrid).
+
+Runbook for a fresh machine / restart:
+
+```sh
+# poller + classifier + builder (the cron does this every 5 min):
+cd ~/src/rotarynairobis && source ~/.opencrabs/projects/rotary-local/.env.sh && bun local/tick.ts
+# site: bun run build.local && bun run local:serve  (put under launchd when public)
+```
 
 ## Verified (2026-11-12)
 
@@ -108,4 +111,16 @@ Then the flip, in order:
 - Local server: all 9 routes 200 (2-70ms), static assets served, `/api/sync`
   serves local facts, `/api/publish` fails closed, `/api/telegram` inert
   (no token in route env — self-heal can never repoint the real webhook).
-- Tests: 22/22 bun local; repo suite + tsc clean at each commit.
+- Tests: 24/24 bun local (self-heal + quiet-tick pins); repo suite + tsc clean at each commit.
+
+## Verified (2026-11-13, the flip)
+
+- `getMe` → @rotaryrcnsbot; webhook was live with 0 pending updates.
+- Final mirror 21 rows; `deleteWebhook` → `getWebhookInfo.url` empty.
+- First post-flip tick: `polled: 0` (correct — mirror already had today's
+  16:15 post), full chain ran clean.
+- Server on :8788: `/twitter/` 200 in 74ms; cold photo 200/230KB in 1.8s
+  via Telegram (token path proven), warm 0.7ms from disk cache.
+- Legacy R2-era filenames (e.g. `photo_616@…`) 404 locally — their bytes
+  lived in suspended R2 and were already broken on the public site; not a
+  flip regression.
