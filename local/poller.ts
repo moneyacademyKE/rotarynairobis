@@ -21,7 +21,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { SqliteStore, DEFAULT_DB_PATH, openStore } from "./sqlite-store";
 import { enqueueJob, MEDIA_CACHE_DIR } from "./classify";
-import { fileKvFor, DEFAULT_LOCAL_ROOT } from "./kv";
+import { fileKvFor } from "./kv";
+import { telegramRead } from "./telegram-read";
 
 export interface TelegramFile {
   file_id: string;
@@ -175,14 +176,14 @@ export function realDeps(): PollerDeps {
   const kv = fileKvFor();
   return {
     fetchUpdates: async (token, offset) => {
-      const r = await fetch(
+      const r = await telegramRead(
         `https://api.telegram.org/bot${token}/getUpdates?offset=${offset}&timeout=0` +
           `&allowed_updates=${encodeURIComponent('["channel_post","edited_channel_post"]')}`,
       );
       return r.json() as any;
     },
     getFile: async (token, fileId) => {
-      const r = await fetch(
+      const r = await telegramRead(
         `https://api.telegram.org/bot${token}/getFile?file_id=${encodeURIComponent(fileId)}`,
       );
       const data = (await r.json()) as any;
@@ -191,7 +192,7 @@ export function realDeps(): PollerDeps {
     },
     downloadPhoto: async (token, filePath, dest) => {
       mkdirSync(dirname(dest), { recursive: true });
-      const r = await fetch(`https://api.telegram.org/file/bot${token}/${filePath}`);
+      const r = await telegramRead(`https://api.telegram.org/file/bot${token}/${filePath}`);
       if (!r.ok) throw new Error(`photo download HTTP ${r.status}`);
       writeFileSync(dest, Buffer.from(await r.arrayBuffer()));
     },
