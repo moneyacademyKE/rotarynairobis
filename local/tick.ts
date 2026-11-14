@@ -27,6 +27,10 @@ export async function tick(dbPath = DEFAULT_DB_PATH, outDir = DEFAULT_OUT_DIR): 
   const at = new Date().toISOString();
   const store = openStore(dbPath);
   try {
+    const revision = () => JSON.stringify(store.db.query(
+      "SELECT (SELECT MAX(tx_id) FROM posts_facts) AS posts, (SELECT MAX(tx_id) FROM media_facts) AS media",
+    ).get());
+    const before = revision();
     const token = process.env.TELEGRAM_BOT_TOKEN;
 
     let poll: TickReport["poll"] = { skipped: true, polled: 0, newPosts: 0, newPhotos: 0 };
@@ -53,10 +57,9 @@ export async function tick(dbPath = DEFAULT_DB_PATH, outDir = DEFAULT_OUT_DIR): 
       }
     }
 
-    // Quiet tick: nothing polled, nothing classified → data unchanged →
-    // skip the rebuild. The 5-min cron becomes a single getUpdates call.
-    const quiet =
-      poll.polled === 0 && !poll.error && classify.done === 0 && classify.failed === 0 && !classify.error;
+    // A failed poll may have partially ingested data. Compare actual facts,
+    // not error flags, before deciding whether publication is necessary.
+    const quiet = before === revision();
     const build = quiet
       ? { skipped: true as const, published: [] as string[], failed: [] as { key: string; error: string }[], rowsWritten: 0 }
       : await buildGalleries(dbPath, outDir);
