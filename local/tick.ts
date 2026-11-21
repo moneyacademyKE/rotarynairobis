@@ -47,8 +47,10 @@ export async function tick(dbPath = DEFAULT_DB_PATH, outDir = DEFAULT_OUT_DIR): 
     const env: ClassifyEnv = {
       INFERSHUB_API_KEY: process.env.INFERSHUB_API_KEY,
       GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+      OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
     };
-    if (env.INFERSHUB_API_KEY || env.GEMINI_API_KEY) {
+    if (env.OPENROUTER_API_KEY || env.INFERSHUB_API_KEY || env.GEMINI_API_KEY) {
       try {
         const r = await drainJobs(store, env, MEDIA_CACHE_DIR);
         classify = { done: r.done, failed: r.failed, skipped: r.skipped };

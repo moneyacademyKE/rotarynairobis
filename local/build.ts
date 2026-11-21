@@ -16,6 +16,7 @@ import {
   type PublishReport,
 } from "../src/lib/gallery";
 import { openStore, DEFAULT_DB_PATH, DEFAULT_OUT_DIR } from "./sqlite-store";
+import { fileKvFor } from "./kv";
 
 const FILE_FOR: Record<string, string> = {
   "gallery:tiktok": "gallery-tiktok.json",
@@ -27,6 +28,9 @@ const FILE_FOR: Record<string, string> = {
 
 export async function buildGalleries(dbPath: string, outDir: string): Promise<PublishReport> {
   const store = openStore(dbPath);
+  // The server reads gallery keys from this same FileKV — writing here is what
+  // makes a rebuild actually serve (the generated/ files alone are orphaned).
+  const kv = fileKvFor();
   try {
     const { posts, media } = await loadFacts(store.env);
     const published: string[] = [];
@@ -37,7 +41,10 @@ export async function buildGalleries(dbPath: string, outDir: string): Promise<Pu
     for (const key of GALLERY_KEYS) {
       try {
         const rows = buildGallery(posts, media, key);
-        writeFileSync(join(outDir, FILE_FOR[key]), JSON.stringify(rows));
+        const json = JSON.stringify(rows);
+        writeFileSync(join(outDir, FILE_FOR[key]), json);
+        // No TTL: the built model is the truth until the next build overwrites it.
+        await kv.put(key, json);
         rowsWritten += rows.length;
         published.push(key);
       } catch (e: any) {
