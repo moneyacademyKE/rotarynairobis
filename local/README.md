@@ -30,7 +30,8 @@ the same five gallery read models through the *worker's own builder*
 | `parity.ts` | Diffs local JSON vs live KV values, classifies diffs |
 | `kv.ts` | FileKV: CF-KV-shaped cache (`get(key,"json")`, TTL, delete) |
 | `poller.ts` | Telegram getUpdates poller — the webhook POST handler ported |
-| `classify.ts` | classification_jobs drain → inferhub/Gemini → media_facts |
+| `classify.ts` | classification_jobs drain → OpenRouter Decisions / inferhub / Gemini → media_facts |
+| `smoke-openrouter.ts` | one-photo Decisions smoke test (shares production criteria) |
 | `platform.ts` | D1Stmt (with bind) + env assembly for the local server |
 | `server.ts` | Bun.serve: /photos bridge, static dist/, Qwik router |
 | `tick.ts` | One pipeline pass: poll → classify → build |
@@ -48,10 +49,13 @@ export CLOUDFLARE_EMAIL=...
 export CLOUDFLARE_API_KEY=...      # global key (read-only use here)
 export D1_DATABASE_ID=2353e3b0-47a4-4fad-bbdf-11d02e3037d6
 export RCNS_KV_NAMESPACE=f92d9b7c7de04b4eaa0fba93f36c95bb   # parity only
-export INFERSHUB_API_KEY=...       # classification main path
-export GEMINI_API_KEY=...          # classification fallback
+export INFERSHUB_API_KEY=...       # classification fallback #1 (main model disabled upstream)
+export GEMINI_API_KEY=...          # classification fallback #2 (placeholder — invalid)
+export OPENROUTER_API_KEY=...      # classification MAIN path (Decisions API)
 export TELEGRAM_BOT_TOKEN=...      # REQUIRED FOR CUTOVER (see below)
 # optional:
+export OPENROUTER_MODEL=...        # default perplexity/pplx-decider-v1.3:free
+export CLASSIFY_PACE_MS=...        # delay between classify calls (free-tier pacing)
 export RCNS_LOCAL_DB / RCNS_LOCAL_OUT / RCNS_LOCAL_ROOT / RCNS_LOCAL_PORT(=8788)
 ```
 
@@ -64,11 +68,38 @@ bun local/parity.ts      # compare vs live KV (benign window = OK)
 bun local/run.ts         # nightly mirror: skip-if-unchanged
 bun local/tick.ts        # poll → classify → build (the post-cutover cron shape)
 bun local/poller.ts      # one getUpdates pass (needs TELEGRAM_BOT_TOKEN)
-bun local/classify.ts    # drain classification jobs
+bun local/classify.ts    # drain classification jobs (CLASSIFY_PACE_MS=3200 to pace)
+bun local/smoke-openrouter.ts [photo]   # one-photo Decisions smoke test
 bun run build.local      # client + SSR bundle (dist/ + server/entry.local.js)
 bun run local:serve      # serve the site on :8788
 bun test local/          # the local test suite
 ```
+
+## Classifier: OpenRouter Decisions (recovered 2026-11-21)
+
+Classification had been **dead since Nov 14, 21:50** — galleries frozen while
+ingestion kept working. Two stacked failures (issue #25): the inferhub main
+model `ag/gemini-3.8-flash-high` is disabled upstream (403), and the Gemini
+fallback key was a 16-char placeholder (`API_KEY_INVALID`). 60 jobs failed.
+
+**Fix (PR #26):** the main path is now the **OpenRouter Decisions API** —
+`perplexity/pplx-decider-v1.3:free`, a System One decision model. It answers a
+typed `choice` question over the image at `POST /api/alpha/decisions` (NOT
+chat/completions — that 400s for decision models) and returns the winning
+category + calibrated confidence (0.95–0.997 on samples). Chain:
+**OpenRouter → inferhub → Gemini**.
+
+- Decision models emit **no text**, so the snippet is the human post caption
+  (`captionMap`), not an AI guess. `parseGeminiResponse` boundary unchanged.
+- Drain is **429-safe** (rate limits back off without failing the job) and
+  accepts `CLASSIFY_PACE_MS` for free-tier pacing.
+- Requeued + drained all 60 stuck photos: **done 20 → 80, failed 0**.
+  Galleries unfrozen (newest Nov 20–21). The `:free` tier handled 60 calls.
+- Also fixed the cache bridge: `build.ts` now writes gallery keys into the
+  same FileKV the server reads (the `generated/` files were orphaned).
+
+If inferhub's main model is re-enabled in the dashboard later, it remains
+fallback #1 automatically — no code change needed.
 
 ## Cutover: COMPLETED 2026-11-13 (17:00 UTC)
 
