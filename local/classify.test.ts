@@ -8,7 +8,7 @@ import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { SqliteStore } from "./sqlite-store";
-import { enqueueJob, drainJobs, type ClassifyDeps } from "./classify";
+import { enqueueJob, drainJobs, captionMap, type ClassifyDeps } from "./classify";
 
 let dir: string;
 let store: SqliteStore;
@@ -102,4 +102,51 @@ test("backoff delay keeps a job out of the next drain until due", async () => {
   // Immediately again: next_attempt_at is in the future → not considered.
   const report = await drainJobs(store, {}, cacheDir, failing);
   expect(report.considered).toBe(0);
+});
+
+test("captionMap maps a photo to its latest post caption", () => {
+  store.db
+    .prepare("INSERT INTO posts_facts (id, text, photos_json) VALUES (?, ?, ?)")
+    .run(1, "Old caption", JSON.stringify(["telegram_x.jpg"]));
+  store.db
+    .prepare("INSERT INTO posts_facts (id, text, photos_json) VALUES (?, ?, ?)")
+    .run(1, "New caption", JSON.stringify(["telegram_x.jpg", "telegram_y.jpg"]));
+  const map = captionMap(store);
+  expect(map.get("telegram_x.jpg")).toBe("New caption");
+  expect(map.get("telegram_y.jpg")).toBe("New caption");
+  expect(map.get("telegram_absent.jpg")).toBeUndefined();
+});
+
+test("drain passes the post caption as the snippet hint (decisions write no text)", async () => {
+  seedPhoto("telegram_hint.jpg");
+  store.db
+    .prepare("INSERT INTO posts_facts (id, text, photos_json) VALUES (?, ?, ?)")
+    .run(7, "Fellowship at the Serena", JSON.stringify(["telegram_hint.jpg"]));
+  enqueueJob(store, "telegram_hint.jpg");
+  let seenHint: string | undefined;
+  const deps: ClassifyDeps = {
+    classify: async (_b, _m, _e, hint) => {
+      seenHint = hint;
+      return JSON.stringify({ type: "PHOTO", snippet: hint ?? "generic" });
+    },
+  };
+  const report = await drainJobs(store, {}, cacheDir, deps);
+  expect(report.done).toBe(1);
+  expect(seenHint).toBe("Fellowship at the Serena");
+  const fact = store.db.prepare("SELECT snippet FROM media_facts WHERE file_name = 'telegram_hint.jpg'").get() as any;
+  expect(fact.snippet).toBe("Fellowship at the Serena");
+});
+
+test("a 429 rate limit leaves the job pending without burning an attempt", async () => {
+  seedPhoto("telegram_rl.jpg");
+  enqueueJob(store, "telegram_rl.jpg");
+  const rateLimited: ClassifyDeps = {
+    classify: async () => { throw Object.assign(new Error("openrouter decisions HTTP 429"), { status: 429 }); },
+  };
+  const report = await drainJobs(store, {}, cacheDir, rateLimited);
+  expect(report.failed).toBe(0);
+  const job = store.db.prepare("SELECT attempts, status, next_attempt_at FROM classification_jobs").get() as any;
+  expect(job.attempts).toBe(0);
+  expect(job.status).toBe("pending");
+  expect(job.next_attempt_at).not.toBeNull();
 });

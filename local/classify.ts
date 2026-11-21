@@ -21,6 +21,8 @@ export const MEDIA_CACHE_DIR = join(DEFAULT_LOCAL_ROOT, "media-cache");
 export interface ClassifyEnv {
   INFERSHUB_API_KEY?: string;
   GEMINI_API_KEY?: string;
+  OPENROUTER_API_KEY?: string;
+  OPENROUTER_MODEL?: string;
 }
 
 const JOBS_SCHEMA = `
@@ -59,7 +61,27 @@ export interface DrainReport {
 }
 
 export interface ClassifyDeps {
-  classify: (base64: string, mimeType: string, env: ClassifyEnv) => Promise<string>;
+  classify: (base64: string, mimeType: string, env: ClassifyEnv, snippetHint?: string) => Promise<string>;
+}
+
+/**
+ * fileName -> latest post caption. Decision models emit no text, so the
+ * snippet is the human-written post caption (better than an AI guess).
+ * Built once per drain; latest non-retracted post wins.
+ */
+export function captionMap(store: SqliteStore): Map<string, string> {
+  const rows = store.db
+    .prepare("SELECT text, photos_json FROM posts_facts WHERE is_retraction = 0 ORDER BY tx_id ASC")
+    .all() as Array<{ text: string | null; photos_json: string | null }>;
+  const map = new Map<string, string>();
+  for (const r of rows) {
+    if (!r.text) continue;
+    let photos: unknown;
+    try { photos = JSON.parse(r.photos_json ?? "[]"); } catch { continue; }
+    if (!Array.isArray(photos)) continue;
+    for (const p of photos) if (typeof p === "string") map.set(p, r.text);
+  }
+  return map;
 }
 
 /**
@@ -71,7 +93,8 @@ export async function drainJobs(
   store: SqliteStore,
   env: ClassifyEnv,
   mediaCacheDir: string = MEDIA_CACHE_DIR,
-  deps: ClassifyDeps = { classify: classifyImage },
+  deps: ClassifyDeps = { classify: (b, m, e, h) => classifyImage(b, m, e, undefined, h) },
+  opts: { paceMs?: number } = {},
 ): Promise<DrainReport> {
   ensureJobsTable(store);
   const at = new Date().toISOString();
@@ -84,6 +107,7 @@ export async function drainJobs(
     )
     .all(at) as Array<{ id: number; file_name: string; attempts: number }>;
 
+  const captions = captionMap(store);
   let done = 0;
   let failed = 0;
   let skipped = 0;
@@ -95,8 +119,9 @@ export async function drainJobs(
       continue;
     }
     try {
+      if (opts.paceMs) await new Promise((r) => setTimeout(r, opts.paceMs));
       const base64 = Buffer.from(readFileSync(path)).toString("base64");
-      const raw = await deps.classify(base64, "image/jpeg", env);
+      const raw = await deps.classify(base64, "image/jpeg", env, captions.get(job.file_name));
       const parsed = parseGeminiResponse(raw);
       // Same insert the queue consumer performs through the media view's
       // INSTEAD OF trigger: (file_name, type, snippet, raw_data), tx auto.
@@ -106,11 +131,20 @@ export async function drainJobs(
       store.db.prepare("UPDATE classification_jobs SET status = 'done' WHERE id = ?").run(job.id);
       done++;
     } catch (e: unknown) {
+      const message = String((e as Error)?.message ?? e).slice(0, 300);
+      // Rate limits are transient, not a bad image: don't burn an attempt or
+      // fail the job — back off longer and leave it pending for the next drain.
+      if ((e as { status?: number })?.status === 429) {
+        const retryAt = new Date(Date.now() + 60_000).toISOString();
+        store.db
+          .prepare("UPDATE classification_jobs SET next_attempt_at = ?, last_error = ? WHERE id = ?")
+          .run(retryAt, message, job.id);
+        continue;
+      }
       const attempts = job.attempts + 1;
       const status = attempts >= 3 ? "failed" : "pending";
       const backoffSec = Math.min(30 * 2 ** attempts, 300);
       const retryAt = new Date(Date.now() + backoffSec * 1000).toISOString();
-      const message = String((e as Error)?.message ?? e).slice(0, 300);
       store.db
         .prepare("UPDATE classification_jobs SET attempts = ?, status = ?, next_attempt_at = ?, last_error = ? WHERE id = ?")
         .run(attempts, status, retryAt, message, job.id);
@@ -125,14 +159,17 @@ if (import.meta.main) {
   const env: ClassifyEnv = {
     INFERSHUB_API_KEY: process.env.INFERSHUB_API_KEY,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+    OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
   };
-  if (!env.INFERSHUB_API_KEY && !env.GEMINI_API_KEY) {
-    console.error("[classify] no INFERSHUB_API_KEY / GEMINI_API_KEY in env");
+  if (!env.OPENROUTER_API_KEY && !env.INFERSHUB_API_KEY && !env.GEMINI_API_KEY) {
+    console.error("[classify] no OPENROUTER_API_KEY / INFERSHUB_API_KEY / GEMINI_API_KEY in env");
     process.exit(1);
   }
   const store = openStore(DEFAULT_DB_PATH);
   try {
-    console.log(`[classify] ${JSON.stringify(await drainJobs(store, env))}`);
+    const paceMs = Number(process.env.CLASSIFY_PACE_MS ?? 0) || 0;
+    console.log(`[classify] ${JSON.stringify(await drainJobs(store, env, undefined, undefined, { paceMs }))}`);
   } finally {
     store.close();
   }
