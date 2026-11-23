@@ -8,7 +8,7 @@ import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { SqliteStore } from "./sqlite-store";
-import { enqueueJob, drainJobs, captionMap, type ClassifyDeps } from "./classify";
+import { enqueueJob, drainJobs, captionMap, SLOW_RETRY_SEC, type ClassifyDeps } from "./classify";
 
 let dir: string;
 let store: SqliteStore;
@@ -70,7 +70,7 @@ test("drain skips a photo with no local bytes (no attempt burn)", async () => {
   expect(job.status).toBe("pending");
 });
 
-test("failures back off and the job fails after three attempts", async () => {
+test("failures back off, then park in a long cooldown without dying", async () => {
   seedPhoto("telegram_b.jpg");
   enqueueJob(store, "telegram_b.jpg");
   const failing: ClassifyDeps = { classify: async () => { calls.push("x"); throw new Error("boom"); } };
@@ -86,12 +86,53 @@ test("failures back off and the job fails after three attempts", async () => {
   due();
   await drainJobs(store, {}, cacheDir, failing); // attempt 2
   due();
-  await drainJobs(store, {}, cacheDir, failing); // attempt 3 → failed
-  job = store.db.prepare("SELECT attempts, status, last_error FROM classification_jobs").get() as any;
+  await drainJobs(store, {}, cacheDir, failing); // attempt 3 → slow lane
+  job = store.db.prepare("SELECT attempts, status, next_attempt_at, last_error FROM classification_jobs").get() as any;
   expect(job.attempts).toBe(3);
-  expect(job.status).toBe("failed");
+  expect(job.status).toBe("pending"); // not 'failed': still reachable
   expect(job.last_error).toContain("boom");
   expect(calls.length).toBe(3);
+
+  // The slow-lane cooldown is ~6h, not the 300s fast-retry ceiling.
+  const waitSec = (new Date(job.next_attempt_at).getTime() - Date.now()) / 1000;
+  expect(waitSec).toBeGreaterThan(5 * 3600);
+  expect(waitSec).toBeLessThanOrEqual(SLOW_RETRY_SEC + 60);
+});
+
+test("a photo stranded by the old terminal status is revived and classified", async () => {
+  seedPhoto("telegram_stranded.jpg");
+  enqueueJob(store, "telegram_stranded.jpg");
+  // The pre-fix shape: three burned attempts and a status nothing ever read again.
+  store.db
+    .prepare("UPDATE classification_jobs SET status = 'failed', attempts = 3 WHERE file_name = 'telegram_stranded.jpg'")
+    .run();
+
+  const report = await drainJobs(store, {}, cacheDir, okDeps);
+  expect(report.done).toBe(1);
+  const job = store.db.prepare("SELECT status FROM classification_jobs WHERE file_name = 'telegram_stranded.jpg'").get() as any;
+  expect(job.status).toBe("done");
+  const fact = store.db.prepare("SELECT type FROM media_facts WHERE file_name = 'telegram_stranded.jpg'").get() as any;
+  expect(fact.type).toBe("EVENT_POSTER");
+});
+
+test("a slow-lane job is retried once its cooldown expires", async () => {
+  seedPhoto("telegram_late.jpg");
+  enqueueJob(store, "telegram_late.jpg");
+  const flaky: ClassifyDeps = {
+    classify: async () => { calls.push("x"); throw new Error("provider blip"); },
+  };
+  for (let i = 0; i < 3; i++) {
+    store.db.prepare("UPDATE classification_jobs SET next_attempt_at = NULL").run();
+    await drainJobs(store, {}, cacheDir, flaky);
+  }
+  // Not due yet: the 6h cooldown holds it out of the next drain.
+  expect((await drainJobs(store, {}, cacheDir, flaky)).considered).toBe(0);
+
+  // Cooldown expires (operator clock, or simply a later day) and it heals.
+  store.db.prepare("UPDATE classification_jobs SET next_attempt_at = NULL").run();
+  const healed: ClassifyDeps = { classify: async () => JSON.stringify({ type: "PHOTO", snippet: "s" }) };
+  const report = await drainJobs(store, {}, cacheDir, healed);
+  expect(report.done).toBe(1);
 });
 
 test("backoff delay keeps a job out of the next drain until due", async () => {

@@ -84,8 +84,10 @@ export function renderReceipt(r: TickReport): string {
   if (r.classify.error) {
     lines.push(`🚫 classify: ${esc(r.classify.error)}`);
   } else if (r.classify.done > 0 || r.classify.failed > 0) {
-    const failed = r.classify.failed > 0 ? ` · failed ${r.classify.failed}` : "";
-    lines.push(`🏷 classified ${r.classify.done}${failed}`);
+    // "unclassified", not "failed": a job that errored stays pending and is
+    // retried after its cooldown, so nothing here has been lost.
+    const pending = r.classify.failed > 0 ? ` · unclassified ${r.classify.failed}` : "";
+    lines.push(`🏷 classified ${r.classify.done}${pending}`);
   }
 
   if (r.build.failed.length > 0) {

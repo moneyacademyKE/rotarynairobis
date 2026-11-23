@@ -63,12 +63,12 @@ describe("renderReceipt", () => {
     expect(html).toContain("new photos 4");
     expect(html).toContain("classified 4");
     expect(html).toContain("galleries 2 · rows 87");
-    expect(html).not.toContain("failed");
+    expect(html).not.toContain("unclassified");
   });
 
-  it("reports classify failures beside successes", () => {
+  it("counts errored classify jobs as unclassified, never lost", () => {
     const html = renderReceipt(report({ classify: { done: 1, failed: 2, skipped: 0 } }));
-    expect(html).toContain("classified 1 · failed 2");
+    expect(html).toContain("classified 1 · unclassified 2");
   });
 
   it("reports a poll error instead of pretending the tick was clean", () => {
