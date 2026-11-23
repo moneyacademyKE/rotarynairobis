@@ -35,7 +35,9 @@ the same five gallery read models through the *worker's own builder*
 | `platform.ts` | D1Stmt (with bind) + env assembly for the local server |
 | `server.ts` | Bun.serve: /photos bridge, static dist/, Qwik router |
 | `tick.ts` | One pipeline pass: poll → classify → build |
-| `local.test.ts`, `poller.test.ts`, `classify.test.ts` | `bun test local/` |
+| `poll-receipt.ts` | tick + receipt straight to the Bot API — the LLM-free cron shape |
+| `poll-receipt.sh` | Launcher (cron `trigger_cmd`): env, bot token, log rotation |
+| `local.test.ts`, `poller.test.ts`, `classify.test.ts`, `poll-receipt.test.ts` | `bun test local/` |
 
 `src/entry.local.tsx` (in src/, built by `vite build --ssr`) is the local
 SSR entry: the Bun middleware router replica with `platform.env` injected
@@ -66,7 +68,8 @@ bun local/mirror.ts      # full export / incremental (idempotent)
 bun local/build.ts       # rebuild the five gallery JSONs
 bun local/parity.ts      # compare vs live KV (benign window = OK)
 bun local/run.ts         # nightly mirror: skip-if-unchanged
-bun local/tick.ts        # poll → classify → build (the post-cutover cron shape)
+bun local/tick.ts        # poll → classify → build (library entry)
+bash local/poll-receipt.sh   # the cron shape: tick + receipt, no LLM involved
 bun local/poller.ts      # one getUpdates pass (needs TELEGRAM_BOT_TOKEN)
 bun local/classify.ts    # drain classification jobs (CLASSIFY_PACE_MS=3200 to pace)
 bun local/smoke-openrouter.ts [photo]   # one-photo Decisions smoke test
@@ -101,6 +104,50 @@ category + calibrated confidence (0.95–0.997 on samples). Chain:
 If inferhub's main model is re-enabled in the dashboard later, it remains
 fallback #1 automatically — no code change needed.
 
+## Ingestion invariant: content flow never depends on a model provider (2026-11-23)
+
+**The rule:** the poll → classify → build chain runs in plain `bun`, on the
+scheduler's `trigger_cmd`, and posts its own receipt through the Bot API. No
+LLM session may sit between Telegram and the database. Classification is the
+one step that wants a model, and it is a *queue*: if every provider is down,
+jobs stay `pending`, retry after their cooldown, and ingestion keeps running.
+
+Why the rule exists: `rcns-local-poll` used to run *inside* an agent turn. On
+2026-11-23 09:15 UTC every provider in the fallback chain returned 503, the
+cron session died before its first tool call, and **Telegram ingestion stopped
+with it for ~6 hours** — a narration failure had become a data failure.
+
+Shape of the runner:
+
+| Stream | Carries | Consumed by |
+|---|---|---|
+| stderr | every tick line, receipt posted/failed | `logs/poll-receipt.log` (rotates at 512 KB) |
+| stdout | escalation text **only** | the cron trigger — non-empty is what wakes an agent |
+
+- `renderReceipt` returns `""` when nothing moved, so "nothing to report" and
+  "report nothing" are one fact. A quiet tick prints nothing to stdout: **zero
+  tokens, no agent woken.**
+- Escalation path: if the direct Bot API send fails, the receipt text goes to
+  stdout so the cron agent can post it — degraded, not silent. The agent's
+  prompt is a one-message relay with an explicit "never re-run the tick".
+- Secrets: the site token and classifier keys come from the 600-perm
+  `.env.sh`; the receipt token is read from `keys.toml` at run time by the
+  launcher. Nothing here echoes a value, and no key lives in this repo.
+- Cron wiring (`cron_manage`, job `rcns-local-poll`, */5 UTC):
+  `trigger_cmd = bash /Users/moe/src/rotarynairobis/local/poll-receipt.sh`,
+  `trigger_on = non_empty`, `deliver_to = telegram:-1004427473737:6322`.
+
+**Known limit, stated not hidden:** a bot never receives its own `sendMessage`,
+so receipts posted this way are absent from OpenCrabs' channel log —
+`channel_search` will not show them. Proof of delivery is the
+`[receipt] posted: …` line in `logs/poll-receipt.log`.
+
+Related, same theme: classification jobs no longer terminate. Three failed
+attempts used to set status `failed`, which nothing ever read again, stranding
+a photo forever on one transient blip (#28). Now: short backoff, then a 6 h
+cooldown, always `pending`, with legacy `failed` rows revived on startup — and
+the receipt says `unclassified N`, never `failed N`.
+
 ## Cutover: COMPLETED 2026-11-13 (17:00 UTC)
 
 The flip ran end-to-end on the owner's token:
@@ -114,8 +161,13 @@ The flip ran end-to-end on the owner's token:
 5. Local server verified live on :8788 incl. cold photo via bot token.
 
 Post-flip hardening (PR #21): `pollOnce` self-heals a re-armed webhook
-(409 → deleteWebhook → retry) — guards against the CF worker's
-`/api/telegram` self-heal re-registering it. Quiet ticks skip the rebuild.
+(409 → deleteWebhook → retry). Quiet ticks skip the rebuild.
+
+The CF worker's `/api/telegram` GET used to re-register the webhook to
+whatever origin served it, unauthenticated — the hazard PR #21 defended
+against. PR #30 removed the mutation: that handler now only reports
+alignment, behind the secret Telegram posts with. The poller remains the
+only thing that re-arms a webhook, and it does so by deleting it.
 
 **State now:** D1 is the cold archive (nightly mirror reports
 `skipped: true` forever — that's the freeze proof). The CF worker serves
