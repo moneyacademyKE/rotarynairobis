@@ -39,8 +39,18 @@ CREATE INDEX IF NOT EXISTS idx_jobs_pending
     ON classification_jobs(status, next_attempt_at);
 `;
 
+/** Fast retries before a job drops to the slow lane, and the slow-lane gap. */
+export const FAST_RETRY_LIMIT = 3;
+export const SLOW_RETRY_SEC = 6 * 3600;
+
 export function ensureJobsTable(store: SqliteStore): void {
   store.db.exec(JOBS_SCHEMA);
+  // One-time revival of legacy terminal rows. 'failed' used to strand a photo
+  // forever when a transient provider blip burned all three attempts (job 103,
+  // 2026-11-23: one OpenRouter hiccup, its neighbours all succeeded). Nothing
+  // writes that status any more, so every job stays reachable and a photo
+  // never waits for an operator to notice it.
+  store.db.exec("UPDATE classification_jobs SET status = 'pending' WHERE status = 'failed'");
 }
 
 /** Idempotent enqueue (UNIQUE file_name): returns job id, or null when already queued/done. */
@@ -56,6 +66,8 @@ export interface DrainReport {
   at: string;
   considered: number;
   done: number;
+  /** Jobs that errored on this drain. Still pending: each retries after its
+      cooldown, so this counts "not classified yet", never "lost". */
   failed: number;
   skipped: number;
 }
@@ -102,7 +114,6 @@ export async function drainJobs(
     .prepare(
       `SELECT * FROM classification_jobs
        WHERE status = 'pending' AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
-         AND attempts < 3
        ORDER BY id`,
     )
     .all(at) as Array<{ id: number; file_name: string; attempts: number }>;
@@ -142,13 +153,16 @@ export async function drainJobs(
         continue;
       }
       const attempts = job.attempts + 1;
-      const status = attempts >= 3 ? "failed" : "pending";
-      const backoffSec = Math.min(30 * 2 ** attempts, 300);
+      // Short backoff while the fast retries last; after that a long cooldown.
+      // Either way the job stays 'pending', so nothing is ever stranded: the
+      // next due drain picks it up again without an operator requeueing it.
+      const backoffSec =
+        attempts >= FAST_RETRY_LIMIT ? SLOW_RETRY_SEC : Math.min(30 * 2 ** attempts, 300);
       const retryAt = new Date(Date.now() + backoffSec * 1000).toISOString();
       store.db
-        .prepare("UPDATE classification_jobs SET attempts = ?, status = ?, next_attempt_at = ?, last_error = ? WHERE id = ?")
-        .run(attempts, status, retryAt, message, job.id);
-      if (status === "failed") failed++;
+        .prepare("UPDATE classification_jobs SET attempts = ?, status = 'pending', next_attempt_at = ?, last_error = ? WHERE id = ?")
+        .run(attempts, retryAt, message, job.id);
+      failed++;
     }
   }
 
