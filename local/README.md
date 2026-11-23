@@ -115,7 +115,8 @@ jobs stay `pending`, retry after their cooldown, and ingestion keeps running.
 Why the rule exists: `rcns-local-poll` used to run *inside* an agent turn. On
 2026-11-23 09:15 UTC every provider in the fallback chain returned 503, the
 cron session died before its first tool call, and **Telegram ingestion stopped
-with it for ~6 hours** — a narration failure had become a data failure.
+with it for nearly 7 hours** (09:15 → 16:13 UTC) — a narration failure had
+become a data failure.
 
 Shape of the runner:
 
