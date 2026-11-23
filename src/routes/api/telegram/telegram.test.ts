@@ -157,24 +157,70 @@ describe("Telegram Webhook Ingestion (TDD Green)", () => {
     expect(insert![1][0]).toBe(3001); // stored under its own message_id, NOT the parent's 2045
   });
 
-  it("should fail gracefully if TELEGRAM_BOT_TOKEN is missing in environment", async () => {
+  it("fails closed on a missing secret before reporting a missing bot token", async () => {
     const jsonMock = vi.fn();
     const badPlatform = { env: { DB: mockPlatform.env.DB } };
     const request = new Request("http://localhost/api/telegram");
 
     const { onGet } = await import("./index");
     await onGet({ request, platform: badPlatform, json: jsonMock } as any);
+    expect(jsonMock).toHaveBeenCalledWith(500, expect.objectContaining({ error: "TELEGRAM_SECRET_TOKEN not configured" }));
+  });
+
+  it("reports a missing TELEGRAM_BOT_TOKEN once the caller is authenticated", async () => {
+    const jsonMock = vi.fn();
+    const badPlatform = { env: { TELEGRAM_SECRET_TOKEN: "secret123", DB: mockPlatform.env.DB } };
+    const request = new Request("http://localhost/api/telegram", {
+      headers: { "X-Telegram-Bot-Api-Secret-Token": "secret123" },
+    });
+
+    const { onGet } = await import("./index");
+    await onGet({ request, platform: badPlatform, json: jsonMock } as any);
     expect(jsonMock).toHaveBeenCalledWith(500, expect.objectContaining({ error: expect.stringContaining("TELEGRAM_BOT_TOKEN") }));
   });
 
-  describe("onGet - Self Healing & Diagnostics", () => {
+  describe("onGet - Webhook Diagnostics (read-only)", () => {
     const originalFetch = globalThis.fetch;
 
     afterEach(() => {
       globalThis.fetch = originalFetch;
     });
 
-    it("should return healthy status if webhook URL is already aligned", async () => {
+    const authedRequest = () =>
+      new Request("http://localhost/api/telegram", {
+        headers: { "X-Telegram-Bot-Api-Secret-Token": "secret123" },
+      });
+
+    it("refuses an unauthenticated GET before touching the Bot API", async () => {
+      const jsonMock = vi.fn();
+      const fetchSpy = vi.fn();
+      globalThis.fetch = fetchSpy as any;
+      const platform = { env: { TELEGRAM_BOT_TOKEN: "token123", TELEGRAM_SECRET_TOKEN: "secret123" } };
+
+      const { onGet } = await import("./index");
+      await onGet({ request: new Request("http://localhost/api/telegram"), platform, json: jsonMock } as any);
+
+      expect(jsonMock).toHaveBeenCalledWith(401, expect.objectContaining({ error: "Unauthorized" }));
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it("refuses a wrong secret the same way", async () => {
+      const jsonMock = vi.fn();
+      const fetchSpy = vi.fn();
+      globalThis.fetch = fetchSpy as any;
+      const platform = { env: { TELEGRAM_BOT_TOKEN: "token123", TELEGRAM_SECRET_TOKEN: "secret123" } };
+      const request = new Request("http://localhost/api/telegram", {
+        headers: { "X-Telegram-Bot-Api-Secret-Token": "guess" },
+      });
+
+      const { onGet } = await import("./index");
+      await onGet({ request, platform, json: jsonMock } as any);
+
+      expect(jsonMock).toHaveBeenCalledWith(401, expect.objectContaining({ error: "Unauthorized" }));
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it("returns healthy status and alignment when the webhook is already aligned", async () => {
       const jsonMock = vi.fn();
       const mockDB = {
         prepare: vi.fn().mockReturnValue({
@@ -188,7 +234,7 @@ describe("Telegram Webhook Ingestion (TDD Green)", () => {
           DB: mockDB,
         },
       };
-      const request = new Request("http://localhost/api/telegram");
+      const request = authedRequest();
 
       globalThis.fetch = vi.fn().mockResolvedValue({
         json: async () => ({
@@ -204,13 +250,13 @@ describe("Telegram Webhook Ingestion (TDD Green)", () => {
         200,
         expect.objectContaining({
           status: "Healthy",
-          heal_status: "Webhook is perfectly aligned. No action needed.",
+          webhook_alignment: "aligned",
           database_facts_count: 42,
         })
       );
     });
 
-    it("should fail with 500 if webhook is not aligned but TELEGRAM_SECRET_TOKEN is missing", async () => {
+    it("fails with 500 when TELEGRAM_SECRET_TOKEN is not configured", async () => {
       const jsonMock = vi.fn();
       const platform = {
         env: {
@@ -236,7 +282,7 @@ describe("Telegram Webhook Ingestion (TDD Green)", () => {
       );
     });
 
-    it("should trigger webhook self-healing if URL is not aligned and secret is provided", async () => {
+    it("reports a mismatch without re-arming the webhook", async () => {
       const jsonMock = vi.fn();
       const mockDB = {
         prepare: vi.fn().mockReturnValue({
@@ -250,35 +296,32 @@ describe("Telegram Webhook Ingestion (TDD Green)", () => {
           DB: mockDB,
         },
       };
-      const request = new Request("http://localhost/api/telegram");
+      const urls: string[] = [];
 
       globalThis.fetch = vi.fn().mockImplementation((url: string) => {
-        if (url.includes("getWebhookInfo")) {
-          return Promise.resolve({
-            json: async () => ({
-              ok: true,
-              result: { url: "http://wrong-url/api/telegram" },
-            }),
-          } as Response);
-        }
-        if (url.includes("setWebhook")) {
-          return Promise.resolve({
-            json: async () => ({ ok: true }),
-          } as Response);
-        }
-        return Promise.resolve({ ok: false } as Response);
+        urls.push(url);
+        return Promise.resolve({
+          json: async () => ({
+            ok: true,
+            result: { url: "https://someone-else.example/api/telegram" },
+          }),
+        } as Response);
       });
 
       const { onGet } = await import("./index");
-      await onGet({ request, platform, json: jsonMock } as any);
+      await onGet({ request: authedRequest(), platform, json: jsonMock } as any);
 
       expect(jsonMock).toHaveBeenCalledWith(
         200,
         expect.objectContaining({
           status: "Healthy",
-          heal_status: expect.stringContaining("Successfully healed!"),
+          webhook_alignment: "not-aligned",
         })
       );
+      // The hazard this change removes: a GET must never call setWebhook, and
+      // never point the webhook at whatever origin served the request.
+      expect(urls.some((u) => u.includes("setWebhook"))).toBe(false);
+      expect(urls.every((u) => u.includes("getWebhookInfo"))).toBe(true);
     });
   });
 

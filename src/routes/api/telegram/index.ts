@@ -2,55 +2,54 @@ import type { RequestHandler } from "@builder.io/qwik-city";
 import { getFile, getDownloadUrl } from "../../../lib/telegram";
 
 /**
- * Self-Healing Webhook & Diagnostics Endpoint
- * Resolves ingestion staleness by inspecting Telegram's Bot API and 
- * automatically aligning the webhook to the worker's current active origin.
+ * Read-only Webhook Diagnostics.
+ *
+ * This handler USED to heal: on a URL mismatch it called `setWebhook` with the
+ * request's own origin, unauthenticated. The dormant worker is still reachable
+ * at its workers.dev URL, so any stray GET — a monitor, a scanner, a curious
+ * passer-by — could flip ingestion off the local poller and onto Cloudflare,
+ * where nothing consumes it (audit 2026-11-21, finding 2). A GET that mutates
+ * the ingestion path is the hazard; deleting the mutation is the fix, and the
+ * local poller already resolves a real conflict by deleting the webhook (409
+ * path in local/poller.ts).
+ *
+ * Diagnostics remain, behind the same secret Telegram itself posts with: fail
+ * closed if the secret is unconfigured, 401 on a mismatch.
  */
 export const onGet: RequestHandler = async ({ request, platform, json }) => {
   const env = platform.env as any;
-  const botToken = env.TELEGRAM_BOT_TOKEN;
 
+  if (!env.TELEGRAM_SECRET_TOKEN) {
+    json(500, { error: "TELEGRAM_SECRET_TOKEN not configured" });
+    return;
+  }
+  const secretToken = request.headers.get("X-Telegram-Bot-Api-Secret-Token");
+  if (secretToken !== env.TELEGRAM_SECRET_TOKEN) {
+    json(401, { error: "Unauthorized" });
+    return;
+  }
+
+  const botToken = env.TELEGRAM_BOT_TOKEN;
   if (!botToken) {
     json(500, { error: "TELEGRAM_BOT_TOKEN is not configured in environment bindings" });
     return;
   }
 
   const requestUrl = new URL(request.url);
-  const targetWebhookUrl = `${requestUrl.origin}/api/telegram`;
+  const expectedWebhookUrl = `${requestUrl.origin}/api/telegram`;
 
   // Fetch current webhook info from Telegram
   const infoRes = await fetch(`https://api.telegram.org/bot${botToken}/getWebhookInfo`);
   const info = await infoRes.json() as any;
 
-  let healStatus = "Webhook is perfectly aligned. No action needed.";
-
-  if (info.ok && info.result.url !== targetWebhookUrl) {
-    if (!env.TELEGRAM_SECRET_TOKEN) {
-      json(500, { error: "TELEGRAM_SECRET_TOKEN not configured" });
-      return;
-    }
-    const secretToken = env.TELEGRAM_SECRET_TOKEN;
-    const setRes = await fetch(
-      `https://api.telegram.org/bot${botToken}/setWebhook`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url: targetWebhookUrl,
-          secret_token: secretToken,
-          allowed_updates: ["channel_post", "edited_channel_post"]
-        })
-      }
-    );
-    const setInfo = await setRes.json() as any;
-    healStatus = setInfo.ok 
-      ? `Successfully healed! Updated webhook URL to: ${targetWebhookUrl}` 
-      : `Failed to update webhook: ${setInfo.description}`;
-  }
+  // Reporting a mismatch is useful; acting on it belongs to an operator or to
+  // the poller, which owns the webhook while the site runs locally.
+  const alignment = info.ok && info.result.url === expectedWebhookUrl
+    ? "aligned"
+    : "not-aligned";
 
   // Diagnostics count is KV-cached (1h TTL): every uncached hit scans the
-  // whole raw-facts table, and this endpoint is unauthenticated — monitors
-  // and passers-by alike can hammer it.
+  // whole raw-facts table.
   let databaseFactsCount: number | null = null;
   const cachedCount = await env.CACHE?.get("telegram_raw_facts_count");
   if (cachedCount !== null && cachedCount !== undefined) {
@@ -62,9 +61,9 @@ export const onGet: RequestHandler = async ({ request, platform, json }) => {
 
   json(200, {
     status: "Healthy",
-    target_webhook_url: targetWebhookUrl,
+    webhook_alignment: alignment,
+    expected_webhook_url: expectedWebhookUrl,
     telegram_webhook_info: info.result,
-    heal_status: healStatus,
     database_facts_count: databaseFactsCount
   });
 };
