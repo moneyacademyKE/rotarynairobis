@@ -223,7 +223,8 @@ cd ~/src/rotarynairobis && source ~/.opencrabs/projects/rotary-local/.env.sh && 
   class as the 2026-11-12 parity gate.
 - Local server: all 9 routes 200 (2-70ms), static assets served, `/api/sync`
   serves local facts, `/api/publish` fails closed, `/api/telegram` inert
-  (no token in route env — self-heal can never repoint the real webhook).
+  (no token in route env — the worker's self-heal could never repoint the real
+  webhook from here; that whole mutation is gone as of #29).
 - Tests: 24/24 bun local (self-heal + quiet-tick pins); repo suite + tsc clean at each commit.
 
 ## Verified (2026-11-13, the flip)
