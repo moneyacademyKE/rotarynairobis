@@ -2,7 +2,7 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { parseD1PostRows } from "../../domain/specs";
 import { GalleryGrid } from "../../components/GalleryGrid";
-import { parseEventDate } from "../../lib/twitter-parser";
+import { dateFromSnippet, parseEventDate } from "../../lib/twitter-parser";
 import { getGallery } from "../../lib/gallery";
 
 export const useTikTokData = routeLoader$(async ({ platform }) => {
@@ -18,7 +18,9 @@ export default component$(() => {
 
   const items = posts.value.map((post, index) => {
     const text = post.text || post.snippet || "";
-    const parsedDate = parseEventDate(text, post.created_at || undefined);
+    // The classifier's sentence carries the date it read off the poster. The
+    // caption is social copy and names other days, so it only fills the gap.
+    const parsedDate = dateFromSnippet(post.snippet, post.text) ?? parseEventDate(text, post.created_at || undefined);
 
     let isUpcoming = false;
     if (parsedDate) {
