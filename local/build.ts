@@ -16,7 +16,7 @@ import {
   type PublishReport,
 } from "../src/lib/gallery";
 import { openStore, DEFAULT_DB_PATH, DEFAULT_OUT_DIR } from "./sqlite-store";
-import { fileKvFor } from "./kv";
+import { FileKV } from "./kv";
 
 const FILE_FOR: Record<string, string> = {
   "gallery:tiktok": "gallery-tiktok.json",
@@ -26,11 +26,17 @@ const FILE_FOR: Record<string, string> = {
   "gallery:events": "gallery-events.json",
 };
 
-export async function buildGalleries(dbPath: string, outDir: string): Promise<PublishReport> {
+export async function buildGalleries(
+  dbPath: string,
+  outDir: string,
+  kvDir: string = join(outDir, "..", "kv"),
+): Promise<PublishReport> {
   const store = openStore(dbPath);
   // The server reads gallery keys from this same FileKV — writing here is what
   // makes a rebuild actually serve (the generated/ files alone are orphaned).
-  const kv = fileKvFor();
+  // The dir is the caller's, never a hardcoded live root: a test that passes
+  // a temp outDir must not be able to name the production cache.
+  const kv = new FileKV(kvDir);
   try {
     const { posts, media } = await loadFacts(store.env);
     const published: string[] = [];

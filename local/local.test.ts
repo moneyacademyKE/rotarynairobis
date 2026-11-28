@@ -4,10 +4,11 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { openStore, type SqliteStore, type FactRow } from "./sqlite-store";
+import { DEFAULT_LOCAL_ROOT } from "./kv";
 import { mirror, needsSync } from "./mirror";
 import { buildGalleries } from "./build";
 import { tick } from "./tick";
@@ -107,6 +108,20 @@ describe("buildGalleries (integration with the worker's own builder)", () => {
     expect(insta).toEqual([
       expect.objectContaining({ id: 11, photo_src: "telegram_b.jpg" }),
     ]);
+    // The cache the server reads sits beside the output dir, never at the
+    // live root. A temp build that can name production is how the site got
+    // overwritten with this very fixture.
+    const cache = JSON.parse(readFileSync(join(dir, "kv", encodeURIComponent("gallery:tiktok") + ".json"), "utf8"));
+    expect(JSON.parse(cache.v)[0].file_name).toBe("telegram_a.jpg");
+  });
+
+  it("never writes the live gallery cache", async () => {
+    const live = join(DEFAULT_LOCAL_ROOT, "kv", encodeURIComponent("gallery:tiktok") + ".json");
+    const before = statSync(live).mtimeMs;
+    const bytes = readFileSync(live);
+    await buildGalleries(join(dir, "test.sqlite"), join(dir, "generated"));
+    expect(statSync(live).mtimeMs).toBe(before);
+    expect(readFileSync(live).equals(bytes)).toBe(true);
   });
 });
 
