@@ -4,11 +4,11 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { openStore, type SqliteStore, type FactRow } from "./sqlite-store";
-import { DEFAULT_LOCAL_ROOT } from "./kv";
+import { DEFAULT_LOCAL_ROOT, fileKvFor, liveStateArms } from "./kv";
 import { mirror, needsSync } from "./mirror";
 import { buildGalleries } from "./build";
 import { tick } from "./tick";
@@ -159,6 +159,63 @@ describe("mirror", () => {
     store.insertFacts("posts_facts", [post(1, "a", [], 5)]);
     expect(await needsSync(store, mockRemote([], { posts: 5, media: 0 }))).toBe(false);
     expect(await needsSync(store, mockRemote([], { posts: 6, media: 0 }))).toBe(true);
+  });
+});
+
+describe("live-state guard (the #33 invariant: tests may never write the served root)", () => {
+  /** Set env vars for one check, restoring whatever was there after. */
+  const withEnv = async (env: Record<string, string | undefined>, fn: () => void | Promise<void>) => {
+    const saved: Record<string, string | undefined> = {};
+    for (const k of Object.keys(env)) saved[k] = process.env[k];
+    for (const [k, v] of Object.entries(env)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+    try {
+      await fn();
+    } finally {
+      for (const [k, v] of Object.entries(saved)) {
+        if (v === undefined) delete process.env[k];
+        else process.env[k] = v;
+      }
+    }
+  };
+
+  it("fileKvFor refuses an armed root under bun test, and the live default too", async () => {
+    // The exact 2026-11-28 setup: env sourced (RCNS_LIVE_STATE=1), marker
+    // present — and the guard still refuses, because a test is a test.
+    const armedRoot = join(dir, "armed");
+    mkdirSync(armedRoot, { recursive: true });
+    writeFileSync(join(armedRoot, "live-state.marker"), "probe");
+    await withEnv({ RCNS_LIVE_STATE: "1", NODE_ENV: "test" }, () => {
+      expect(() => fileKvFor(armedRoot)).toThrow("tests may never write");
+      expect(() => fileKvFor()).toThrow("tests may never write");
+      expect(liveStateArms(armedRoot).testMode).toBe(true);
+    });
+  });
+
+  it("fileKvFor fails closed outside test mode without both arms", async () => {
+    const unarmed = join(dir, "no-marker");
+    // env armed, marker missing
+    await withEnv({ RCNS_LIVE_STATE: "1", NODE_ENV: "production" }, () => {
+      expect(() => fileKvFor(unarmed)).toThrow("refusing live KV");
+    });
+    // marker is irrelevant when the env is not armed
+    await withEnv({ RCNS_LIVE_STATE: undefined, NODE_ENV: "production" }, () => {
+      expect(() => fileKvFor(unarmed)).toThrow("refusing live KV");
+    });
+  });
+
+  it("an armed, marked, non-test root still serves (the production path)", async () => {
+    const armedRoot = join(dir, "armed-serve");
+    mkdirSync(armedRoot, { recursive: true });
+    writeFileSync(join(armedRoot, "live-state.marker"), "probe");
+    await withEnv({ RCNS_LIVE_STATE: "1", NODE_ENV: "production" }, async () => {
+      const kv = fileKvFor(armedRoot);
+      await kv.put("guard:probe", "ok");
+      expect(await kv.get("guard:probe")).toBe("ok");
+      expect(liveStateArms(armedRoot)).toEqual({ envArmed: true, markerArmed: true, testMode: false });
+    });
   });
 });
 
