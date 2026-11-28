@@ -59,6 +59,7 @@ export TELEGRAM_BOT_TOKEN=...      # REQUIRED FOR CUTOVER (see below)
 export OPENROUTER_MODEL=...        # default perplexity/pplx-decider-v1.3:free
 export CLASSIFY_PACE_MS=...        # delay between classify calls (free-tier pacing)
 export RCNS_LOCAL_DB / RCNS_LOCAL_OUT / RCNS_LOCAL_ROOT / RCNS_LOCAL_PORT(=8788)
+export RCNS_LIVE_STATE=1           # REQUIRED to write the live KV — see "Live-state isolation"
 ```
 
 ## Commands
@@ -149,6 +150,35 @@ a photo forever on one transient blip (#28). Now: short backoff, then a 6 h
 cooldown, always `pending`, with legacy `failed` rows revived on startup — and
 the receipt says `unclassified N`, never `failed N`.
 
+## Live-state isolation: tests may never write the served root (2026-11-28)
+
+**The rule:** the FileKV the local server serves is production state. A handle
+to it is handed out only by `fileKvFor()` (`local/kv.ts`), and only to a
+process that armed live state deliberately:
+
+1. `RCNS_LIVE_STATE=1` in the 600-perm `.env.sh` — both launch paths
+   (`run-server.sh`, `poll-receipt.sh`) source it, so armed is the default
+   *in production*;
+2. a `live-state.marker` file in the state root — a fresh machine that never
+   ran the runbook cannot be armed by a stray env var;
+3. `NODE_ENV` is not `test` — `bun test` sets it, so a test run with `.env.sh`
+   fully sourced is still refused. This is not hypothetical: #31 was exactly
+   that, a test whose KV writes landed on the served root and replaced all
+   five galleries with fixture rows.
+
+PR #32 fixed the one caller; #33 closed the class at the factory — every
+live-cache writer (the launchd server's `openLocalStack`, the cron poller's
+`realDeps`) flows through `fileKvFor()`, which now throws before a single
+byte moves (it cannot even create the live directory). Callers that want a
+scratch KV construct `FileKV(dir)` directly on a temp dir — same as the tests.
+
+Arm a fresh machine (runbook step, once):
+
+```sh
+printf 'export RCNS_LIVE_STATE=1\n' >> ~/.opencrabs/projects/rotary-local/.env.sh
+printf 'armed <date> <who>\n' > ~/.opencrabs/projects/rotary-local/live-state.marker
+```
+
 ## Cutover: COMPLETED 2026-11-13 (17:00 UTC)
 
 The flip ran end-to-end on the owner's token:
@@ -179,6 +209,9 @@ its last-published KV state at `rotarynairobis.iamkingori.workers.dev`
 Runbook for a fresh machine / restart:
 
 ```sh
+# arm live writes once per machine (see "Live-state isolation"):
+printf 'export RCNS_LIVE_STATE=1\n' >> ~/.opencrabs/projects/rotary-local/.env.sh
+printf 'armed %s\n' "$(date -u +%FT%TZ)" > ~/.opencrabs/projects/rotary-local/live-state.marker
 # poller + classifier + builder (the cron does this every 5 min):
 cd ~/src/rotarynairobis && source ~/.opencrabs/projects/rotary-local/.env.sh && bun local/tick.ts
 # site: launchd manages it now (see Public serving); manual: bun run build.local && bun run local:serve
