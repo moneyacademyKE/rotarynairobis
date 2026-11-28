@@ -24,8 +24,8 @@ export const usePosts = routeLoader$(async ({ platform }) => {
   return uniquePosts;
 });
 
-import { cleanPostText, parseEventDate, formatExtractedDate, reformatEventText, extractVenue } from "../../lib/twitter-parser";
-export { cleanPostText, parseEventDate, formatExtractedDate, reformatEventText, extractVenue };
+import { cleanPostText, dateFromSnippet, parseEventDate, formatExtractedDate, reformatEventText, extractVenue } from "../../lib/twitter-parser";
+export { cleanPostText, dateFromSnippet, parseEventDate, formatExtractedDate, reformatEventText, extractVenue };
 
 
 export default component$(() => {
@@ -43,7 +43,7 @@ export default component$(() => {
 
   posts.value.forEach((post, index) => {
     const text = post.text || post.snippet || "";
-    const parsedDate = parseEventDate(text, post.created_at || undefined);
+    const parsedDate = dateFromSnippet(post.snippet, post.text) ?? parseEventDate(text, post.created_at || undefined);
     
     if (parsedDate) {
       if (parsedDate >= today) {
@@ -92,7 +92,7 @@ export default component$(() => {
             ) : (
               upcoming.map((post) => {
                 const targetText = post.text || post.snippet || "";
-                const eventDate = parseEventDate(targetText, post.created_at || undefined);
+                const eventDate = dateFromSnippet(post.snippet, post.text) ?? parseEventDate(targetText, post.created_at || undefined);
                 const displayDate = formatExtractedDate(eventDate);
                 const formattedContent = reformatEventText(targetText, post.account || "", post.created_at || undefined, post.snippet || undefined);
                 const cleanedTarget = cleanPostText(targetText);
@@ -146,7 +146,7 @@ export default component$(() => {
             ) : (
               previous.map((post) => {
                 const targetText = post.text || post.snippet || "";
-                const eventDate = parseEventDate(targetText, post.created_at || undefined);
+                const eventDate = dateFromSnippet(post.snippet, post.text) ?? parseEventDate(targetText, post.created_at || undefined);
                 const displayDate = formatExtractedDate(eventDate);
                 const formattedContent = reformatEventText(targetText, post.account || "", post.created_at || undefined, post.snippet || undefined);
                 const cleanedTarget = cleanPostText(targetText);

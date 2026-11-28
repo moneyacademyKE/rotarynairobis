@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseEventDate, reformatEventText, extractVenue, formatExtractedDate } from "../../lib/twitter-parser";
+import { dateFromSnippet, parseEventDate, reformatEventText, extractVenue, formatExtractedDate } from "../../lib/twitter-parser";
 
 describe("Twitter Event Text Parsing & Formatting", () => {
   describe("parseEventDate", () => {
@@ -35,6 +35,52 @@ describe("Twitter Event Text Parsing & Formatting", () => {
       expect(date!.getFullYear()).toBe(2026);
       expect(date!.getMonth()).toBe(1); // Feb is 1
       expect(date!.getDate()).toBe(9);
+    });
+
+    // Live post 5853: the poster invites people to a 29 October fellowship, and the
+    // caption also mentions the January caravan that fellowship is planning. The
+    // badge follows the poster's own event, the soonest date, not the later one.
+    it("should follow the poster's own event when a caption also names a later date", () => {
+      const text = "The Caravan is slated for January 15th, 2027. Join us this Thursday. Thursday, 29th October";
+      const date = parseEventDate(text, "2026-10-29T13:25:43Z");
+      expect(date).not.toBeNull();
+      expect(date!.getFullYear()).toBe(2026);
+      expect(date!.getMonth()).toBe(9);
+      expect(date!.getDate()).toBe(29);
+    });
+
+    // Live post 3999: "4 decades" plus a bare "on Thursday" is not a date.
+    it("should not read 'decades' or a bare weekday as an event date", () => {
+      const text = "4 decades of building stuff. Now come to Social House on Thursday at 6:00 pm.";
+      expect(parseEventDate(text, "2026-08-03T20:42:51Z")).toBeNull();
+    });
+
+    // The classifier reads the poster. Its sentence names the real date even
+    // when the caption does not, so the badge takes it over the caption.
+    it("should read the date the classifier wrote into the snippet", () => {
+      const snippet = "The Rotary Club of Lavington will be hosting Eng. Michael Vallez to present on 'Africa Skills Revolution' at Social House from 06:00 PM on Thursday, August 6, 2026.";
+      const date = dateFromSnippet(snippet);
+      expect(date).not.toBeNull();
+      expect(date!.getFullYear()).toBe(2026);
+      expect(date!.getMonth()).toBe(7);
+      expect(date!.getDate()).toBe(6);
+      expect(dateFromSnippet("just a caption with no date")).toBeNull();
+    });
+
+    // The same sentence is rejected when its year never appears in the caption,
+    // because that year was guessed rather than read.
+    it("should reject a snippet year the caption does not state", () => {
+      const snippet = "The Rotary Club of Nairobi Madaraka will be hosting the 'Old School R&B Brunch Social' event at our fellowship venue from 11:00 AM on Saturday, February 27, 2027.";
+      const caption = "Save the date, to be confirmed. Let's come together for new Mums.";
+      expect(dateFromSnippet(snippet, caption)).toBeNull();
+      expect(dateFromSnippet(snippet, caption + " See you in 2027.")).not.toBeNull();
+    });
+
+    it("should still resolve 'this Thursday' against the post date", () => {
+      const date = parseEventDate("No fellowship this Thursday", "2026-05-19T12:00:00Z");
+      expect(date).not.toBeNull();
+      expect(date!.getMonth()).toBe(4);
+      expect(date!.getDate()).toBe(21);
     });
   });
 

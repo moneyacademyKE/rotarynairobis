@@ -32,35 +32,39 @@ export function parseEventDate(text: string, created_at?: string): Date | null {
     if (!isNaN(date.getTime())) return date;
   }
   
-  // 2. Month name followed by day
-  const regex1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})(?!\d)(?:st|nd|rd|th)?(?:\s*(?:,\s*)?(\d{4}))?/i;
-  const match1 = lowercase.match(regex1);
-  if (match1) {
-    const monthStr = match1[1].slice(0, 3).toLowerCase();
+  // 2 & 3. Every explicit calendar date in the caption. A month name must be a
+  // whole word, or "4 decades" reads as December. A caption can name more than
+  // one date (the fellowship this week, and the project months out): the badge
+  // follows the soonest one that is not already behind the post.
+  const dated: Date[] = [];
+  const monthWord = "january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec";
+  const calendar = new RegExp(
+    `\\b(?:(${monthWord})\\.?\\s+(\\d{1,2})|(\\d{1,2})(?:st|nd|rd|th)?(?:\\s+of)?\\s+(${monthWord}))\\b(?:\\s*(?:,\\s*)?(\\d{4}))?(?!\\d)`,
+    "gi",
+  );
+  for (const hit of lowercase.matchAll(calendar)) {
+    const monthStr = (hit[1] || hit[4]).slice(0, 3).toLowerCase();
     const monthIndex = months.indexOf(monthStr) % 12;
-    const day = parseInt(match1[2], 10);
-    const year = match1[3] ? parseInt(match1[3], 10) : baseDate.getFullYear();
+    const day = parseInt(hit[2] || hit[3], 10);
+    const year = hit[5] ? parseInt(hit[5], 10) : baseDate.getFullYear();
     const date = new Date(year, monthIndex, day);
-    if (!isNaN(date.getTime())) return date;
+    if (!isNaN(date.getTime()) && date.getMonth() === monthIndex) dated.push(date);
   }
-
-  // 3. Day followed by month name
-  const regex2 = /(\d{1,2})(?!\d)(?:st|nd|rd|th)?(?:\s+of)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*(?:\s*(?:,\s*)?(\d{4}))?/i;
-  const match2 = lowercase.match(regex2);
-  if (match2) {
-    const day = parseInt(match2[1], 10);
-    const monthStr = match2[2].slice(0, 3).toLowerCase();
-    const monthIndex = months.indexOf(monthStr) % 12;
-    const year = match2[3] ? parseInt(match2[3], 10) : baseDate.getFullYear();
-    const date = new Date(year, monthIndex, day);
-    if (!isNaN(date.getTime())) return date;
+  if (dated.length) {
+    const ahead = dated
+      .filter((date) => date >= new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate()))
+      .sort((a, b) => a.getTime() - b.getTime());
+    return (ahead[0] ?? dated[dated.length - 1]);
   }
 
   // 4. Explicit Relative Weekdays (e.g., "this Thursday", "coming Wednesday", "no fellowship this Tuesday")
   const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
   for (let i = 0; i < weekdays.length; i++) {
     const dayName = weekdays[i];
-    const regex = new RegExp(`\\b(?:this|coming|next|on|today's)\\s+${dayName}\\b`, "i");
+    // "this Thursday" is a date. A bare "on Thursday" is not: it is how a
+    // caption says "come on Thursday" with no week attached, and reading it
+    // as one stamps an event onto a Thursday months after it happened.
+    const regex = new RegExp(`\\b(?:this|coming|next|today's)\\s+${dayName}\\b`, "i");
     if (regex.test(lowercase) || lowercase.includes(`no fellowship this ${dayName}`)) {
       const baseDay = baseDate.getDay();
       let diff = i - baseDay;
@@ -96,6 +100,25 @@ export function parseEventDate(text: string, created_at?: string): Date | null {
   }
 
   return null;
+}
+
+// The classifier writes one sentence per poster, and that sentence ends with the
+// date it read off the poster: "...from 06:00 PM on Thursday, August 6, 2026."
+// That date beats the caption, which is social copy and names the wrong day.
+// The classifier sometimes invents a year the poster never states: a caption that
+// says "date to be confirmed" came back as February 2027. A year is only real
+// when the caption also states it.
+export function dateFromSnippet(snippet?: string | null, caption?: string | null): Date | null {
+  if (!snippet) return null;
+  const match = snippet.match(/\bon\s+[A-Za-z]+,\s+([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})/);
+  if (!match) return null;
+  const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+  const monthIndex = months.indexOf(match[1].toLowerCase());
+  if (monthIndex < 0) return null;
+  const year = parseInt(match[3], 10);
+  if (caption !== undefined && caption !== null && !caption.includes(String(year))) return null;
+  const date = new Date(year, monthIndex, parseInt(match[2], 10));
+  return isNaN(date.getTime()) ? null : date;
 }
 
 export function formatExtractedDate(date: Date | null): string {
